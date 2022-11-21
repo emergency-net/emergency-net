@@ -14,18 +14,10 @@ form.addEventListener('submit', event => {
     })
     .then(response => response.json())
     .then(data => {
-        const messageList = document.querySelector('#messages')
-        messageList.innerHTML = ''
-        for (const message of data) {
-            const newMessage = document.createElement('li')
-            newMessage.textContent = message
-            messageList.appendChild(newMessage)
-        }
-        
+        renderMessages(data)
     })
     .catch(error => {
-        const errorMessage = document.querySelector('#error')
-        errorMessage.textContent = error.message
+        renderError(error)
     })
 
     event.preventDefault()
@@ -34,15 +26,23 @@ form.addEventListener('submit', event => {
 fetch('/messages')
     .then(response => response.json())
     .then(data => {
-        const messageList = document.querySelector('#messages')
-        messageList.innerHTML = ''
-        for (const message of data) {
-            const newMessage = document.createElement('li')
-            newMessage.textContent = message
-            messageList.appendChild(newMessage)
-        }
+        renderMessages(data)
     })
     .catch(error => {
-        const errorMessage = document.querySelector('#error')
-        errorMessage.textContent = error.message
+        renderError(error)
     })
+
+function renderMessages(messages) {
+    const messageList = document.querySelector('#messages')
+    messageList.innerHTML = ''
+    for (const message of messages) {
+        const newMessage = document.createElement('li')
+        newMessage.textContent = message
+        messageList.appendChild(newMessage)
+    }
+}
+
+function renderError(error) {
+    const errorMessage = document.querySelector('#error')
+    errorMessage.textContent = error.message
+}
