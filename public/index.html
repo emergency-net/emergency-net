@@ -3,12 +3,19 @@
 <head>
     <meta charset="utf-8">
     <title>Index</title>
+
+    <script src="script.js" defer></script>
 </head>
 <body>
-    <form action="/send-message" method="post">
+    <ul id="messages">
+    </ul>
+
+    <form id="form">
         <label for="message">your message: </label>
         <input id="message" name="message" type="text">
-        <button type="submit">submit</button>
+        <button id="submit" type="submit">submit</button>
     </form>
+
+    <p id="error"></p>
 </body>
 </html>

@@ -10,14 +10,15 @@ app.use(serve('public'))
 
 const messages = []
 router.post('/send-message', koaBody(), async ctx => {
-    messages.push(ctx.request.body.message)
-    ctx.type = 'text/html'
-    ctx.body = ''
-    for (const message of messages) {
-        ctx.body += `<p>Your message was: ${message}<p>`
-    }
-    ctx.body += "<a href='/'><button>click to return</button></a>"
+    messages.push(`${ctx.request.ip} says: ${ctx.request.body.message}`)
+    console.log(ctx.request.body)
+    ctx.type = 'application/json'
+    ctx.body = messages
 })
+    .get('/messages', async ctx => {
+        ctx.type = 'application/json'
+        ctx.body = messages
+    })
 
 app.use(router.routes())
 
