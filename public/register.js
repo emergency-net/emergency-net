@@ -15,9 +15,9 @@ form.addEventListener('submit', event => {
         .then(data => {
             localStorage.setItem('token', data.token)
             document.body.innerHTML = ''
-                const para = document.createElement('p')
-                para.textContent = 'You are being redirected to the home page'
-                document.body.appendChild(para)
+            const para = document.createElement('p')
+            para.textContent = 'You are being redirected to the home page'
+            document.body.appendChild(para)
             setTimeout(() => {
                 window.location.href = '/'
             }, 5000);
@@ -33,4 +33,18 @@ form.addEventListener('submit', event => {
 function renderError(error) {
     const errorMessage = document.querySelector('#error')
     errorMessage.textContent = error.message
+}
+
+if (localStorage.getItem('token')) {
+    document.body.innerHTML = ''
+    const para1 = document.createElement('p')
+    para1.textContent = 'You are already registered.'
+
+    const para2 = document.createElement('p')
+    para2.textContent += ' Redirected to the home page.'
+    document.body.appendChild(para1)
+    document.body.appendChild(para2)
+    setTimeout(() => {
+        window.location.href = '/'
+    }, 5000);
 }

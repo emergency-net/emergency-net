@@ -19,7 +19,6 @@ app.use(serve('public', { extensions: ['html'] }))
 
 app.use(jwt({
     secret: (header, payload) => {
-        console.log(payload.iss);
         return 'shared-secret'
     }
 }).unless({ path: [/^\/register/] }))
@@ -28,6 +27,7 @@ const messages = new Set()
 
 router
     .post('/register', koaBody(), async ctx => {
+        
         const clientIP = ctx.request.ip.split(':').slice(-1)[0]
         let clientMac = null
         if (clientIP !== '1') { // if not localhost
