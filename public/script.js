@@ -43,12 +43,16 @@ fetch('/messages', {
     })
     .catch(() => {
         document.body.innerHTML = ''
+
         const para1 = document.createElement('p')
         para1.textContent = 'You need to register in order to send and read messages.'
+
         const para2 = document.createElement('p')
         para2.textContent = 'You are being redirected to the registration page.'
+
         document.body.appendChild(para1)
         document.body.appendChild(para2)
+        
         setTimeout(() => {
             window.location.href = '/register'
         }, 5000);

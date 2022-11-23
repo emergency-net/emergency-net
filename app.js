@@ -11,9 +11,18 @@ const arp = await import('node-arp');
 const app = new Koa()
 const router = new Router()
 
+const apMac = os.networkInterfaces()['Wi-Fi']
+    .find(addr => addr.family === 'IPv4')
+    .mac
+
 app.use(serve('public', { extensions: ['html'] }))
 
-app.use(jwt({ secret: 'shared-secret' }).unless({ path: [/^\/register/] }))
+app.use(jwt({
+    secret: (header, payload) => {
+        console.log(payload.iss);
+        return 'shared-secret'
+    }
+}).unless({ path: [/^\/register/] }))
 
 const messages = new Set()
 
@@ -30,7 +39,14 @@ router
                 }
             })
         }
-        const token = sign({ clientMac: clientMac }, 'shared-secret', { subject: ctx.request.body.username });
+        const token = sign({ clientMac: clientMac }, 'shared-secret', {
+            algorithm: 'HS512',
+            issuer: apMac,
+            header: {
+                typ: 'JWT'
+            },
+            subject: ctx.request.body.username
+        })
         ctx.type = 'application/json'
         ctx.body = {
             username: ctx.request.body.username,
@@ -38,11 +54,6 @@ router
         }
     })
     .post('/send-message', koaBody(), async ctx => {
-        const apMac = os.networkInterfaces()['Wi-Fi']
-            .find(addr => addr.family === 'IPv4')
-            .mac
-
-        console.log(ctx.state.user)
         messages.add(`From: ${ctx.state.user.sub}@${ctx.state.user.clientMac ?? 'localhost'}\nTo: ${apMac}\nAt: ${new Date()}\nMessage: ${ctx.request.body.message}`)
         ctx.type = 'application/json'
         ctx.body = JSON.stringify(Array.from(messages))
