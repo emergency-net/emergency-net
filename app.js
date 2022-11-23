@@ -2,22 +2,54 @@ import Koa from 'koa'
 import serve from 'koa-static'
 import { koaBody } from 'koa-body'
 import Router from '@koa/router'
+import jwt from 'koa-jwt'
+import pkg from 'jsonwebtoken';
+const { sign } = pkg;
+const os = await import('node:os');
+const arp = await import('node-arp');
 
 const app = new Koa()
 const router = new Router()
 
-app.use(serve('public'))
+app.use(serve('public', { extensions: ['html'] }))
 
-const messages = []
-router.post('/send-message', koaBody(), async ctx => {
-    messages.push(`${ctx.request.ip} says: ${ctx.request.body.message}`)
-    console.log(ctx.request.body)
-    ctx.type = 'application/json'
-    ctx.body = messages
-})
+app.use(jwt({ secret: 'shared-secret' }).unless({ path: [/^\/register/] }))
+
+const messages = new Set()
+
+router
+    .post('/register', koaBody(), async ctx => {
+        const clientIP = ctx.request.ip.split(':').slice(-1)[0]
+        let clientMac = null
+        if (clientIP !== '1') { // if not localhost
+            arp.getMAC(clientIP, (err, mac) => {
+                if (!err) {
+                    clientMac = mac
+                } else {
+                    console.log(err)
+                }
+            })
+        }
+        const token = sign({ clientMac: clientMac }, 'shared-secret', { subject: ctx.request.body.username });
+        ctx.type = 'application/json'
+        ctx.body = {
+            username: ctx.request.body.username,
+            token: token
+        }
+    })
+    .post('/send-message', koaBody(), async ctx => {
+        const apMac = os.networkInterfaces()['Wi-Fi']
+            .find(addr => addr.family === 'IPv4')
+            .mac
+
+        console.log(ctx.state.user)
+        messages.add(`From: ${ctx.state.user.sub}@${ctx.state.user.clientMac ?? 'localhost'}\nTo: ${apMac}\nAt: ${new Date()}\nMessage: ${ctx.request.body.message}`)
+        ctx.type = 'application/json'
+        ctx.body = JSON.stringify(Array.from(messages))
+    })
     .get('/messages', async ctx => {
         ctx.type = 'application/json'
-        ctx.body = messages
+        ctx.body = JSON.stringify(Array.from(messages))
     })
 
 app.use(router.routes())
