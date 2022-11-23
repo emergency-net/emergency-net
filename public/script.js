@@ -19,7 +19,6 @@ form.addEventListener('submit', event => {
     .then(data => {
         if (data instanceof Array) {
             renderMessages(data)
-            localStorage.setItem('messages', data)
         }
     })
     .catch(error => {
@@ -38,7 +37,6 @@ fetch('/messages', {
     .then(data => {
         if (data instanceof Array) {
             renderMessages(data)
-            localStorage.setItem('messages', data)
         }
     })
     .catch(() => {
