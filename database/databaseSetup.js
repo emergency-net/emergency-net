@@ -10,7 +10,8 @@ let db = new sqlite3.Database('Emergency-Net-DB.db', (err)=>{
 });
 
 db.run(`CREATE TABLE public_keys (mac_id text PRIMARY KEY,
-                                public_key text NOT NULL);`);
+                                public_key text NOT NULL,
+                                private_key text);`);
 
 
 
@@ -33,7 +34,7 @@ for(let i = 0; i<AP_count; i++){
              {
                 let mac = "mac_".concat(i);
                 console.log(mac);
-               db.run(`INSERT INTO public_keys (mac_id, public_key) VALUES (?, ?);`, mac, publicKey);
+               db.run(`INSERT INTO public_keys (mac_id, public_key, private_key) VALUES (?, ?, ?);`, mac, publicKey, privateKey);
              }
              else
              {
