@@ -1,6 +1,9 @@
 const form = document.querySelector('#form')
 
-const keyPair = await window.crypto.subtle.generateKey(
+// generate key pair
+let publicKey
+let privateKey
+window.crypto.subtle.generateKey(
     {
         name: "RSA-OAEP",
         modulusLength: 4096,
@@ -9,18 +12,43 @@ const keyPair = await window.crypto.subtle.generateKey(
     },
     true,
     ["encrypt", "decrypt"]
-)
+).then(keyPair => {
+    privateKey = keyPair.privateKey
 
-const publicKey = await window.crypto.subtle.exportKey(
-    'jwk',
-    keyPair.publicKey
-)
+    window.crypto.subtle.exportKey(
+        'jwk',
+        keyPair.publicKey
+    ).then(publicKeyResult => {
+        publicKey = publicKeyResult
+        console.log(publicKey)
+    })
+    // Save the private key to the IndexedDB
+    // const request = indexedDB.open('privateKeyDB')
+    // request.onerror = function (event) {
+    //     console.error(event.target.errorCode)
+    // }
+    // request.onsuccess = function (event) {
+    //     db = event.target.result
 
-localStorage.setItem('privateKey', keyPair.privateKey)
+    //     const transaction = db.transaction(['privateKeys'], 'readwrite')
+    //     const privateKeyStore = transaction.objectStore('privateKeys')
+    //     const addRequest = privateKeyStore.add(keyPair.privateKey)
+    //     addRequest.onsuccess = function () {
+    //         console.log('saved the private key to the IDB');
+    //     }
+    // }
+    // request.onupgradeneeded = function (event) {
+    //     db = event.target.result
+
+    //     db.createObjectStore('privateKeys', { autoIncrement: true })
+    // }
+})
+
 
 form.addEventListener('submit', event => {
     const username = document.querySelector('#username').value
-    const data = { username: username, publicKey: publicKey }
+    console.log(publicKey)
+    const data = { username: username, publicKey: JSON.stringify(publicKey) }
 
     fetch('/register', {
         method: 'POST',
@@ -31,19 +59,46 @@ form.addEventListener('submit', event => {
     })
         .then(response => response.json())
         .then(data => {
-            localStorage.setItem('token', data.token)
+            console.log(privateKey)
+            console.log(data)
+            console.log(base64ToArrayBuffer(data.encryptedToken))
 
-            document.body.innerHTML = ''
+            window.crypto.subtle.decrypt(
+                { name: "RSA-OAEP" },
+                privateKey,
+                base64ToArrayBuffer(data.encryptedToken)
+            ).then(decrypted => {
+                const tokenAndDate = new TextDecoder().decode(decrypted).split(';')
+                if (Date.parse(tokenAndDate[1]) + 30000 < Date.now()) {
+                    document.body.innerHTML = ''
 
-            const para = document.createElement('p')
-            para.textContent = 'You are being redirected to the home page'
+                    const para = document.createElement('p')
+                    para.textContent = 'Time Out. Try Again.'
 
-            document.body.appendChild(para)
+                    document.body.appendChild(para)
 
-            setTimeout(() => {
-                window.location.href = '/'
-            }, 4000);
+                    setTimeout(() => {
+                        window.location.href = '/register'
+                    }, 4000);
+                }
 
+                
+                localStorage.setItem('token', tokenAndDate[0])
+
+                document.body.innerHTML = ''
+
+                const para = document.createElement('p')
+                para.textContent = 'Successfully registered. You are being redirected to the home page'
+
+                document.body.appendChild(para)
+
+                setTimeout(() => {
+                    window.location.href = '/'
+                }, 4000)
+            })
+                .catch(err => {
+                    console.log(err)
+                })
         })
         .catch(error => {
             renderError(error)
@@ -55,6 +110,8 @@ form.addEventListener('submit', event => {
 function renderError(error) {
     const errorMessage = document.querySelector('#error')
     errorMessage.textContent = error.message
+    console.log(typeof (error))
+    console.log(error.message)
 }
 
 if (localStorage.getItem('token')) {
@@ -72,4 +129,14 @@ if (localStorage.getItem('token')) {
     setTimeout(() => {
         window.location.href = '/'
     }, 4000);
+}
+
+function base64ToArrayBuffer(base64) {
+    const binary_string = window.atob(base64);
+    const len = binary_string.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
 }

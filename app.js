@@ -52,20 +52,25 @@ router
         })
 
         const clientPublicKey = crypto.createPublicKey(
-            ctx.request.body.publicKey,
-            'jwk'
+            {
+                key: JSON.parse(ctx.request.body.publicKey),
+                format: 'jwk'
+            }
         )
 
         const encrypted = crypto.publicEncrypt(
-            clientPublicKey,
-            token + new Date().toString()
+            {
+                key: clientPublicKey,
+                oaepHash: 'SHA-512',
+                padding: crypto.constants.RSA_PKCS1_OAEP_PADDING
+            },
+            Buffer.from(token + ';' + new Date().toString())
         ).toString('base64')
-
 
         ctx.type = 'application/json'
         ctx.body = {
             username: ctx.request.body.username,
-            token: encrypted
+            encryptedToken: encrypted
         }
     })
     .post('/send-message', koaBody(), async ctx => {
@@ -81,3 +86,4 @@ router
 app.use(router.routes())
 
 app.listen(3000)
+
