@@ -31,24 +31,34 @@ request.onerror = function (event) {
     console.error(event.target.errorCode)
 }
 
-let messages = new Set()
+
 
 request.onupgradeneeded = function (event) {
     db = event.target.result
 
-    const messageStore = db.createObjectStore('messages_os', { keyPath: 'name' })
+    db.createObjectStore('messages_os', { keyPath: 'name' })
+}
+
+let messages = new Set()
+
+request.onsuccess = function (event) {
+    db = event.target.result
+
+    const transaction = db.transaction(['messages_os'], 'readonly')
+    const messageStore = transaction.objectStore('messages_os')
 
     const getRequest = messageStore.get('messages')
     getRequest.onsuccess = function () {
         if (getRequest.result) {
             messages = getRequest.result.data
+            console.log(getRequest.result.data)
         }
 
         fetch('/messages', {
             method: 'POST',
             headers: headers,
             body: {
-                messages: JSON.stringify(Array.from(messages))
+                messages: Array.from(messages)
             }
         })
             .then(response => response.json())
@@ -62,10 +72,6 @@ request.onupgradeneeded = function (event) {
                 console.log(error.message)
             })
     }
-}
-
-request.onsuccess = function (event) {
-    db = event.target.result
 
     form.addEventListener('submit', event => {
         const message = document.querySelector('#message').value
@@ -86,12 +92,12 @@ request.onsuccess = function (event) {
                     const messageStore = transaction.objectStore('messages_os')
                     const putRequest = messageStore.put({
                         name: 'messages',
-                        data: Array.from(messages)
+                        data: messages
                     })
                     putRequest.onsuccess = function () {
                         console.log('saved the messages to the IDB');
                     }
-                    renderMessages(data)
+                    renderMessages(messages)
                 }
             })
             .catch(error => {
