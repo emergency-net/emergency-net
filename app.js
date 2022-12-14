@@ -8,6 +8,11 @@ const { sign } = pkg;
 const os = await import('node:os');
 const arp = await import('node-arp');
 const crypto = await import('node:crypto')
+var fs = await import('fs');
+var path = await import('path');
+var http = await import('http');
+var https = await import('https');
+
 
 const app = new Koa()
 const router = new Router()
@@ -51,9 +56,10 @@ router
             subject: ctx.request.body.username
         })
 
+        console.log(ctx.request.body)
         const clientPublicKey = crypto.createPublicKey(
             {
-                key: JSON.parse(ctx.request.body.publicKey),
+                key: ctx.request.body.publicKey,
                 format: 'jwk'
             }
         )
@@ -64,7 +70,7 @@ router
                 oaepHash: 'SHA-512',
                 padding: crypto.constants.RSA_PKCS1_OAEP_PADDING
             },
-            Buffer.from(token + ';' + new Date().toString())
+            token + ';' + new Date().toString()
         ).toString('base64')
 
         ctx.type = 'application/json'
@@ -74,7 +80,6 @@ router
         }
     })
     .post('/send-message', koaBody(), async ctx => {
-        console.log(ctx.request.body.messages);
         for (const message of ctx.request.body.messages) {
             messages.add(message)
         }
@@ -83,15 +88,62 @@ router
         ctx.body = JSON.stringify(Array.from(messages))
     })
     .post('/messages', koaBody(), async ctx => {
-        console.log(ctx.request.body.messages)
         for (const message of ctx.request.body.messages) {
             messages.add(message)
         }
         ctx.type = 'application/json'
-        ctx.body = JSON.stringify(Array.from(messages))
+        ctx.body = Array.from(messages)
     })
 
 app.use(router.routes())
 
-app.listen(3000)
+var config = {
+    domain: 'localhost',
+    http: {
+      port: 8443,
+    },
+    https: {
+      port: 3000,
+      options: {
+        key: fs.readFileSync(path.resolve(process.cwd(), 'server.key'), 'utf8').toString(),
+        cert: fs.readFileSync(path.resolve(process.cwd(), 'server.pem'), 'utf8').toString(),
+      },
+    },
+  };
+  
+  let serverCallback = app.callback();
+  try {
+    var httpServer = http.createServer(serverCallback);
+    httpServer
+      .listen(config.http.port, function(err) {
+        if (!!err) {
+          console.error('HTTP server FAIL: ', err, (err && err.stack));
+        }
+        else {
+          console.log(`HTTP  server OK: http://${config.domain}:${config.http.port}`);
+        }
+      });
+  }
+  catch (ex) {
+    console.error('Failed to start HTTP server\n', ex, (ex && ex.stack));
+  }
+  try {
+    var httpsServer = https.createServer(config.https.options, serverCallback);
+    httpsServer
+      .listen(config.https.port, function(err) {
+        if (!!err) {
+          console.error('HTTPS server FAIL: ', err, (err && err.stack));
+        }
+        else {
+          console.log(`HTTPS server OK: https://${config.domain}:${config.https.port}`);
+        }
+      });
+  }
+  catch (ex) {
+    console.error('Failed to start HTTPS server\n', ex, (ex && ex.stack));
+  }
+  
+  export default app
+
+//app.listen(3000)
 

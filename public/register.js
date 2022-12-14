@@ -20,7 +20,6 @@ window.crypto.subtle.generateKey(
         keyPair.publicKey
     ).then(publicKeyResult => {
         publicKey = publicKeyResult
-        console.log(publicKey)
     })
 })
 
@@ -28,7 +27,7 @@ window.crypto.subtle.generateKey(
 form.addEventListener('submit', event => {
     const username = document.querySelector('#username').value
     console.log(publicKey)
-    const data = { username: username, publicKey: JSON.stringify(publicKey) }
+    const data = { username: username, publicKey: publicKey }
 
     fetch('/register', {
         method: 'POST',
@@ -39,9 +38,6 @@ form.addEventListener('submit', event => {
     })
         .then(response => response.json())
         .then(data => {
-            console.log(privateKey)
-            console.log(data)
-            console.log(base64ToArrayBuffer(data.encryptedToken))
 
             window.crypto.subtle.decrypt(
                 { name: "RSA-OAEP" },
@@ -90,8 +86,6 @@ form.addEventListener('submit', event => {
 function renderError(error) {
     const errorMessage = document.querySelector('#error')
     errorMessage.textContent = error.message
-    console.log(typeof (error))
-    console.log(error.message)
 }
 
 if (localStorage.getItem('token')) {

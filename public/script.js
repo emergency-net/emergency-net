@@ -3,7 +3,7 @@ const form = document.querySelector('#form')
 const token = localStorage.getItem('token')
 
 const headers = {}
-
+headers['Content-Type'] = 'application/json'
 if (token) {
     headers.Authorization = 'Bearer ' + token
 } else {
@@ -53,13 +53,14 @@ request.onsuccess = function (event) {
             messages = getRequest.result.data
             console.log(getRequest.result.data)
         }
-
+        const data = {
+            foo: 'bar',
+            messages: Array.from(messages)
+        }
         fetch('/messages', {
             method: 'POST',
             headers: headers,
-            body: {
-                messages: Array.from(messages)
-            }
+            body: JSON.stringify(data)
         })
             .then(response => response.json())
             .then(data => {
@@ -76,7 +77,7 @@ request.onsuccess = function (event) {
     form.addEventListener('submit', event => {
         const message = document.querySelector('#message').value
         const data = { message: message, messages: Array.from(messages) }
-        headers['Content-Type'] = 'application/json'
+        
         fetch('/send-message', {
             method: 'POST',
             headers: headers,
