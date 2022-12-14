@@ -22,26 +22,6 @@ window.crypto.subtle.generateKey(
         publicKey = publicKeyResult
         console.log(publicKey)
     })
-    // Save the private key to the IndexedDB
-    // const request = indexedDB.open('privateKeyDB')
-    // request.onerror = function (event) {
-    //     console.error(event.target.errorCode)
-    // }
-    // request.onsuccess = function (event) {
-    //     db = event.target.result
-
-    //     const transaction = db.transaction(['privateKeys'], 'readwrite')
-    //     const privateKeyStore = transaction.objectStore('privateKeys')
-    //     const addRequest = privateKeyStore.add(keyPair.privateKey)
-    //     addRequest.onsuccess = function () {
-    //         console.log('saved the private key to the IDB');
-    //     }
-    // }
-    // request.onupgradeneeded = function (event) {
-    //     db = event.target.result
-
-    //     db.createObjectStore('privateKeys', { autoIncrement: true })
-    // }
 })
 
 

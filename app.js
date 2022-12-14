@@ -12,7 +12,7 @@ const crypto = await import('node:crypto')
 const app = new Koa()
 const router = new Router()
 
-const apMac = os.networkInterfaces()['Wi-Fi']
+const apMac = os.networkInterfaces()['wlp0s20f3']
     .find(addr => addr.family === 'IPv4')
     .mac
 
@@ -74,11 +74,19 @@ router
         }
     })
     .post('/send-message', koaBody(), async ctx => {
+        console.log(ctx.request.body.messages);
+        for (const message of ctx.request.body.messages) {
+            messages.add(message)
+        }
         messages.add(`From: ${ctx.state.user.sub}@${ctx.state.user.clientMac ?? 'localhost'}\nTo: ${apMac}\nAt: ${new Date()}\nMessage: ${ctx.request.body.message}`)
         ctx.type = 'application/json'
         ctx.body = JSON.stringify(Array.from(messages))
     })
-    .get('/messages', async ctx => {
+    .post('/messages', koaBody(), async ctx => {
+        console.log(ctx.request.body.messages)
+        for (const message of ctx.request.body.messages) {
+            messages.add(message)
+        }
         ctx.type = 'application/json'
         ctx.body = JSON.stringify(Array.from(messages))
     })
