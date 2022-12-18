@@ -17,7 +17,7 @@ var https = await import('https');
 const app = new Koa()
 const router = new Router()
 
-const apMac = os.networkInterfaces()['wlp0s20f3']
+const apMac = os.networkInterfaces()['Wi-Fi']
     .find(addr => addr.family === 'IPv4')
     .mac
 

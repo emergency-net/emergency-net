@@ -3,7 +3,7 @@ const form = document.querySelector('#form')
 // generate key pair
 let publicKey
 let privateKey
-window.crypto.subtle.generateKey(
+crypto.subtle.generateKey(
     {
         name: "RSA-OAEP",
         modulusLength: 4096,
@@ -15,12 +15,12 @@ window.crypto.subtle.generateKey(
 ).then(keyPair => {
     privateKey = keyPair.privateKey
 
-    window.crypto.subtle.exportKey(
+    return crypto.subtle.exportKey(
         'jwk',
         keyPair.publicKey
-    ).then(publicKeyResult => {
-        publicKey = publicKeyResult
-    })
+    )
+}).then(publicKeyResult => {
+    publicKey = publicKeyResult
 })
 
 
@@ -38,43 +38,40 @@ form.addEventListener('submit', event => {
     })
         .then(response => response.json())
         .then(data => {
-
-            window.crypto.subtle.decrypt(
+            return crypto.subtle.decrypt(
                 { name: "RSA-OAEP" },
                 privateKey,
                 base64ToArrayBuffer(data.encryptedToken)
-            ).then(decrypted => {
-                const tokenAndDate = new TextDecoder().decode(decrypted).split(';')
-                if (Date.parse(tokenAndDate[1]) + 30000 < Date.now()) {
-                    document.body.innerHTML = ''
-
-                    const para = document.createElement('p')
-                    para.textContent = 'Time Out. Try Again.'
-
-                    document.body.appendChild(para)
-
-                    setTimeout(() => {
-                        window.location.href = '/register'
-                    }, 4000);
-                }
-
-                
-                localStorage.setItem('token', tokenAndDate[0])
-
+            )
+        })
+        .then(decrypted => {
+            const tokenAndDate = new TextDecoder().decode(decrypted).split(';')
+            
+            if (Date.parse(tokenAndDate[1]) + 30000 < Date.now()) {
                 document.body.innerHTML = ''
 
                 const para = document.createElement('p')
-                para.textContent = 'Successfully registered. You are being redirected to the home page'
+                para.textContent = 'Time Out. Try Again.'
 
                 document.body.appendChild(para)
 
                 setTimeout(() => {
-                    window.location.href = '/'
-                }, 4000)
-            })
-                .catch(err => {
-                    console.log(err)
-                })
+                    window.location.href = '/register'
+                }, 4000);
+            }
+
+            localStorage.setItem('token', tokenAndDate[0])
+
+            document.body.innerHTML = ''
+
+            const para = document.createElement('p')
+            para.textContent = 'Successfully registered. You are being redirected to the home page'
+
+            document.body.appendChild(para)
+
+            setTimeout(() => {
+                window.location.href = '/'
+            }, 4000)
         })
         .catch(error => {
             renderError(error)
