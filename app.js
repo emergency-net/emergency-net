@@ -17,7 +17,7 @@ var https = await import('https');
 const app = new Koa()
 const router = new Router()
 
-const apMac = os.networkInterfaces()['Wi-Fi']
+const apMac = os.networkInterfaces()['wlp0s20f3']
     .find(addr => addr.family === 'IPv4')
     .mac
 
@@ -56,27 +56,27 @@ router
             subject: ctx.request.body.username
         })
 
-        console.log(ctx.request.body)
-        const clientPublicKey = crypto.createPublicKey(
-            {
-                key: ctx.request.body.publicKey,
-                format: 'jwk'
-            }
-        )
+        // console.log(ctx.request.body)
+        // const clientPublicKey = crypto.createPublicKey(
+        //     {
+        //         key: ctx.request.body.publicKey,
+        //         format: 'jwk'
+        //     }
+        // )
 
-        const encrypted = crypto.publicEncrypt(
-            {
-                key: clientPublicKey,
-                oaepHash: 'SHA-512',
-                padding: crypto.constants.RSA_PKCS1_OAEP_PADDING
-            },
-            token + ';' + new Date().toString()
-        ).toString('base64')
+        // const encrypted = crypto.publicEncrypt(
+        //     {
+        //         key: clientPublicKey,
+        //         oaepHash: 'SHA-512',
+        //         padding: crypto.constants.RSA_PKCS1_OAEP_PADDING
+        //     },
+        //     token + ';' + new Date().toString()
+        // ).toString('base64')
 
         ctx.type = 'application/json'
         ctx.body = {
             username: ctx.request.body.username,
-            encryptedToken: encrypted
+            token: token
         }
     })
     .post('/send-message', koaBody(), async ctx => {

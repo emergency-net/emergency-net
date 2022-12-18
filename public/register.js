@@ -1,33 +1,32 @@
 const form = document.querySelector('#form')
 
 // generate key pair
-let publicKey
-let privateKey
-crypto.subtle.generateKey(
-    {
-        name: "RSA-OAEP",
-        modulusLength: 4096,
-        publicExponent: new Uint8Array([1, 0, 1]),
-        hash: "SHA-512"
-    },
-    true,
-    ["encrypt", "decrypt"]
-).then(keyPair => {
-    privateKey = keyPair.privateKey
+// let publicKey
+// let privateKey
+// crypto.subtle.generateKey(
+//     {
+//         name: "RSA-OAEP",
+//         modulusLength: 4096,
+//         publicExponent: new Uint8Array([1, 0, 1]),
+//         hash: "SHA-512"
+//     },
+//     true,
+//     ["encrypt", "decrypt"]
+// ).then(keyPair => {
+//     privateKey = keyPair.privateKey
 
-    return crypto.subtle.exportKey(
-        'jwk',
-        keyPair.publicKey
-    )
-}).then(publicKeyResult => {
-    publicKey = publicKeyResult
-})
+//     return crypto.subtle.exportKey(
+//         'jwk',
+//         keyPair.publicKey
+//     )
+// }).then(publicKeyResult => {
+//     publicKey = publicKeyResult
+// })
 
 
 form.addEventListener('submit', event => {
     const username = document.querySelector('#username').value
-    console.log(publicKey)
-    const data = { username: username, publicKey: publicKey }
+    const data = { username: username }
 
     fetch('/register', {
         method: 'POST',
@@ -38,29 +37,7 @@ form.addEventListener('submit', event => {
     })
         .then(response => response.json())
         .then(data => {
-            return crypto.subtle.decrypt(
-                { name: "RSA-OAEP" },
-                privateKey,
-                base64ToArrayBuffer(data.encryptedToken)
-            )
-        })
-        .then(decrypted => {
-            const tokenAndDate = new TextDecoder().decode(decrypted).split(';')
-            
-            if (Date.parse(tokenAndDate[1]) + 30000 < Date.now()) {
-                document.body.innerHTML = ''
-
-                const para = document.createElement('p')
-                para.textContent = 'Time Out. Try Again.'
-
-                document.body.appendChild(para)
-
-                setTimeout(() => {
-                    window.location.href = '/register'
-                }, 4000);
-            }
-
-            localStorage.setItem('token', tokenAndDate[0])
+            localStorage.setItem('token', data.token)
 
             document.body.innerHTML = ''
 
@@ -73,6 +50,24 @@ form.addEventListener('submit', event => {
                 window.location.href = '/'
             }, 4000)
         })
+        // .then(decrypted => {
+        //     const tokenAndDate = new TextDecoder().decode(decrypted).split(';')
+            
+        //     if (Date.parse(tokenAndDate[1]) + 30000 < Date.now()) {
+        //         document.body.innerHTML = ''
+
+        //         const para = document.createElement('p')
+        //         para.textContent = 'Time Out. Try Again.'
+
+        //         document.body.appendChild(para)
+
+        //         setTimeout(() => {
+        //             window.location.href = '/register'
+        //         }, 4000);
+        //     }
+
+            
+        // })
         .catch(error => {
             renderError(error)
         })
