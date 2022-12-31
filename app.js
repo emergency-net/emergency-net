@@ -8,8 +8,6 @@ import pkg from 'jsonwebtoken'
 const { sign } = pkg
 
 import os from 'node:os'
-import crypto from 'node:crypto'
-const webcrypto = crypto.webcrypto
 
 import https from 'node:https'
 import fs from 'node:fs'
