@@ -31,21 +31,24 @@ app.use(jwt({
 })
     .unless({ path: [/^\/register/] }))
 
-const messages = new Set()
-const users = new Map()
+const messages = new Map([
+    ['1', new Map()],
+    ['2', new Map()],
+    ['3', new Map()]
+])
+const users = new Set()
 
 router
     .post('/register', koaBody(), async ctx => {
         ctx.type = 'application/json'
-        let token = users.get(ctx.request.body.username)
-        if (token) {
+        if (users.has(ctx.request.body.username)) {
             ctx.body = {
                 username: ctx.request.body.username,
-                token: token,
+                token: null,
                 error: true
             }
         } else {
-            token = sign({}, 'shared-secret', {
+            const token = sign({}, 'shared-secret', {
                 algorithm: 'HS512',
                 issuer: apMac,
                 header: {
@@ -54,7 +57,7 @@ router
                 subject: ctx.request.body.username
             })
 
-            users.set(ctx.request.body.username, token)
+            users.add(ctx.request.body.username)
 
             ctx.body = {
                 username: ctx.request.body.username,
@@ -63,20 +66,31 @@ router
             }
         }
     })
-    .post('/send-message', koaBody(), async ctx => {
-        for (const message of ctx.request.body.messages) {
-            messages.add(message)
-        }
-        messages.add(`From: ${ctx.state.user.sub}@${ctx.state.user.clientMac ?? 'localhost'}\nTo: ${apMac}\nAt: ${new Date()}\nMessage: ${ctx.request.body.message}`)
+    .post('/new-message/:ch', koaBody(), async ctx => {
+        messages.get(ctx.params.ch)
+            .set(
+                [new Date().toISOString(), ctx.state.user.sub, ctx.state.user.iss].join(';'),
+                ctx.request.body.message
+            )
         ctx.type = 'application/json'
-        ctx.body = JSON.stringify(Array.from(messages))
+        ctx.body = JSON.stringify(Array.from(messages.get(ctx.params.ch)))
     })
-    .post('/messages', koaBody(), async ctx => {
-        for (const message of ctx.request.body.messages) {
-            messages.add(message)
-        }
+    .get('/sync/:ch', async ctx => {
         ctx.type = 'application/json'
-        ctx.body = Array.from(messages)
+        ctx.body = JSON.stringify(Array.from(messages.get(ctx.params.ch).keys()))
+    })
+    .post('/messages/:ch', koaBody(), async ctx => {
+        const messagesNeeded = new Map()
+        for (const key of ctx.request.body.keysNeeded) {
+            messagesNeeded.set(key, messages.get(ctx.params.ch).get(key))
+        }
+
+        for (const message of ctx.request.body.newMessages) {
+            messages.get(ctx.params.ch).set(message[0], message[1])
+        }
+
+        ctx.type = 'application/json'
+        ctx.body = JSON.stringify(Array.from(messagesNeeded))
     })
 
 app.use(router.routes())

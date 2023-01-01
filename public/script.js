@@ -1,9 +1,7 @@
-const form = document.querySelector('#form')
-
 const token = localStorage.getItem('token')
-
-const headers = {}
-headers['Content-Type'] = 'application/json'
+const headers = {
+    'Content-Type': 'application/json'
+}
 if (token) {
     headers.Authorization = 'Bearer ' + token
 } else {
@@ -31,63 +29,35 @@ request.onerror = function (event) {
     console.error(event.target.errorCode)
 }
 
-
-
 request.onupgradeneeded = function (event) {
     db = event.target.result
-
     db.createObjectStore('messages_os', { keyPath: 'name' })
 }
 
-let messages = new Set()
+let messages = new Map([
+    ['1', new Map()],
+    ['2', new Map()],
+    ['3', new Map()]
+])
 
 request.onsuccess = function (event) {
     db = event.target.result
 
-    const transaction = db.transaction(['messages_os'], 'readonly')
-    const messageStore = transaction.objectStore('messages_os')
+    for (let i = 1; i <= 3; i++) {
+        const form = document.querySelector(`#form-ch${i}`)
+        form.addEventListener('submit', event => {
+            const message = document.querySelector(`#message-ch${i}`).value
+            const data = { message: message }
 
-    const getRequest = messageStore.get('messages')
-    getRequest.onsuccess = function () {
-        if (getRequest.result) {
-            messages = getRequest.result.data
-            console.log(getRequest.result.data)
-        }
-        const data = {
-            foo: 'bar',
-            messages: Array.from(messages)
-        }
-        fetch('/messages', {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(data)
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-                if (data instanceof Array) {
-                    renderMessages(data)
-                }
+            fetch(`/new-message/${i}`, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(data)
             })
-            .catch(error => {
-                console.log(error.message)
-            })
-    }
-
-    form.addEventListener('submit', event => {
-        const message = document.querySelector('#message').value
-        const data = { message: message, messages: Array.from(messages) }
-        
-        fetch('/send-message', {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(data)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data instanceof Array) {
+                .then(response => response.json())
+                .then(data => {
                     for (const message of data) {
-                        messages.add(message)
+                        messages.get(i.toString()).set(message[0], message[1])
                     }
                     const transaction = db.transaction(['messages_os'], 'readwrite')
                     const messageStore = transaction.objectStore('messages_os')
@@ -98,26 +68,92 @@ request.onsuccess = function (event) {
                     putRequest.onsuccess = function () {
                         console.log('saved the messages to the IDB');
                     }
-                    renderMessages(messages)
-                }
+                    renderMessages(messages, i.toString())
+                })
+                .catch(error => {
+                    renderError(error)
+                })
+
+            event.preventDefault()
+        })
+
+        document.querySelector(`#sync-ch${i}`).addEventListener('click', event => {
+            event.preventDefault()
+
+            fetch(`/sync/${i}`, {
+                method: 'GET',
+                headers: headers
             })
-            .catch(error => {
-                renderError(error)
-            })
-    
-        event.preventDefault()
-    })
+                .then(response => response.json())
+                .then(keys => {
+                    let keysNeeded = []
+                    const existingKeys = []
+
+                    let transaction = db.transaction(['messages_os'], 'readwrite')
+                    let messageStore = transaction.objectStore('messages_os')
+                    const getRequest = messageStore.get('messages')
+                    getRequest.onsuccess = function (event) {
+                        console.log(event.target.result)
+                        const newMessages = new Map()
+                        if (event.target.result) {
+                            messages = event.target.result.data
+                            for (const key of keys) {
+                                debugger
+                                if (!messages.get(i.toString()).has(key)) {
+                                    debugger
+                                    keysNeeded.push(key)
+                                } else {
+                                    existingKeys.push(key)
+                                }
+                            }
+
+                            for (const key of messages.get(i.toString()).keys()) {
+                                if (!existingKeys.includes(key)) {
+                                    newMessages.set(key, messages.get(i.toString()).get(key))
+                                }
+                            }
+                        } else {
+                            keysNeeded = keys  // if there are no messages stored in the browser, request all messages  
+                        }
+
+                        fetch(`/messages/${i}`, {
+                            method: 'POST',
+                            headers: headers,
+                            body: JSON.stringify({
+                                keysNeeded: keysNeeded,
+                                newMessages: Array.from(newMessages)
+                            })
+                        })
+                            .then(response => response.json())
+                            .then(messagesNeeded => {
+                                for (const message of messagesNeeded) {
+                                    messages.get(i.toString()).set(message[0], message[1])
+                                }
+                                transaction = db.transaction(['messages_os'], 'readwrite')
+                                messageStore = transaction.objectStore('messages_os')
+                                const putRequest = messageStore.put({
+                                    name: 'messages',
+                                    data: messages
+                                })
+                                putRequest.onsuccess = function () {
+                                    console.log('saved the messages to the IDB');
+                                }
+                                renderMessages(messages, i.toString())
+                            })
+                    }
+                })
+                .catch(error => renderError(error))
+        })
+    }
 }
 
-
-
-
-function renderMessages(messages) {
-    const messageList = document.querySelector('#messages')
+function renderMessages(messages, ch) {
+    const messageList = document.querySelector(`#messages-ch${ch}`)
     messageList.innerHTML = ''
-    for (const message of messages) {
+    for (const message of messages.get(ch)) {
         const newMessage = document.createElement('li')
-        newMessage.textContent = message
+        messageContents = message[0].split(';')
+        newMessage.textContent = `${messageContents[1]}@${messageContents[2]} at ${new Date(messageContents[0]).toLocaleString()}: ${message[1]}`
         messageList.appendChild(newMessage)
     }
 }

@@ -30,20 +30,22 @@ form.addEventListener('submit', event => {
     })
         .then(response => response.json())
         .then(data => {
-            localStorage.setItem('token', data.token)
             document.body.innerHTML = ''
             const para = document.createElement('p')
             if (data.error) {
-                para.textContent = `The username ${data.username} already exists.`
+                para.textContent = `The username "${data.username}" already exists in this access point.
+                    Choose another username (or another access point).`
+                setTimeout(() => {
+                    window.location.href = '/register'
+                }, 4000)
             } else {
-                para.textContent = 'Successfully registered.'
+                localStorage.setItem('token', data.token)
+                para.textContent = 'Successfully registered. You are being redirected to the home page'
+                setTimeout(() => {
+                    window.location.href = '/'
+                }, 4000)
             }
-            para.textContent += ' You are being redirected to the home page.'
             document.body.appendChild(para)
-
-            setTimeout(() => {
-                window.location.href = '/'
-            }, 4000)
         })
         .catch(error => {
             renderError(error)

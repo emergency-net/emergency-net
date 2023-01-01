@@ -1,20 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <title>Index</title>
 
     <script src="script.js" defer></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <ul id="messages">
-    </ul>
-    <form id="form">
-        <label for="message">your message: </label>
-        <input id="message" name="message" type="text">
-        <button id="submit" type="submit">submit</button>
-    </form>
 
+<body>
+    <div class="flex-container">
+        <div class="flex-item">
+            <h1>Channel 1</h1>
+            <ul id="messages-ch1">
+            </ul>
+            <form id="form-ch1">
+                <label for="message">your message: </label>
+                <input id="message-ch1" name="message" type="text">
+                <button id="submit-ch1" type="submit">submit</button>
+                <button id="sync-ch1" type="button">sync messages</button>
+            </form>
+        </div>
+
+        <div class="flex-item">
+            <h1>Channel 2</h1>
+            <ul id="messages-ch2">
+            </ul>
+            <form id="form-ch2">
+                <label for="message">your message: </label>
+                <input id="message-ch2" name="message" type="text">
+                <button id="submit-ch2" type="submit">submit</button>
+                <button id="sync-ch2" type="button">sync messages</button>
+            </form>
+        </div>
+
+        <div class="flex-item">
+            <h1>Channel 3</h1>
+            <ul id="messages-ch3">
+            </ul>
+            <form id="form-ch3">
+                <label for="message">your message: </label>
+                <input id="message-ch3" name="message" type="text">
+                <button id="submit-ch3" type="submit">submit</button>
+                <button id="sync-ch3" type="button">sync messages</button>
+            </form>
+        </div>
+    </div>
     <p id="error"></p>
 </body>
+
 </html>
