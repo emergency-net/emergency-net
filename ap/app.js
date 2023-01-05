@@ -3,6 +3,7 @@ import serve from 'koa-static'
 import { koaBody } from 'koa-body'
 import Router from '@koa/router'
 import jwt from 'koa-jwt'
+import send from 'koa-send'
 
 import pkg from 'jsonwebtoken'
 const { sign } = pkg
@@ -21,6 +22,14 @@ const router = new Router()
 const apMac = os.networkInterfaces()[process.env.NET_INT]
     .find(addr => addr.family === 'IPv4')
     .mac
+
+app.use(async (ctx, next) => {
+    if (!ctx.path.startsWith('/sync') && ctx.method === 'GET') {
+        await send(ctx, 'dist/index.html')
+    } else {
+        await next()
+    }
+})
 
 app.use(serve('dist', { extensions: ['html', 'ico'] }))
 
@@ -45,8 +54,9 @@ router
             ctx.body = {
                 username: ctx.request.body.username,
                 token: null,
-                error: true
+                error: 'username already exists.'
             }
+            ctx.status = 409
         } else {
             const token = sign({}, 'shared-secret', {
                 algorithm: 'HS512',
@@ -62,7 +72,7 @@ router
             ctx.body = {
                 username: ctx.request.body.username,
                 token: token,
-                error: false
+                error: null
             }
         }
     })
@@ -94,6 +104,8 @@ router
     })
 
 app.use(router.routes())
+
+
 
 https
     .createServer(

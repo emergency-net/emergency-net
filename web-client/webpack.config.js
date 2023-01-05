@@ -33,5 +33,15 @@ export default {
                 use: ['@svgr/webpack'],
             }
         ]
+    },
+    devServer: {
+        port: 3001, 
+        open: true,
+        proxy: {
+            '/': {
+                target: 'https://localhost',
+                secure: false
+            }
+        }
     }
 }

@@ -1,7 +1,8 @@
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { App, loader as AppLoader } from './App'
-import { Register } from './Register'
+import { Register, action as registerAction } from './Register'
+import { Error } from './Error'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 
@@ -13,7 +14,9 @@ const router = createBrowserRouter([
         children: [
             {
                 path: '/register',
-                element: <Register />
+                element: <Register />,
+                errorElement: <Error />,
+                action: registerAction
             }
         ]
     },

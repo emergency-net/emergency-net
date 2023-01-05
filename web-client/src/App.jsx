@@ -21,8 +21,8 @@ export function App() {
         <>
             <TopBar />
             <Container className='mt-5'>
-                <Row className='flex-column align-items-center'>
-                    <Col className='w-50'>
+                <Row className='justify-content-center'>
+                    <Col className='col-sm-12 col-md-8'>
                         <Outlet />
                     </Col>
                 </Row>
@@ -33,6 +33,5 @@ export function App() {
 
 export function loader() {
     const token = localStorage.getItem('token')
-
     return { token }
 }

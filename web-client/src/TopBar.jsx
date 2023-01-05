@@ -7,7 +7,7 @@ export function TopBar() {
     return (
         <Navbar bg="light">
             <Container className='justify-content-center'>
-                <Navbar.Brand className='' href="/">emergency-net</Navbar.Brand>
+                <Navbar.Brand>emergency-net</Navbar.Brand>
                 <Nav>
                     <LinkContainer to='/'>
                         <Nav.Link>Home</Nav.Link>
