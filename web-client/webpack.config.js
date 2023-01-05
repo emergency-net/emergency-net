@@ -1,5 +1,6 @@
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import path from 'node:path'
+import FaviconsWebpackPlugin from 'favicons-webpack-plugin'
 
 export default {
     mode: 'production',  // default
@@ -14,7 +15,8 @@ export default {
     },
     plugins: [new HtmlWebpackPlugin({
         template: 'index.html'
-    })],
+    }),
+    new FaviconsWebpackPlugin('favicon.ico')],
     module: {
         rules: [
             {
@@ -25,6 +27,10 @@ export default {
             {
                 test: /\.css$/,
                 use: ['style-loader', 'css-loader']
+            },
+            {
+                test: /\.svg$/,
+                use: ['@svgr/webpack'],
             }
         ]
     }

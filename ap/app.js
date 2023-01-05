@@ -22,7 +22,7 @@ const apMac = os.networkInterfaces()[process.env.NET_INT]
     .find(addr => addr.family === 'IPv4')
     .mac
 
-app.use(serve('dist', { extensions: ['html'] }))
+app.use(serve('dist', { extensions: ['html', 'ico'] }))
 
 app.use(jwt({
     secret: (header, payload) => {
