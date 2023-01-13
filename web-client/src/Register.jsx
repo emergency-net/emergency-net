@@ -1,4 +1,4 @@
-import { Form as FormR, useNavigate, useActionData } from 'react-router-dom'
+import { Form as FormR, useNavigate, useActionData, redirect } from 'react-router-dom'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import Card from 'react-bootstrap/Card'
@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 export function Register() {
     const navigate = useNavigate()
     const data = useActionData()
-    
+
     useEffect(() => {
         if (data) {
             localStorage.setItem('token', data.token)
@@ -23,7 +23,7 @@ export function Register() {
                 <FormR method='post' action='/register'>
                     <Form.Group className='w-75 mx-auto'>
                         <Form.Label>Username</Form.Label>
-                        <Form.Control type="text" name='username' placeholder="Enter username" />
+                        <Form.Control required type="text" name='username' placeholder="Enter username" />
                         <Form.Text className="text-muted">
                             Your username needs to be unique in this access point.
                         </Form.Text>
@@ -41,6 +41,10 @@ export function Register() {
 
 export async function action({ request }) {
     const data = Object.fromEntries(await request.formData())
+
+    if (data.username === '')
+        throw new Response('Bad Request', {status: 400, statusText: 'Bad Request'})
+    
     const response = await fetch('/register', {
         method: 'POST',
         headers: {
@@ -54,4 +58,9 @@ export async function action({ request }) {
     }
 
     return response
+}
+
+export function loader() {
+    if (localStorage.getItem('token')) return redirect('/')
+    return null
 }

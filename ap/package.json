@@ -8,6 +8,9 @@
     "koa-jwt": "^4.0.3",
     "koa-send": "^5.0.1",
     "koa-static": "^5.0.0",
-    "node-arp": "^1.0.6"
+    "node-arp": "^1.0.6",
+    "sqlite": "^4.1.2",
+    "sqlite3": "^5.1.4",
+    "winston": "^3.8.2"
   }
 }
