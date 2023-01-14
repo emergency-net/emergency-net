@@ -17,7 +17,7 @@ db.run(`CREATE TABLE public_keys (mac_id text PRIMARY KEY,
 
 
 for (let i = 0; i < AP_count; i++) {
-  let my_passphrase = crypto.randomBytes(512).toString('hex');
+  // let my_passphrase = crypto.randomBytes(512).toString('hex');
   await crypto.generateKeyPair('rsa', {
     modulusLength: 4096,
     publicKeyEncoding: {
@@ -26,9 +26,7 @@ for (let i = 0; i < AP_count; i++) {
     },
     privateKeyEncoding: {
       type: 'pkcs8',
-      format: 'pem',
-      cipher: 'aes-256-cbc',
-      passphrase: my_passphrase
+      format: 'pem'
     }
   }, (err, publicKey, privateKey) => { // Callback function
     if (!err) {

@@ -11,46 +11,76 @@ import os from 'node:os'
 
 import https from 'node:https'
 import fs from 'node:fs'
+import crypto from 'node:crypto'
+
 import * as dotenv from 'dotenv'
 
-dotenv.config()
+import winston from 'winston'
+import { open } from 'sqlite'
+import sqlite3 from 'sqlite3'
 
-const app = new Koa()
-const router = new Router()
+dotenv.config()
 
 const apMac = os.networkInterfaces()[process.env.NET_INT]
     .find(addr => addr.family === 'IPv4')
     .mac
 
-app.use(serve('public', { extensions: ['html'] }))
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    defaultMeta: { apMac: apMac },
+    transports: [
+        //
+        // - Write all logs with importance level of `info` or less to `combined.log`
+        //
+        new winston.transports.File({ filename: 'combined.log' }),
+    ],
+})
+
+const db = await open({
+    filename: 'database/Emergency-Net-DB.db',
+    driver: sqlite3.Database
+})
+
+
+const app = new Koa()
+const router = new Router()
+
+app.use(serve('dist', { extensions: ['html', 'ico'] }))
 
 app.use(jwt({
-    secret: (header, payload) => {
-        return 'shared-secret'
+    secret: async (header, payload) => {
+        const { public_key } = await db.get('SELECT public_key FROM public_keys WHERE mac_id = ?', 'mac_0')
+
+        return public_key
     }
 })
     .unless({ path: [/^\/register/] }))
 
 const messages = new Map([
-    ['1', new Map()],
-    ['2', new Map()],
-    ['3', new Map()]
+    [process.env.CH1, new Map()],
+    [process.env.CH2, new Map()],
+    [process.env.CH3, new Map()],
+    [process.env.CH4, new Map()],
+    [process.env.CH5, new Map()]
 ])
 const users = new Set()
 
 router
     .post('/register', koaBody(), async ctx => {
         ctx.type = 'application/json'
-        if (users.has(ctx.request.body.username)) {
+        if (ctx.request.body.username === '' || users.has(ctx.request.body.username)) {
             ctx.body = {
                 username: ctx.request.body.username,
                 token: null,
-                error: true
+                error: 'username already exists.'
             }
+            ctx.status = 409
         } else {
-            const token = sign({}, 'shared-secret', {
-                algorithm: 'HS512',
-                issuer: apMac,
+            const { private_key } = await db.get('SELECT private_key FROM public_keys WHERE mac_id = ?', 'mac_0')
+            const token = sign({}, private_key, {
+                algorithm: 'RS512',
+                issuer: 'mac_0',
                 header: {
                     typ: 'JWT'
                 },
@@ -62,18 +92,22 @@ router
             ctx.body = {
                 username: ctx.request.body.username,
                 token: token,
-                error: false
+                error: null
             }
         }
     })
     .post('/new-message/:ch', koaBody(), async ctx => {
         messages.get(ctx.params.ch)
             .set(
-                [new Date().toISOString(), ctx.state.user.sub, ctx.state.user.iss].join(';'),
+                `${ctx.state.user.sub}@${ctx.state.user.iss} at ${new Date().toLocaleString()}: `,
                 ctx.request.body.message
             )
+
+        logger.info(ctx.request.body.message + ' channel: [' + ctx.params.ch + ']')
+
         ctx.type = 'application/json'
         ctx.body = JSON.stringify(Array.from(messages.get(ctx.params.ch)))
+        ctx.status = 201
     })
     .get('/sync/:ch', async ctx => {
         ctx.type = 'application/json'
@@ -104,3 +138,4 @@ https
         app.callback()
     )
     .listen(443)
+
