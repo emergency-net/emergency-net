@@ -50,7 +50,7 @@ app.use(serve('dist', { extensions: ['html', 'ico'] }))
 
 app.use(jwt({
     secret: async (header, payload) => {
-        const { public_key } = await db.get('SELECT public_key FROM public_keys WHERE mac_id = ?', 'mac_0')
+        const { public_key } = await db.get('SELECT public_key FROM public_keys WHERE mac_id = ?', payload.iss)
 
         return public_key
     }
@@ -77,7 +77,7 @@ router
             }
             ctx.status = 409
         } else {
-            const { private_key } = await db.get('SELECT private_key FROM public_keys WHERE mac_id = ?', 'mac_0')
+            const { private_key } = await db.get('SELECT private_key FROM public_keys WHERE mac_id = ?', apMac)
             const token = sign({}, private_key, {
                 algorithm: 'RS512',
                 issuer: 'mac_0',
