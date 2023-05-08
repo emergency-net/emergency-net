@@ -18,6 +18,7 @@ import * as dotenv from 'dotenv'
 import winston from 'winston'
 import { open } from 'sqlite'
 import sqlite3 from 'sqlite3'
+import { log } from 'node:console'
 
 dotenv.config()
 
@@ -42,7 +43,7 @@ const db = await open({
     driver: sqlite3.Database
 })
 
-
+console.log('AP MAC: ', apMac)
 const app = new Koa()
 const router = new Router()
 
@@ -80,7 +81,7 @@ router
             const { private_key } = await db.get('SELECT private_key FROM public_keys WHERE mac_id = ?', apMac)
             const token = sign({}, private_key, {
                 algorithm: 'RS512',
-                issuer: 'mac_0',
+                issuer: apMac,
                 header: {
                     typ: 'JWT'
                 },
