@@ -3,10 +3,10 @@
     "version": "0.1.0",
     "description": "web client (frontend) of the emergency-net server",
     "type": "module",
-    "scripts":{
+    "scripts": {
         "start": "webpack serve --mode development --open",
         "build": "webpack --mode production"
-    }, 
+    },
     "devDependencies": {
         "@babel/preset-react": "^7.18.6",
         "@svgr/webpack": "^6.5.1",
@@ -23,6 +23,7 @@
         "bootstrap": "^5.2.3",
         "favicons": "^7.0.2",
         "idb": "^7.1.1",
+        "jsencrypt": "^3.3.2",
         "lodash": "^4.17.21",
         "react": "^18.2.0",
         "react-bootstrap": "^2.7.0",

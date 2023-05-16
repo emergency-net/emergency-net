@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import Card from 'react-bootstrap/Card'
 import { useEffect } from 'react'
+import { JSEncrypt } from "jsencrypt";
 
 export function Register() {
     const navigate = useNavigate()
@@ -45,6 +46,15 @@ export async function action({ request }) {
     if (data.username === '')
         throw new Response('Bad Request', {status: 400, statusText: 'Bad Request'})
     
+    var encrypt = new JSEncrypt();
+    var crypt = new JSEncrypt({default_key_size: 2048});
+    var PublicPrivateKey = {
+        PublicKey: crypt.getPublicKey(),
+        PrivateKey:crypt.getPrivateKey()
+    };
+
+    data["public_key"] = PublicPrivateKey.PublicKey;
+
     const response = await fetch('/register', {
         method: 'POST',
         headers: {

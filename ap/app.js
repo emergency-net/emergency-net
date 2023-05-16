@@ -20,16 +20,20 @@ import { open } from 'sqlite'
 import sqlite3 from 'sqlite3'
 import { log } from 'node:console'
 
+const time = new Date()
 dotenv.config()
 
-const apMac = os.networkInterfaces()[process.env.NET_INT]
-    .find(addr => addr.family === 'IPv4')
-    .mac
+// const apName = os.networkInterfaces()[process.env.NET_INT]
+//     .find(addr => addr.family === 'IPv4')
+//     .mac
+
+// TODO env'den al daha sonra /etc/hostname 
+const apName = "melihaktas"
 
 const logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
-    defaultMeta: { apMac: apMac },
+    defaultMeta: { apName: apName },
     transports: [
         //
         // - Write all logs with importance level of `info` or less to `combined.log`
@@ -43,7 +47,6 @@ const db = await open({
     driver: sqlite3.Database
 })
 
-console.log('AP MAC: ', apMac)
 const app = new Koa()
 const router = new Router()
 
@@ -51,12 +54,12 @@ app.use(serve('dist', { extensions: ['html', 'ico'] }))
 
 app.use(jwt({
     secret: async (header, payload) => {
-        const { public_key } = await db.get('SELECT public_key FROM public_keys WHERE mac_id = ?', payload.iss)
-
+        const { public_key } = await db.get('SELECT public_key FROM ap_private_keys WHERE ap_name = ?', payload.iss)
         return public_key
     }
 })
-    .unless({ path: [/^\/register/] }))
+    .unless({ path: [/^\/register/ , /^\/temp/  ]  }))
+    
 
 const messages = new Map([
     [process.env.CH1, new Map()],
@@ -68,6 +71,46 @@ const messages = new Map([
 const users = new Set()
 
 router
+    .post('/temp', koaBody(), async ctx => {
+        const username = ctx.request.body.username
+        const publicKey = ctx.request.body.publicKey 
+
+        ctx.type = 'application/json'
+        if (username === '' || users.has(username)) {
+            ctx.body = {
+                apName: apName,
+                tod: time.getTime(),
+                priority: -1,
+                type: "MT_REG_RJT",
+                username: username,
+                token: null,
+                error: 'username already exists.'
+            }
+            ctx.status = 409
+        } else {
+            const { private_key } = await db.get('SELECT private_key FROM ap_private_keys WHERE ap_name = ?', apName)
+            const token = sign({username, publicKey}, private_key, {
+                algorithm: 'RS512',
+                issuer: apName,
+                header: {
+                    typ: 'JWT'
+                },
+                subject: username
+            })
+
+            ctx.body = {
+                apName: apName,
+                tod: time.getTime(),
+                priority: -1,
+                type: "MT_REG_ACK",
+                username: username,
+                token: token,
+                APPublicKeyList: "",
+                PUPublicKeyList: "",
+                error: null
+            }
+        }
+    })
     .post('/register', koaBody(), async ctx => {
         ctx.type = 'application/json'
         if (ctx.request.body.username === '' || users.has(ctx.request.body.username)) {
@@ -78,10 +121,10 @@ router
             }
             ctx.status = 409
         } else {
-            const { private_key } = await db.get('SELECT private_key FROM public_keys WHERE mac_id = ?', apMac)
+            const { private_key } = await db.get('SELECT private_key FROM ap_private_keys WHERE ap_name = ?', apName)
             const token = sign({}, private_key, {
                 algorithm: 'RS512',
-                issuer: apMac,
+                issuer: apName,
                 header: {
                     typ: 'JWT'
                 },
@@ -103,9 +146,8 @@ router
                 `${ctx.state.user.sub}@${ctx.state.user.iss} at ${new Date().toLocaleString()}: `,
                 ctx.request.body.message
             )
-
+        console.log(users)
         logger.info(ctx.request.body.message + ' channel: [' + ctx.params.ch + ']')
-
         ctx.type = 'application/json'
         ctx.body = JSON.stringify(Array.from(messages.get(ctx.params.ch)))
         ctx.status = 201

@@ -9,9 +9,12 @@ let db = new sqlite3.Database('Emergency-Net-DB.db', (err) => {
   console.log('An empty database is generated.');
 });
 
-db.run(`CREATE TABLE public_keys (mac_id text PRIMARY KEY,
+// db.run(`CREATE TABLE public_keys (mac_id text PRIMARY KEY,
+//                                 public_key text NOT NULL,
+//                                 private_key text);`);
+db.run(`CREATE TABLE ap_private_keys (ap_name text PRIMARY KEY,
                                 public_key text NOT NULL,
-                                private_key text);`);
+                                private_key text);`)
 
 
 
