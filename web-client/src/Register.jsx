@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form'
 import Card from 'react-bootstrap/Card'
 import { useEffect } from 'react'
 import { JSEncrypt } from "jsencrypt";
-
+const time = new Date()
 export function Register() {
     const navigate = useNavigate()
     const data = useActionData()
@@ -70,7 +70,39 @@ export async function action({ request }) {
     return response
 }
 
-export function loader() {
-    if (localStorage.getItem('token')) return redirect('/')
-    return null
+export async function loader() {
+    let token = localStorage.getItem('token') 
+    let publicKey = localStorage.getItem('publicKey')
+    let username = localStorage.getItem('username')
+
+    let data = {
+        id: 0,
+        tod: time.getTime(),
+        priority: -1,
+        type: "MT_HELLO",
+        token: token,
+        username: username,
+        publicKey:  publicKey
+    }
+    const response = await fetch('/hello', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }).then(response => response.json())
+
+    // TODO check ap token
+    if (response.type == "MT_HELLO_AGAIN") return redirect('/')
+    // TODO check ap token
+    if (response.type == "MT_HELLO_ACK") {
+        console.log(response)
+    }
+
+    // TODO check rejection message and status
+    if (response.type == "MT_HELLO_RJT")   throw new Response(response.error , {
+                                        status: 400,
+                                    });
+    
+    return null   
 }

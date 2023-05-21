@@ -61,8 +61,6 @@ export function Channel({ channelName, messages }) {
                 const { data } = await db.get('messages_os', 'messages')
                 data.set(channelName, messages)
     
-                
-                console.log(messages)
                 await db.put('messages_os', {
                     name: 'messages',
                     data: data
