@@ -58,7 +58,7 @@ app.use(jwt({
         return public_key
     }
 })
-    .unless({ path: [/^\/register/ , /^\/temp/  ]  }))
+    .unless({ path: [/^\/register/ , /^\/temp/ , /^\/hello/ ]  }))
     
 
 const messages = new Map([
@@ -71,46 +71,61 @@ const messages = new Map([
 const users = new Set()
 
 router
-    .post('/temp', koaBody(), async ctx => {
-        const username = ctx.request.body.username
-        const publicKey = ctx.request.body.publicKey 
-
+    .post('/hello', koaBody(), async ctx => {
+        // Request example
+        // id: 0,
+        // tod: time.getTime(),
+        // priority: -1,
+        // type: "MT_HELLO",
+        // token: token,
+        // username: username,
+        // publicKey:  publicKey
         ctx.type = 'application/json'
-        if (username === '' || users.has(username)) {
-            ctx.body = {
-                apName: apName,
-                tod: time.getTime(),
-                priority: -1,
-                type: "MT_REG_RJT",
-                username: username,
-                token: null,
-                error: 'username already exists.'
-            }
-            ctx.status = 409
-        } else {
-            const { private_key } = await db.get('SELECT private_key FROM ap_private_keys WHERE ap_name = ?', apName)
-            const token = sign({username, publicKey}, private_key, {
-                algorithm: 'RS512',
-                issuer: apName,
-                header: {
-                    typ: 'JWT'
-                },
-                subject: username
-            })
 
+        if (ctx.request.body.token){
+            // TODO check if token is valid
+            if (true) {
+                ctx.body = {
+                    id: apName,
+                    tod: time.getTime(),
+                    priority: -1,
+                    type: "MT_HELLO_AGAIN",
+                    apToken: "mock ap token",
+                    APPublicKeyList: "",
+                    PUPublicKeyList: "",
+                    error: null
+                }
+                ctx.status = 200
+            }
+            else{
+                ctx.body = {
+                    id: apName,
+                    tod: time.getTime(),
+                    priority: -1,
+                    type: "MT_HELLO_RJT",
+                    apToken: "mock ap token",
+                    error: "Token is not valid"
+                }
+                ctx.status = 200
+            }
+        }
+        else{
             ctx.body = {
-                apName: apName,
+                id: apName,
                 tod: time.getTime(),
                 priority: -1,
-                type: "MT_REG_ACK",
-                username: username,
-                token: token,
+                type: "MT_HELLO_ACK",
+                apToken: "mock ap token",
                 APPublicKeyList: "",
                 PUPublicKeyList: "",
                 error: null
             }
+            ctx.status = 200
         }
+        console.log(ctx.request.body)
+        console.log(ctx.body)
     })
+    
     .post('/register', koaBody(), async ctx => {
         ctx.type = 'application/json'
         if (ctx.request.body.username === '' || users.has(ctx.request.body.username)) {
