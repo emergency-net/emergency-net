@@ -72,14 +72,6 @@ const users = new Set()
 
 router
     .post('/hello', koaBody(), async ctx => {
-        // Request example
-        // id: 0,
-        // tod: time.getTime(),
-        // priority: -1,
-        // type: "MT_HELLO",
-        // token: token,
-        // username: username,
-        // publicKey:  publicKey
         ctx.type = 'application/json'
 
         if (ctx.request.body.token){
@@ -122,16 +114,19 @@ router
             }
             ctx.status = 200
         }
-        console.log(ctx.request.body)
-        console.log(ctx.body)
     })
-    
+
     .post('/register', koaBody(), async ctx => {
         ctx.type = 'application/json'
-        if (ctx.request.body.username === '' || users.has(ctx.request.body.username)) {
+        console.log("reg:", ctx.request.body)
+        let username = ctx.request.body.username
+        if (username === '' || users.has(username)) {
             ctx.body = {
-                username: ctx.request.body.username,
-                token: null,
+                id: apName,
+                tod: time.getTime(),
+                priority: -1,
+                type: "MT_REG_RJT",
+                username: username,
                 error: 'username already exists.'
             }
             ctx.status = 409
@@ -147,12 +142,21 @@ router
             })
 
             users.add(ctx.request.body.username)
-
+            
+            let id = username + "@" + apName 
+            
             ctx.body = {
-                username: ctx.request.body.username,
+                id: apName,
+                tod: time.getTime(),
+                priority: -1,
+                type: "MT_REG_ACK",
+                id: id,
                 token: token,
+                APPublicKeyList: "",
+                PUPublicKeyList: "",
                 error: null
             }
+            ctx.status = 200
         }
     })
     .post('/new-message/:ch', koaBody(), async ctx => {

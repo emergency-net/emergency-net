@@ -41,9 +41,9 @@ export function Register() {
 }
 
 export async function action({ request }) {
-    const data = Object.fromEntries(await request.formData())
+    const form_data = Object.fromEntries(await request.formData())
 
-    if (data.username === '')
+    if (form_data.username === '')
         throw new Response('Bad Request', {status: 400, statusText: 'Bad Request'})
     
     var encrypt = new JSEncrypt();
@@ -53,7 +53,17 @@ export async function action({ request }) {
         PrivateKey:crypt.getPrivateKey()
     };
 
-    data["public_key"] = PublicPrivateKey.PublicKey;
+    localStorage.setItem('publicKey', PublicPrivateKey.PublicKey)
+    localStorage.setItem('privateKey', PublicPrivateKey.PrivateKey)
+
+    let data = {
+        id: 0,
+        tod: time.getTime(),
+        priority: -1,
+        type: "MT_REG",
+        username: form_data.username,
+        publicKey:  PublicPrivateKey.PublicKey
+    }
 
     const response = await fetch('/register', {
         method: 'POST',
@@ -61,12 +71,15 @@ export async function action({ request }) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
-    })
+    }).then(response => {
+        if (response.status === 309) throw response
+        return response.json()
+    }).catch(error => console.error(error))
 
-    if (response.status === 409) {
-        throw response
-    }
-
+    console.log(response)
+    
+    localStorage.setItem('id', response.id)
+    
     return response
 }
 
