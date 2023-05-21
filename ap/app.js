@@ -23,6 +23,29 @@ import { log } from 'node:console'
 const time = new Date()
 dotenv.config()
 
+// const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
+//     modulusLength: 2048,
+//     publicKeyEncoding: {
+//         type: 'spki',
+//         format: 'pem'
+//     },
+//     privateKeyEncoding: {
+//         type: 'pkcs8',
+//         format: 'pem'
+//     }
+//     }); 
+
+// let temp = "selamm"
+
+// let message = crypto.privateEncrypt({
+//     key:privateKey,
+//   }, Buffer.from(temp))
+
+// console.log( crypto.publicDecrypt({
+//     key:publicKey,
+//   }, message).toString('utf-8')
+// )
+
 // const apName = os.networkInterfaces()[process.env.NET_INT]
 //     .find(addr => addr.family === 'IPv4')
 //     .mac
@@ -159,16 +182,25 @@ router
             ctx.status = 200
         }
     })
-    .post('/new-message/:ch', koaBody(), async ctx => {
-        messages.get(ctx.params.ch)
+    .post('/new-message', koaBody(), async ctx => {
+        let channel = ctx.request.body.channel
+
+        // let message = crypto.publicDecrypt({
+        //     key: ctx.request.body.publicKey
+        //   },
+        //   Buffer.from(ctx.request.body.message, 'base64'))
+
+        let message = ctx.request.body.message
+
+        messages.get(ctx.request.body.channel)
             .set(
-                `${ctx.state.user.sub}@${ctx.state.user.iss} at ${new Date().toLocaleString()}: `,
-                ctx.request.body.message
+                // TODO add tod to locale string  
+                `${ctx.request.body.id} at ${new Date().toLocaleString()}: `,
+                message
             )
-        console.log(users)
-        logger.info(ctx.request.body.message + ' channel: [' + ctx.params.ch + ']')
+        logger.info(message + ' channel: [' + channel + ']')
         ctx.type = 'application/json'
-        ctx.body = JSON.stringify(Array.from(messages.get(ctx.params.ch)))
+        ctx.body = JSON.stringify(Array.from(messages.get(channel)))
         ctx.status = 201
     })
     .get('/sync/:ch', async ctx => {
