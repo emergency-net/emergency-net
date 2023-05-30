@@ -10,6 +10,9 @@ import { LinkContainer } from 'react-router-bootstrap'
 import useForceUpdate from 'use-force-update'
 import {Buffer} from 'buffer'
 import { JSEncrypt } from "jsencrypt"
+import crypto from 'crypto';
+import forge from 'node-forge';
+
 
 const time = new Date()
 
@@ -127,49 +130,23 @@ export async function action({ request }) {
         return null
     }
     
-    let publicKey = localStorage.getItem('publicKey')
+    let APPublicKey = localStorage.getItem('APPublicKey')
     let privateKey = localStorage.getItem('privateKey')
+    let publicKey = localStorage.getItem('publicKey')
 
-    // let keyPair = await crypto.subtle.generateKey(
-    //     {
-    //       name: "RSA-OAEP",
-    //       modulusLength: 4096,
-    //       publicExponent: new Uint8Array([1, 0, 1]),
-    //       hash: "SHA-256",
-    //     },
-    //     true,
-    //     ["encrypt", "decrypt"]
-    //   );
+    const messagePacket = {
+        id: localStorage.getItem('id'),
+        tod: time.getTime(),
+        message: form_data.message,
+        channel: form_data.channel
+    }
+    let packetString = JSON.stringify(messagePacket)
+    const signature = sign(packetString, localStorage.getItem('privateKey')) 
+    console.log(signature)
+    console.log(packetString)
+    // const meliBytes = privateKeyObject.encrypt(forge.util.encodeUtf8(form_data.message));
+    // const temp_message = forge.util.encode64(meliBytes);
 
-    // console.log(crypto.subtle)
-    // let melih = await crypto.subtle.encrypt(
-    //     {name: "RSA-OAEP"},
-    //     keyPair.publicKey,
-    //     Buffer.from("kadir")
-    //     )
-    
-    // console.log(melih)
-    // let nohut = await crypto.subtle.decrypt(
-    //     {name: "RSA-OAEP"},
-    //     keyPair.privateKey,
-    //     melih
-    //     )
-    //     var enc = new TextDecoder("utf-8")
-    // console.log(enc.decode(nohut))
-
-
-
-    // const encrypt = new JSEncrypt();
-
-    // encrypt.setPublicKey(publicKey);
-    // let message = encrypt.encrypt("selamm")
-    // console.log(message, typeof(message))
-
-    // const decrypt = new JSEncrypt()
-    // decrypt.setPrivateKey(privateKey);
-    // let result = decrypt.decrypt(message)
-    // console.log("result", result)
-    let message = form_data.message
     let data = {
         id: localStorage.getItem('id'),
         tod: time.getTime(),
@@ -178,7 +155,8 @@ export async function action({ request }) {
         type: "MT_MSG",
         token: localStorage.getItem('token'),
         publicKey: publicKey,
-        message: message,
+        message: packetString,
+        signature: signature,
         channel: form_data.channel
     }
 
@@ -199,3 +177,11 @@ export async function action({ request }) {
 
 }
 
+export function sign(packetString, privateKey, ){
+    const privateKeyObject = forge.pki.privateKeyFromPem(privateKey)
+    const md = forge.md.sha256.create();
+    md.update(packetString, 'utf8');
+    const signature = privateKeyObject.sign(md);
+    const signatureBase64 = forge.util.encode64(signature);
+    return signatureBase64
+}

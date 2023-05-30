@@ -116,6 +116,8 @@ export async function loader() {
     if (response.type == "MT_HELLO_RJT")   throw new Response(response.error , {
                                         status: 400,
                                     });
+
+    localStorage.setItem('APPublicKey', response.APPublicKey)
     
     return null   
 }

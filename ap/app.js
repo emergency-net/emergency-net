@@ -19,36 +19,10 @@ import winston from 'winston'
 import { open } from 'sqlite'
 import sqlite3 from 'sqlite3'
 import { log } from 'node:console'
+import forge from 'node-forge'
 
 const time = new Date()
 dotenv.config()
-
-// const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
-//     modulusLength: 2048,
-//     publicKeyEncoding: {
-//         type: 'spki',
-//         format: 'pem'
-//     },
-//     privateKeyEncoding: {
-//         type: 'pkcs8',
-//         format: 'pem'
-//     }
-//     }); 
-
-// let temp = "selamm"
-
-// let message = crypto.privateEncrypt({
-//     key:privateKey,
-//   }, Buffer.from(temp))
-
-// console.log( crypto.publicDecrypt({
-//     key:publicKey,
-//   }, message).toString('utf-8')
-// )
-
-// const apName = os.networkInterfaces()[process.env.NET_INT]
-//     .find(addr => addr.family === 'IPv4')
-//     .mac
 
 // TODO env'den al daha sonra /etc/hostname 
 const apName = "melihaktas"
@@ -96,7 +70,8 @@ const users = new Set()
 router
     .post('/hello', koaBody(), async ctx => {
         ctx.type = 'application/json'
-
+        const { public_key } = await db.get('SELECT public_key FROM ap_private_keys WHERE ap_name = ?', apName)
+        console.log("hello", public_key)
         if (ctx.request.body.token){
             // TODO check if token is valid
             if (true) {
@@ -108,6 +83,7 @@ router
                     apToken: "mock ap token",
                     APPublicKeyList: "",
                     PUPublicKeyList: "",
+                    APPublicKey: public_key,
                     error: null
                 }
                 ctx.status = 200
@@ -119,6 +95,7 @@ router
                     priority: -1,
                     type: "MT_HELLO_RJT",
                     apToken: "mock ap token",
+                    APPublicKey: public_key,
                     error: "Token is not valid"
                 }
                 ctx.status = 200
@@ -133,6 +110,7 @@ router
                 apToken: "mock ap token",
                 APPublicKeyList: "",
                 PUPublicKeyList: "",
+                APPublicKey: public_key,
                 error: null
             }
             ctx.status = 200
@@ -141,7 +119,6 @@ router
 
     .post('/register', koaBody(), async ctx => {
         ctx.type = 'application/json'
-        console.log("reg:", ctx.request.body)
         let username = ctx.request.body.username
         if (username === '' || users.has(username)) {
             ctx.body = {
@@ -155,7 +132,8 @@ router
             ctx.status = 409
         } else {
             const { private_key } = await db.get('SELECT private_key FROM ap_private_keys WHERE ap_name = ?', apName)
-            const token = sign({}, private_key, {
+            const token = sign({
+                mtPublicKey: ctx.request.body.publicKey}, private_key, {
                 algorithm: 'RS512',
                 issuer: apName,
                 header: {
@@ -183,25 +161,57 @@ router
         }
     })
     .post('/new-message', koaBody(), async ctx => {
-        let channel = ctx.request.body.channel
+        const clientPublicKey = ctx.request.body.publicKey
+        const username = ctx.request.body.username
+        const signature = ctx.request.body.signature
+        let packet = ctx.request.body.message
+        
+        const verified = client_verify(packet, clientPublicKey, signature);
+        
+        console.log('Signature verified:', verified);
+        
+        const token_jwt = pkg.decode(ctx.request.body.token)
 
-        // let message = crypto.publicDecrypt({
-        //     key: ctx.request.body.publicKey
-        //   },
-        //   Buffer.from(ctx.request.body.message, 'base64'))
+        // TODOO check tod 
+        ctx.body = {
+            id: apName,
+            tod: time.getTime(),
+            priority: -1,
+            username: username,
+        }
 
-        let message = ctx.request.body.message
+        if (token_jwt.mtPublicKey != clientPublicKey){
+            ctx.body["type"] =  "MT_MSG_RJT"
+            ctx.body["error"] =  "Public Keys does not match"
+            ctx.status = 409
+        }
+        if (! verified){
+            ctx.body["type"] =  "MT_MSG_RJT"
+            ctx.body["error"] =  "Token is not valid"
+            ctx.status = 409
+        }
+        if (! ctx.body.error){
+            packet = JSON.parse(packet)
+    
+            const message = packet.message
+            const channel = packet.channel
+            
+            messages.get(ctx.request.body.channel)
+                .set(
+                    // TODO add tod to locale string  
+                    `${ctx.request.body.id} at ${new Date().toLocaleString()}: `,
+                    message
+                )
+            logger.info(message + ' channel: [' + channel + ']')
+    
+            ctx.type = 'application/json'
+            
+            // TODO replace body and request to sync 
+            ctx.body["type"] = "MT_MSG_ACK",
+            ctx.status = 201
+            ctx.body = JSON.stringify(Array.from(messages.get(channel)))
+        }
 
-        messages.get(ctx.request.body.channel)
-            .set(
-                // TODO add tod to locale string  
-                `${ctx.request.body.id} at ${new Date().toLocaleString()}: `,
-                message
-            )
-        logger.info(message + ' channel: [' + channel + ']')
-        ctx.type = 'application/json'
-        ctx.body = JSON.stringify(Array.from(messages.get(channel)))
-        ctx.status = 201
     })
     .get('/sync/:ch', async ctx => {
         ctx.type = 'application/json'
@@ -233,3 +243,10 @@ https
     )
     .listen(443)
 
+function client_verify(packet, clientPublicKey, signature){
+    const publicKeyObject = forge.pki.publicKeyFromPem(clientPublicKey);
+    const md = forge.md.sha256.create();
+    md.update(packet, 'utf8');
+    const signature64 = forge.util.decode64(signature);
+    return publicKeyObject.verify(md.digest().bytes(), signature64);
+}
