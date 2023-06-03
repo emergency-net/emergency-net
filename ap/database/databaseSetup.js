@@ -14,7 +14,12 @@ let db = new sqlite3.Database('Emergency-Net-DB.db', (err) => {
 //                                 private_key text);`);
 db.run(`CREATE TABLE ap_private_keys (ap_name text PRIMARY KEY,
                                 public_key text NOT NULL,
-                                private_key text);`)
+                                private_key text,
+                                ap_token text);`)
+db.run(`CREATE TABLE pu_private_keys (pu_name text PRIMARY KEY,
+  public_key text NOT NULL,
+  private_key text,
+token text);`)
 
 
 

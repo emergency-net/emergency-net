@@ -141,7 +141,7 @@ export async function action({ request }) {
         channel: form_data.channel
     }
     let packetString = JSON.stringify(messagePacket)
-    const signature = sign(packetString, localStorage.getItem('privateKey')) 
+    const signature = packetSign(packetString, localStorage.getItem('privateKey')) 
     console.log(signature)
     console.log(packetString)
     // const meliBytes = privateKeyObject.encrypt(forge.util.encodeUtf8(form_data.message));
@@ -155,7 +155,7 @@ export async function action({ request }) {
         type: "MT_MSG",
         token: localStorage.getItem('token'),
         publicKey: publicKey,
-        message: packetString,
+        packet: packetString,
         signature: signature,
         channel: form_data.channel
     }
@@ -177,11 +177,18 @@ export async function action({ request }) {
 
 }
 
-export function sign(packetString, privateKey, ){
+export function packetSign(packetString, privateKey){
     const privateKeyObject = forge.pki.privateKeyFromPem(privateKey)
     const md = forge.md.sha256.create();
     md.update(packetString, 'utf8');
     const signature = privateKeyObject.sign(md);
     const signatureBase64 = forge.util.encode64(signature);
     return signatureBase64
+}
+export function packetVerify(packet, clientPublicKey, signature){
+    const publicKeyObject = forge.pki.publicKeyFromPem(clientPublicKey);
+    const md = forge.md.sha256.create();
+    md.update(packet, 'utf8');
+    const signature64 = forge.util.decode64(signature);
+    return publicKeyObject.verify(md.digest().bytes(), signature64);
 }
