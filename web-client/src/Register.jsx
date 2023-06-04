@@ -4,6 +4,7 @@ import Form from 'react-bootstrap/Form'
 import Card from 'react-bootstrap/Card'
 import { useEffect } from 'react'
 import { JSEncrypt } from "jsencrypt";
+import jwt_decode from "jwt-decode";
 
 const time = new Date()
 export function Register() {
@@ -75,8 +76,6 @@ export async function action({ request }) {
         if (response.status === 309) throw response
         return response.json()
     }).catch(error => console.error(error))
-
-    console.log(response)
     
     localStorage.setItem('id', response.id)
     
@@ -105,11 +104,17 @@ export async function loader() {
         body: JSON.stringify(data)
     }).then(response => response.json())
 
-    // TODO check ap token
+    let decoded = jwt_decode(response.apToken)
+    if (decoded.apPublicKey.replaceAll("\n", "") !== response.APPublicKey.replaceAll("\n", "")){
+        console.log("Public Keys does not match.")
+        console.log(decoded.apPublicKey.replaceAll("\n", ""), response.APPublicKey.replaceAll("\n", ""))
+        throw new Response(response.error , {
+            status: 400,
+        })
+    }
     if (response.type == "MT_HELLO_AGAIN") return redirect('/')
-    // TODO check ap token
+
     if (response.type == "MT_HELLO_ACK") {
-        console.log(response)
     }
 
     // TODO check rejection message and status
