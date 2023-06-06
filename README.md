@@ -2,6 +2,10 @@
 Emergency-net is a distributed Wi-Fi network system that provides communication between people after the infrastructure fails.
 
 ## Setup
+- Install [mkcert](https://github.com/FiloSottile/mkcert)
+- mkcert localhost
+- Update .env  
+
 - Setup Client
     - install nvm 
     - install node 18
