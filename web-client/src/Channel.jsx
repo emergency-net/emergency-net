@@ -14,8 +14,6 @@ import crypto from 'crypto';
 import forge from 'node-forge';
 
 
-const time = new Date()
-
 export function Channel({ channelName, messages }) {
     const forceUpdate = useForceUpdate()
 
@@ -136,20 +134,19 @@ export async function action({ request }) {
 
     const messagePacket = {
         id: localStorage.getItem('id'),
-        tod: time.getTime(),
+        tod: Date.now(),
         message: form_data.message,
         channel: form_data.channel
     }
     let packetString = JSON.stringify(messagePacket)
     const signature = packetSign(packetString, localStorage.getItem('privateKey')) 
-    console.log(signature)
-    console.log(packetString)
+
     // const meliBytes = privateKeyObject.encrypt(forge.util.encodeUtf8(form_data.message));
     // const temp_message = forge.util.encode64(meliBytes);
 
     let data = {
         id: localStorage.getItem('id'),
-        tod: time.getTime(),
+        tod: Date.now(),
         // TODO add priority
         priority: -1,
         type: "MT_MSG",

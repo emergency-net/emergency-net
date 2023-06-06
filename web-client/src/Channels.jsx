@@ -12,11 +12,9 @@ import { openDB } from 'idb'
 import axios from 'axios'
 import jwt_decode from "jwt-decode";
 
-const time = new Date()
-
-
 export function Channels() {
     const [activeCh, setActiveCh] = useState('Erzak 📦')
+    const [res, setres] = useState('')
     let { messages } = useLoaderData()
     let data = messages?.data ?? new Map()
 
@@ -76,7 +74,7 @@ export function Channels() {
             <Row>
             <Col md={12} lg={4}>
                 Create Channel
-            <FormR method='post'  className='mt-2' onSubmit={createChannel}>
+            <FormR method='post'  className='mt-2' onSubmit={(e)=>createChannel(e, setres)}>
                     <Form.Group className='d-flex justify-content-between'>
                         <div className='w-100 me-2'>
                             <Form.Control required type="text" id="channel" name='channel' placeholder="Enter the channel name" />
@@ -94,7 +92,7 @@ export function Channels() {
             <Row>
             <Col md={12} lg={4}>
                 Destroy Channel
-            <FormR method='post'  className='mt-2' onSubmit={destroyChannel}>
+            <FormR method='post'  className='mt-2' onSubmit={(e)=>destroyChannel(e, setres)}>
                     <Form.Group className='d-flex justify-content-between'>
                         <div className='w-100 me-2'>
                             <Form.Control required type="text" id="channel" name='channel' placeholder="Enter the channel name" />
@@ -112,7 +110,7 @@ export function Channels() {
             <Row>
             <Col md={12} lg={4}>
                 Disable AP
-            <FormR method='post'  className='mt-2' onSubmit={disableAP}>
+            <FormR method='post'  className='mt-2' onSubmit={(e)=>disableAP(e, setres)}>
                     <Form.Group className='d-flex justify-content-between'>
                         <div className='w-100 me-2'>
                             <Form.Control required type="text" id="APName" name='APName' placeholder="Enter the AP name" />
@@ -130,7 +128,7 @@ export function Channels() {
             <Row>
             <Col md={12} lg={4}>
                 Disable PU
-            <FormR method='post'  className='mt-2' onSubmit={disablePU}>
+            <FormR method='post'  className='mt-2' onSubmit={(e)=>disablePU(e, setres)}>
                     <Form.Group className='d-flex justify-content-between'>
                         <div className='w-100 me-2'>
                             <Form.Control required type="text" id="PUName" name='PUName' placeholder="Enter the PU name" />
@@ -145,6 +143,9 @@ export function Channels() {
             </FormR>
             </Col>
             </Row>
+            {res?  <div>
+                {res}
+            </div>:<div/>}
         </Tab.Container>
     )
 }
@@ -156,7 +157,7 @@ export async function loader() {
     return { messages }
 }
 
-export async function createChannel(e) {
+export async function createChannel(e, setres) {
     if (! e.target.channel) {
         return null
     }
@@ -167,7 +168,7 @@ export async function createChannel(e) {
     let publicKey = localStorage.getItem('publicKey')
     const messagePacket = {
         id: localStorage.getItem('id'),
-        tod: time.getTime(),
+        tod: Date.now(),
         channel: e.target.channel.value
     }
 
@@ -176,7 +177,7 @@ export async function createChannel(e) {
 
     let data = {
         id: localStorage.getItem('id'),
-        tod: time.getTime(),
+        tod: Date.now(),
         // TODO add priority
         priority: -1,
         type: "CH_CREATE",
@@ -185,32 +186,53 @@ export async function createChannel(e) {
         packet: packetString,
         signature: signature,
     }
-
+    
     const response = await axios.post('/create-channel', data, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + localStorage.getItem('token')
         }
-        });
-
+    });
+    
+    
+    if (response.data.type == "CH_CREATE_ACK"){
+        setres("SUCCESSFUL")
+    }
+    else{
+        setres(response.data.error)
+        throw response
+    }
+    
+    // Token public key is the same with the packet
+    
     let packet = JSON.parse(response.data.packet)
     let decoded = jwt_decode(packet.id)
-
-    // Token public key is the same with the packet
+    
     if (decoded.apPublicKey.replaceAll("\n", "") !== response.data.apPublicKey.replaceAll("\n", "")){
         console.log("Public Keys does not match.")
         console.log(decoded.apPublicKey.replaceAll("\n", ""), response.data.apPublicKey.replaceAll("\n", ""))
     }
 
+    const db = await openDB('messageDB', 1, {
+        upgrade(db) {
+            db.createObjectStore('messages_os', { keyPath: 'name' })
+        }
+    })
+    const messages = await db.get('messages_os', 'messages')
+    messages.data.set(e.target.channel.value, new Map())
+    await db.put('messages_os', {
+        name: 'messages',
+        data: messages.data
+    })
+ 
+
     
-    if (response.status !== 201)
-        throw response
 
     return response
 
 }
 
-export async function destroyChannel(e) {
+export async function destroyChannel(e, setres) {
     if (! e.target.channel) {
         return null
     }
@@ -222,7 +244,7 @@ export async function destroyChannel(e) {
 
     const messagePacket = {
         id: localStorage.getItem('id'),
-        tod: time.getTime(),
+        tod: Date.now(),
         channel: e.target.channel.value
     }
 
@@ -231,7 +253,7 @@ export async function destroyChannel(e) {
 
     let data = {
         id: localStorage.getItem('id'),
-        tod: time.getTime(),
+        tod: Date.now(),
         // TODO add priority
         priority: -1,
         type: "CH_DESTROY",
@@ -241,30 +263,46 @@ export async function destroyChannel(e) {
         signature: signature,
     }
 
+    const db = await openDB('messageDB', 1, {
+        upgrade(db) {
+            db.createObjectStore('messages_os', { keyPath: 'name' })
+        }
+    })
+    const messages = await db.get('messages_os', 'messages')
+    messages.data.delete(e.target.channel.value)
+    await db.put('messages_os', {
+        name: 'messages',
+        data: messages.data
+    })
+
     const response = await axios.post('/destroy-channel', data, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + localStorage.getItem('token')
         }
         });
-
+   if (response.data.type == "CH_DESTROY_ACK"){
+        setres("SUCCESSFUL")
+    }
+    else{
+        setres(response.data.error)
+        throw response
+    }
+    
+    
     let packet = JSON.parse(response.data.packet)
     let decoded = jwt_decode(packet.id)
-
     // Token public key is the same with the packet
     if (decoded.apPublicKey.replaceAll("\n", "") !== response.data.apPublicKey.replaceAll("\n", "")){
         console.log("Public Keys does not match.")
         console.log(decoded.apPublicKey.replaceAll("\n", ""), response.data.apPublicKey.replaceAll("\n", ""))
     }
 
-    
-    if (response.status !== 201)
-        throw response
 
     return response
 
 }
-export async function disableAP(e) {
+export async function disableAP(e, setres) {
     if (! e.target.APName) {
         return null
     }
@@ -276,7 +314,7 @@ export async function disableAP(e) {
 
     const messagePacket = {
         id: localStorage.getItem('id'),
-        tod: time.getTime(),
+        tod: Date.now(),
         APName: e.target.APName.value
     }
 
@@ -285,7 +323,7 @@ export async function disableAP(e) {
 
     let data = {
         id: localStorage.getItem('id'),
-        tod: time.getTime(),
+        tod: Date.now(),
         // TODO add priority
         priority: -1,
         type: "AP_DISABLE",
@@ -301,24 +339,27 @@ export async function disableAP(e) {
             'Authorization': 'Bearer ' + localStorage.getItem('token')
         }
         });
-
+    if (response.data.type == "AP_DISABLE_ACK"){
+        setres("SUCCESSFUL")
+    }
+    else{
+        setres(response.data.error)
+        throw response
+    }
+    
+    // Token public key is the same with the packet
+    
     let packet = JSON.parse(response.data.packet)
     let decoded = jwt_decode(packet.id)
-
-    // Token public key is the same with the packet
     if (decoded.apPublicKey.replaceAll("\n", "") !== response.data.apPublicKey.replaceAll("\n", "")){
         console.log("Public Keys does not match.")
         console.log(decoded.apPublicKey.replaceAll("\n", ""), response.data.apPublicKey.replaceAll("\n", ""))
     }
-
     
-    if (response.status !== 201)
-        throw response
-
     return response
 
 }
-export async function disablePU(e) {
+export async function disablePU(e, setres) {
     if (! e.target.PUName) {
         return null
     }
@@ -330,7 +371,7 @@ export async function disablePU(e) {
 
     const messagePacket = {
         id: localStorage.getItem('id'),
-        tod: time.getTime(),
+        tod: Date.now(),
         PUName: e.target.PUName.value
     }
 
@@ -339,7 +380,7 @@ export async function disablePU(e) {
 
     let data = {
         id: localStorage.getItem('id'),
-        tod: time.getTime(),
+        tod: Date.now(),
         // TODO add priority
         priority: -1,
         type: "PU_DISABLE",
@@ -355,20 +396,24 @@ export async function disablePU(e) {
             'Authorization': 'Bearer ' + localStorage.getItem('token')
         }
         });
-
+    
+    if (response.data.type == "PU_DISABLE_ACK"){
+        setres("SUCCESSFUL")
+    }
+    else{
+        setres(response.data.error)
+        throw response
+    }
+    
+    // TODO verify jwt 
     let packet = JSON.parse(response.data.packet)
     let decoded = jwt_decode(packet.id)
-
     // Token public key is the same with the packet
     if (decoded.apPublicKey.replaceAll("\n", "") !== response.data.apPublicKey.replaceAll("\n", "")){
         console.log("Public Keys does not match.")
         console.log(decoded.apPublicKey.replaceAll("\n", ""), response.data.apPublicKey.replaceAll("\n", ""))
     }
-
     
-    if (response.status !== 201)
-        throw response
-
     return response
 
 }

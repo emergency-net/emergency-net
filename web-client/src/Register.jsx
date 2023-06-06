@@ -6,7 +6,6 @@ import { useEffect } from 'react'
 import { JSEncrypt } from "jsencrypt";
 import jwt_decode from "jwt-decode";
 
-const time = new Date()
 export function Register() {
     const navigate = useNavigate()
     const data = useActionData()
@@ -59,7 +58,7 @@ export async function action({ request }) {
 
     let data = {
         id: 0,
-        tod: time.getTime(),
+        tod: Date.now(),
         priority: -1,
         type: "MT_REG",
         username: form_data.username,
@@ -89,7 +88,7 @@ export async function loader() {
 
     let data = {
         id: 0,
-        tod: time.getTime(),
+        tod: Date.now(),
         priority: -1,
         type: "MT_HELLO",
         token: token,
