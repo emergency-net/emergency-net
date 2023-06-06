@@ -9,9 +9,17 @@ let db = new sqlite3.Database('Emergency-Net-DB.db', (err) => {
   console.log('An empty database is generated.');
 });
 
-db.run(`CREATE TABLE public_keys (mac_id text PRIMARY KEY,
+// db.run(`CREATE TABLE public_keys (mac_id text PRIMARY KEY,
+//                                 public_key text NOT NULL,
+//                                 private_key text);`);
+db.run(`CREATE TABLE ap_private_keys (ap_name text PRIMARY KEY,
                                 public_key text NOT NULL,
-                                private_key text);`);
+                                private_key text,
+                                ap_token text);`)
+db.run(`CREATE TABLE pu_private_keys (pu_name text PRIMARY KEY,
+  public_key text NOT NULL,
+  private_key text,
+token text);`)
 
 
 
@@ -32,7 +40,7 @@ for (let i = 0; i < AP_count; i++) {
     if (!err) {
       let mac = "mac_".concat(i);
       console.log(mac);
-      db.run(`INSERT INTO public_keys (mac_id, public_key, private_key) VALUES (?, ?, ?);`, mac, publicKey, privateKey);
+      db.run(`INSERT INTO ap_private_keys (ap_name, public_key, private_key) VALUES (?, ?, ?);`, mac, publicKey, privateKey);
     }
     else {
       // Prints error

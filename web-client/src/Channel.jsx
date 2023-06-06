@@ -8,6 +8,11 @@ import { openDB } from 'idb'
 import ListGroup from 'react-bootstrap/ListGroup'
 import { LinkContainer } from 'react-router-bootstrap'
 import useForceUpdate from 'use-force-update'
+import {Buffer} from 'buffer'
+import { JSEncrypt } from "jsencrypt"
+import crypto from 'crypto';
+import forge from 'node-forge';
+
 
 export function Channel({ channelName, messages }) {
     const forceUpdate = useForceUpdate()
@@ -61,8 +66,6 @@ export function Channel({ channelName, messages }) {
                 const { data } = await db.get('messages_os', 'messages')
                 data.set(channelName, messages)
     
-                
-                console.log(messages)
                 await db.put('messages_os', {
                     name: 'messages',
                     data: data
@@ -120,12 +123,41 @@ export function Channel({ channelName, messages }) {
 }
 
 export async function action({ request }) {
-    const data = Object.fromEntries(await request.formData())
-    console.log(data.message)
-    if (!data.message) {
+    const form_data = Object.fromEntries(await request.formData())
+    if (!form_data.message) {
         return null
     }
-    const response = await fetch(`/new-message/${data.channel}`,
+    
+    let APPublicKey = localStorage.getItem('APPublicKey')
+    let privateKey = localStorage.getItem('privateKey')
+    let publicKey = localStorage.getItem('publicKey')
+
+    const messagePacket = {
+        id: localStorage.getItem('id'),
+        tod: Date.now(),
+        message: form_data.message,
+        channel: form_data.channel
+    }
+    let packetString = JSON.stringify(messagePacket)
+    const signature = packetSign(packetString, localStorage.getItem('privateKey')) 
+
+    // const meliBytes = privateKeyObject.encrypt(forge.util.encodeUtf8(form_data.message));
+    // const temp_message = forge.util.encode64(meliBytes);
+
+    let data = {
+        id: localStorage.getItem('id'),
+        tod: Date.now(),
+        // TODO add priority
+        priority: -1,
+        type: "MT_MSG",
+        token: localStorage.getItem('token'),
+        publicKey: publicKey,
+        packet: packetString,
+        signature: signature,
+        channel: form_data.channel
+    }
+
+    const response = await fetch(`/new-message`,
         {
             method: 'POST',
             headers: {
@@ -142,3 +174,18 @@ export async function action({ request }) {
 
 }
 
+export function packetSign(packetString, privateKey){
+    const privateKeyObject = forge.pki.privateKeyFromPem(privateKey)
+    const md = forge.md.sha256.create();
+    md.update(packetString, 'utf8');
+    const signature = privateKeyObject.sign(md);
+    const signatureBase64 = forge.util.encode64(signature);
+    return signatureBase64
+}
+export function packetVerify(packet, clientPublicKey, signature){
+    const publicKeyObject = forge.pki.publicKeyFromPem(clientPublicKey);
+    const md = forge.md.sha256.create();
+    md.update(packet, 'utf8');
+    const signature64 = forge.util.decode64(signature);
+    return publicKeyObject.verify(md.digest().bytes(), signature64);
+}

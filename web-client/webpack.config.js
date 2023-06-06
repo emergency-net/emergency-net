@@ -11,7 +11,8 @@ export default {
         filename: 'bundle.js'
     },
     resolve: {
-        extensions: ['.jsx', '.js']
+        extensions: ['.jsx', '.js'],
+        fallback: { "crypto": false }
     },
     plugins: [new HtmlWebpackPlugin({
         template: 'index.html'

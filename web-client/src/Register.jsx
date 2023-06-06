@@ -3,6 +3,8 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import Card from 'react-bootstrap/Card'
 import { useEffect } from 'react'
+import { JSEncrypt } from "jsencrypt";
+import jwt_decode from "jwt-decode";
 
 export function Register() {
     const navigate = useNavigate()
@@ -40,27 +42,86 @@ export function Register() {
 }
 
 export async function action({ request }) {
-    const data = Object.fromEntries(await request.formData())
+    const form_data = Object.fromEntries(await request.formData())
 
-    if (data.username === '')
+    if (form_data.username === '')
         throw new Response('Bad Request', {status: 400, statusText: 'Bad Request'})
     
+    var crypt = new JSEncrypt({default_key_size: 2048});
+    var PublicPrivateKey = {
+        PublicKey: crypt.getPublicKey(),
+        PrivateKey:crypt.getPrivateKey()
+    };
+
+    localStorage.setItem('publicKey', PublicPrivateKey.PublicKey)
+    localStorage.setItem('privateKey', PublicPrivateKey.PrivateKey)
+
+    let data = {
+        id: 0,
+        tod: Date.now(),
+        priority: -1,
+        type: "MT_REG",
+        username: form_data.username,
+        publicKey:  PublicPrivateKey.PublicKey
+    }
+
     const response = await fetch('/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
-    })
-
-    if (response.status === 409) {
-        throw response
-    }
-
+    }).then(response => {
+        if (response.status === 309) throw response
+        return response.json()
+    }).catch(error => console.error(error))
+    
+    localStorage.setItem('id', response.id)
+    
     return response
 }
 
-export function loader() {
-    if (localStorage.getItem('token')) return redirect('/')
-    return null
+export async function loader() {
+    let token = localStorage.getItem('token') 
+    let publicKey = localStorage.getItem('publicKey')
+    let username = localStorage.getItem('username')
+
+    let data = {
+        id: 0,
+        tod: Date.now(),
+        priority: -1,
+        type: "MT_HELLO",
+        token: token,
+        username: username,
+        publicKey:  publicKey
+    }
+    const response = await fetch('/hello', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }).then(response => response.json())
+
+    let decoded = jwt_decode(response.apToken)
+    if (decoded.apPublicKey.replaceAll("\n", "") !== response.APPublicKey.replaceAll("\n", "")){
+        console.log("Public Keys does not match.")
+        console.log(decoded.apPublicKey.replaceAll("\n", ""), response.APPublicKey.replaceAll("\n", ""))
+        throw new Response(response.error , {
+            status: 400,
+        })
+    }
+    if (response.type == "MT_HELLO_AGAIN") return redirect('/')
+
+    if (response.type == "MT_HELLO_ACK") {
+    }
+
+    // TODO check rejection message and status
+    if (response.type == "MT_HELLO_RJT")   throw new Response(response.error , {
+                                        status: 400,
+                                    });
+
+    localStorage.setItem('APPublicKey', response.APPublicKey)
+    
+    return null   
 }
