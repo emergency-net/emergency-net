@@ -289,6 +289,7 @@ router
         ctx.type = 'application/json'
         ctx.body = JSON.stringify(Array.from(messagesNeeded))
     })
+    
     .post('/create-channel', koaBody(), async ctx => {
 
         const clientPublicKey = ctx.request.body.publicKey
