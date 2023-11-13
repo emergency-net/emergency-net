@@ -1,31 +1,37 @@
+import { createHash } from 'crypto';
 
-class RegisterUtils {
+export function createToken(mtUsername, mtPubKey) {
 
-    createToken (mtUsername, mtPubKey) {
+    const tod = Date.now();
 
-        const tod = Date.now();
-
-        const registerContent = {
-            apRegId: process.env.apId,
-            todReg: tod,
-            mtUsername: mtUsername,
-            mtPubKey: mtPubKey
-        }
-
-        var encoded = this.jsonToBase64(registerContent);
-
-        return encoded;
+    const registerContent = {
+        apRegId: process.env.apId,
+        todReg: tod,
+        mtUsername: mtUsername,
+        mtPubKey: mtPubKey
     }
 
-    jsonToBase64(object) {
-        const json = JSON.stringify(object);
-        return Buffer.from(json).toString("base64");
-    }
+    var encoded = jsonToBase64(registerContent);
+    var hashed = this.hashBase64(encoded);
+    var signed = sign(hashed);
 
-    base64toJson(base64String) {
-        const json = Buffer.from(base64String, "base64").toString();
-        return JSON.parse(json);
-    }
+    return `${encoded}.${signed}.${cert}`;
+}
 
+export function hashBase64(base64String, algorithm = 'sha256', encoding = 'hex') {
+    return createHash(algorithm)
+        .update(base64String)
+        .digest(encoding);
+}
 
+export function sign(hash) {
+    const sign = crypto.createSign('RSA-SHA256');
+    sign.update(hash);
+    return sign.sign(privateKey, 'base64');
+}
+
+export function sign(hash) {
+    const sign = crypto.createSign('RSA-SHA256');
+    sign.update(hash);
+    return sign.sign(privateKey, 'base64');
 }
