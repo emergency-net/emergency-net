@@ -1,5 +1,5 @@
 import { hashBase64 } from "./RegisterUtils";
-import { base64toJson, publicDecrypt, verifyACAP, verifyPUAP } from "./cryptoUtil";
+import { base64toJson, publicDecrypt, verifyACAP, verifyPUAP } from "CryptoUtil";
 
 export function verifyAPReg(data, cert) {
 

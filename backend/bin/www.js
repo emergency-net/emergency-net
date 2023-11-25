@@ -7,6 +7,8 @@
 import http from "http";
 import dotenv from "dotenv";
 import app from "../app.js";
+import fs from 'node:fs';
+
 dotenv.config();
 
 /**
@@ -19,7 +21,8 @@ app.set("port", port);
  * Create HTTP server.
  */
 
-const server = http.createServer(app);
+export const server = http.createServer(app);
+export const adminKey = fs.readFileSync(process.env.KEY_PATH);
 
 /**
  * Listen on provided port, on all network interfaces.
