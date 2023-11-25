@@ -1,14 +1,13 @@
-import { DataSource } from "typeorm";
-import { User } from "./entities/User.js"
+//var typeorm = require("typeorm");
 
-const AppDataSource = new DataSource({
+/*const AppDataSource = new typeorm.DataSource({
     type: "sqlite3",
     host: "localhost",
     port: 3306,
     username: "test",
     password: "test",
     database: "test",
-    entity: []
+    entity: [require("./entity/User.js")]
 })
 
 AppDataSource.initialize()
@@ -19,4 +18,4 @@ AppDataSource.initialize()
         console.error("Error during Data Source initialization", err)
     })
 
-export default AppDataSource;
+export default AppDataSource;*/

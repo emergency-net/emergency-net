@@ -6,7 +6,8 @@ import logger from "morgan";
 import sqlite3 from 'sqlite3';
 import {open} from "sqlite";
 import indexRouter from "./src/routes/index.js";
-import AppDataSource from "./database/newDbSetup.js";
+//import AppDataSource from "./database/newDbSetup.js";
+
 const app = express();
 
 // view engine setup
@@ -49,7 +50,5 @@ func().then(async () => {
   console.log(await db.all(sql))
   
 });
-
-
 
 export default app;

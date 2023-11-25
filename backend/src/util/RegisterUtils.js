@@ -1,26 +1,29 @@
-import { createHash } from "crypto";
+import { apId, publicKey } from "../../bin/www.js";
+import { jsonToBase64, sign, signByAdmin } from "./CryptoUtil.js";
 
-export function createToken(mtUsername, mtPubKey) {
+export function createToken(mtUsername, mtPubKey) { 
   const tod = Date.now();
 
   const registerContent = {
-    apRegId: process.env.apId,
+    apReg: apId,
     todReg: tod,
     mtUsername: mtUsername,
-    mtPubKey: mtPubKey,
+    mtPubKey: mtPubKey.toString(),
   };
+  
+  let registerContentStringified = JSON.stringify(registerContent);
 
   var encoded = jsonToBase64(registerContent);
-  var hashed = this.hashBase64(encoded);
-  var signed = sign(hashed);
+  var signed = sign(registerContentStringified);
 
+  const apContent = {
+    apPub: publicKey.toString(),
+    apId: "ortabayir"
+  }
+  const encodedApContent = jsonToBase64(apContent);
+  const signedApContent = signByAdmin((JSON.stringify(apContent)));
+  var cert = `${encodedApContent}.${signedApContent}`;
   return `${encoded}.${signed}.${cert}`;
 }
 
-export function hashBase64(
-  base64String,
-  algorithm = "sha256",
-  encoding = "hex"
-) {
-  return createHash(algorithm).update(base64String).digest(encoding);
-}
+

@@ -17,13 +17,28 @@ const { privateKey: privKey, publicKey: pubKey } = crypto.generateKeyPairSync("r
   modulusLength: 2048, // Length of the key in bits
 });
 
-export const adminKey = fs.readFileSync(process.env.KEY_PATH);
+const { privateKey: adminPrivKey, publicKey: adminPubKey } = crypto.generateKeyPairSync("rsa", {
+  modulusLength: 2048, // Length of the key in bits
+});
+
+const { privateKey: kardelenPrivKey, publicKey: kardelenPubKey } = crypto.generateKeyPairSync("rsa", {
+  modulusLength: 2048, // Length of the key in bits
+});
+
+export const karPrivKey = Buffer.from(kardelenPrivKey.export({ format: "pem", type: "pkcs1" }));
+
+export const karPubKey = Buffer.from(kardelenPubKey.export({ format: "pem", type: "pkcs1" }));
+//export const adminKey = fs.readFileSync(process.env.KEY_PATH);
+
+export const adminPrivateKey = Buffer.from(adminPrivKey.export({ format: "pem", type: "pkcs1" }));
+
+export const adminKey = Buffer.from(adminPubKey.export({ format: "pem", type: "pkcs1" }));
 
 export const privateKey = Buffer.from(privKey.export({ format: "pem", type: "pkcs1" }));
 
 export const publicKey = Buffer.from(pubKey.export({ format: "pem", type: "pkcs1" }));
 
-export const apId = "Ortabayır";
+export const apId = "ortabayir";
 /**
  * Get port from environment and store in Express.
  */

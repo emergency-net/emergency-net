@@ -1,37 +1,42 @@
-import { hashBase64 } from "./RegisterUtils.js";
-import { base64toJson, publicDecrypt, verifyACAP, verifyPUAP } from "./CryptoUtil.js";
+import { adminKey } from "../../bin/www.js";
+import { base64toJson, hashBase64, publicDecrypt, verify, verifyACAP, verifyPUAP } from "./CryptoUtil.js";
 
 export function verifyAPReg(data, cert) {
-
+    let isVerified = false;
     var fragmentedCert = cert.split(".");
-    var APData;
+    var encodedAPData;
+    console.log("fragmented cert " + fragmentedCert);
     if (fragmentedCert.length === 2) {
-        APData = fragmentedCert[0];
-        var encryptedData = fragmentedCert[1];
-        isVerified = verifyACAP(APData, encryptedData);
+        encodedAPData = fragmentedCert[0];
+        var adminSignature = fragmentedCert[1];
+        isVerified = verifyACAP(encodedAPData, adminSignature);
+        console.log(encodedAPData);
     }
     else if (fragmentedCert.length === 4) {
-        APData = fragmentedCert[0];
-        var encryptedAPData = fragmentedCert[1];
-        var PUData = fragmentedCert[2];
-        var encryptedPUData = fragmentedCert[3];
-        isVerified = verifyPUAP(APData, encryptedAPData, PUData, encryptedPUData);
+        encodedAPData = fragmentedCert[0];
+        var PUsignature = fragmentedCert[1];
+        var encodedPUData = fragmentedCert[2];
+        var adminSignature = fragmentedCert[3];
+        isVerified = verifyPUAP(encodedAPData, PUsignature, encodedPUData, adminSignature);
     }
 
     var decodedData = base64toJson(data);
-    return (isVerified && decodedData.APReg == APData.Id) ? APData.PubKey : -1;
+    var decodedAPData = base64toJson(encodedAPData);
+    //Assume certificates have apId and apPub fields
+    return (isVerified && decodedData.apReg == decodedAPData.apId) ? decodedAPData.apPub : -1;
 }
 
 export function verifyToken(token) {
     var fragmentedToken = token.split(".");
-    var data = fragmentedToken[0];
-    var encryptedData = fragmentedToken[1];
+    //Mt identity
+    var encodedData = fragmentedToken[0];
+    var signature = fragmentedToken[1];
     var cert = fragmentedToken.slice(2).join('.');
-    var APPubKey = verifyAPReg(data, cert);
-    if (APPubKey > 0) {
-        var decryptedHash = publicDecrypt(APPubKey, encryptedData);
-        var hash = hashBase64(data);
-        return hash === decryptedHash;
+    var APPubKey = verifyAPReg(encodedData, cert);
+    console.log(APPubKey);
+    console.log("FRAGMENTED TOKEN ALPERENE GIRSIN " + fragmentedToken);
+    if (APPubKey != -1) {
+        return verify(JSON.stringify(base64toJson(encodedData)), signature, Buffer.from(APPubKey));
     }
     return false;
 }

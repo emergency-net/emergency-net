@@ -1,5 +1,5 @@
-import crypto from "crypto";
-import { privateKey, adminKey } from "../../bin/www.js";
+import crypto, { createHash } from "crypto";
+import { privateKey, adminKey, adminPrivateKey } from "../../bin/www.js";
 
 export function jsonToBase64(object) {
   const json = JSON.stringify(object);
@@ -31,32 +31,48 @@ export function privateDecrypt(privateKey, encryptedToken) {
     .toString();
 }
 
-export function sign(hash) {
+export function sign(data) {
   const sign = crypto.createSign("RSA-SHA256");
-  sign.update(hash);
+  sign.update(data);
   return sign.sign(privateKey, "base64");
 }
 
-export function verify(hash, signature, publicKey) {
+export function signByAdmin(data) {
+  const sign = crypto.createSign("RSA-SHA256");
+  sign.update(data);
+  return sign.sign(adminPrivateKey, "base64");
+}
+
+export function verify(data, signature, publicKey) {
   const verify = crypto.createVerify('RSA-SHA256');
-  verify.update(hash);
+  verify.update(data);
 
   const isVerified = verify.verify(publicKey, signature, 'base64');
   return isVerified;
 }
 
+export function hashBase64(
+  base64String,
+  algorithm = "sha256",
+) {
+  return createHash(algorithm).update(base64String).digest();
+}
+
 // Admin-Certified AP
 // TO-DO:: object equality check will be implemented
-export function verifyACAP(data, encryptedData, adminKey) {
-  return verifyAPIdentity(data, publicDecrypt(adminKey, encryptedData));
+export function verifyACAP(encodedData, adminSignature) {
+  const stringifiedData = JSON.stringify(base64toJson(encodedData));
+  return verify(stringifiedData, adminSignature, adminKey);
 }
 
 // PU-Certified AP
-// TO-DO:: object equality check will be implemented
-export function verifyPUAP(APData, encryptedAPData, PUData, encryptedPUData) {
-  if (PUData == publicDecrypt(adminKey, encryptedPUData)) {
-    const PUPubkey = PUData.PUPubkey;
-    return APData == publicDecrypt(PUPubkey, encryptedAPData);
+export function verifyPUAP(encodedAPData, PUsignature, encodedPUData, adminSignature) {
+  const PUData = base64toJson(encodedPUData);
+  const stringifiedPUData = JSON.stringify(PUData);
+  if (verify(stringifiedPUData, adminSignature, adminKey)) {
+    const stringifiedAPData = JSON.stringify(base64toJson(encodedAPData));
+    const PUkey = PUData.pubKey;
+    return verify(stringifiedAPData, PUsignature, PUkey)
   }
   return false;
 }

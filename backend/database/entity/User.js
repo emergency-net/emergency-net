@@ -1,4 +1,4 @@
-var EntitySchema = require("typeorm").EntitySchema
+import { EntitySchema } from "typeorm";
 
 module.exports = new EntitySchema({
     name: "User",
@@ -6,8 +6,7 @@ module.exports = new EntitySchema({
     columns: {    
         username: {
             primary: true,
-            type: "varchar",
-            generated: false,
+            type: "varchar"
         },
     },
 })
