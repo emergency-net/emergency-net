@@ -7,9 +7,27 @@
 import http from "http";
 import dotenv from "dotenv";
 import app from "../app.js";
-import fs from 'node:fs';
+import fs from "node:fs";
+import crypto from "crypto";
 
 dotenv.config();
+
+const adminKey = fs.readFileSync(process.env.KEY_PATH);
+
+app.set("adminKey", adminKey);
+
+const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
+  modulusLength: 2048, // Length of the key in bits
+});
+
+app.set(
+  "privateKey",
+  Buffer.from(privateKey.export({ format: "pem", type: "pkcs1" }))
+);
+app.set(
+  "publicKey",
+  Buffer.from(publicKey.export({ format: "pem", type: "pkcs1" }))
+);
 
 /**
  * Get port from environment and store in Express.
@@ -22,7 +40,6 @@ app.set("port", port);
  */
 
 export const server = http.createServer(app);
-export const adminKey = fs.readFileSync(process.env.KEY_PATH);
 
 /**
  * Listen on provided port, on all network interfaces.

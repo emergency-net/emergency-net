@@ -24,15 +24,3 @@ export function hashBase64(
 ) {
   return createHash(algorithm).update(base64String).digest(encoding);
 }
-
-export function sign(hash) {
-  const sign = crypto.createSign("RSA-SHA256");
-  sign.update(hash);
-  return sign.sign(privateKey, "base64");
-}
-
-export function sign(hash) {
-  const sign = crypto.createSign("RSA-SHA256");
-  sign.update(hash);
-  return sign.sign(privateKey, "base64");
-}
