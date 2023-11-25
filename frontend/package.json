@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/crypto-js": "^4.2.1",
+    "crypto-js": "^4.2.0",
+    "keypair": "^1.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
