@@ -3,7 +3,7 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-
+import sqlite3 from 'sqlite3';
 import indexRouter from "./src/routes/index.js";
 
 const app = express();
@@ -31,5 +31,11 @@ app.use((err, req, res, next) => {
   console.error(err);
   res.send(err);
 });
+
+
+const db = open({
+  filename: 'database/Emergency-Net-DB.db',
+  driver: sqlite3.Database
+})
 
 export default app;
