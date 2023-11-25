@@ -1,34 +1,38 @@
-import { verifyToken } from "../util/HelloUtil"
+import { verifyToken } from "../util/HelloUtil.js"
+import {apId} from "../../bin/www.js"
 
 class HelloController {
-    async hello(ctx) {
-        let token = ctx.request.body.token
+
+    async  hello(req, res, next) {
+        let token = req.body.token
+        let tod_reg = Date.now();
         if (token != null) {
             if (verifyToken(token)) {
-                ctx.body = {
-                    id: apName,
+                res.body = {
+                    id: apId,
                     tod: tod_reg,
                     priority: -1,
                     type: "MT_HELLO_ACK",
                 }
-                ctx.status = 200
+                res.status = 200
             } else {
-                ctx.body = {
-                    id: apName,
+                res.body = {
+                    id: apId,
                     tod: tod_reg,
                     priority: -1,
                     type: "MT_HELLO_RJT",
                 }
-                ctx.status = 400
+                res.status = 400
             }
         } else {
-            ctx.body = {
-                id: apName,
+            res.body = {
+                id: apId,
                 tod: tod_reg,
                 priority: -1,
                 type: "MT_REG_PAGE",
             }
-            ctx.status = 200
+            res.status = 200
         }
     }
 }
+export const helloController = new HelloController();

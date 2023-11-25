@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { privateKey } from "../../app.js";
+import { privateKey, adminKey } from "../../bin/www.js";
 
 export function jsonToBase64(object) {
   const json = JSON.stringify(object);
@@ -35,6 +35,14 @@ export function sign(hash) {
   const sign = crypto.createSign("RSA-SHA256");
   sign.update(hash);
   return sign.sign(privateKey, "base64");
+}
+
+export function verify(hash, signature, publicKey) {
+  const verify = crypto.createVerify('RSA-SHA256');
+  verify.update(hash);
+
+  const isVerified = verify.verify(publicKey, signature, 'base64');
+  return isVerified;
 }
 
 // Admin-Certified AP
