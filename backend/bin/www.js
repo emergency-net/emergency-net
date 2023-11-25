@@ -23,7 +23,7 @@ export const privateKey = Buffer.from(privKey.export({ format: "pem", type: "pkc
 
 export const publicKey = Buffer.from(pubKey.export({ format: "pem", type: "pkcs1" }));
 
-
+export const apId = "Ortabayır";
 /**
  * Get port from environment and store in Express.
  */

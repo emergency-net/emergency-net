@@ -37,6 +37,14 @@ export function sign(hash) {
   return sign.sign(privateKey, "base64");
 }
 
+export function verify(hash, signature, publicKey) {
+  const verify = crypto.createVerify('RSA-SHA256');
+  verify.update(hash);
+
+  const isVerified = verify.verify(publicKey, signature, 'base64');
+  return isVerified;
+}
+
 // Admin-Certified AP
 // TO-DO:: object equality check will be implemented
 export function verifyACAP(data, encryptedData, adminKey) {
