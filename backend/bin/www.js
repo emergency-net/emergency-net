@@ -12,22 +12,17 @@ import crypto from "crypto";
 
 dotenv.config();
 
-const adminKey = fs.readFileSync(process.env.KEY_PATH);
 
-app.set("adminKey", adminKey);
-
-const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
+const { privateKey: privKey, publicKey: pubKey } = crypto.generateKeyPairSync("rsa", {
   modulusLength: 2048, // Length of the key in bits
 });
 
-app.set(
-  "privateKey",
-  Buffer.from(privateKey.export({ format: "pem", type: "pkcs1" }))
-);
-app.set(
-  "publicKey",
-  Buffer.from(publicKey.export({ format: "pem", type: "pkcs1" }))
-);
+export const adminKey = fs.readFileSync(process.env.KEY_PATH);
+
+export const privateKey = Buffer.from(privKey.export({ format: "pem", type: "pkcs1" }));
+
+export const publicKey = Buffer.from(pubKey.export({ format: "pem", type: "pkcs1" }));
+
 
 /**
  * Get port from environment and store in Express.

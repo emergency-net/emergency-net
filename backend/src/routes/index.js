@@ -3,7 +3,10 @@ import {
   privateEncrypt,
   publicDecrypt,
   publicEncrypt,
+  sign,
 } from "../util/CryptoUtil.js";
+
+import { privateKey, publicKey } from "../../bin/www.js";
 const router = express.Router();
 
 /* GET home page. */
@@ -12,14 +15,11 @@ router.get("/", (req, res, next) => {
 });
 
 router.get("/test", (req, res, next) => {
-  const adminKey = req.app.get("adminKey");
-  const privateKey = req.app.get("privateKey");
-  const publicKey = req.app.get("publicKey");
 
   const encrypted = privateEncrypt(privateKey, "slm");
   const decrypted = publicDecrypt(publicKey, encrypted);
-
-  res.send(JSON.stringify({ encrypted, decrypted }));
+  const signed = sign("slm");
+  res.send(JSON.stringify({ encrypted, signed}));
 });
 
 export default router;

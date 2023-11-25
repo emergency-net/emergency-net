@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { privateKey } from "../../app.js";
+import { privateKey, adminKey } from "../../bin/www.js";
 
 export function jsonToBase64(object) {
   const json = JSON.stringify(object);
