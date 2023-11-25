@@ -11,7 +11,7 @@ function App() {
     const encrypted = await encrypt(encryptKeys!.public, msg);
     const exportedKey = await exportKey(encryptKeys!.public);
 
-    axios.post("http://localhost:3001/mtEncryptTest", {
+    axios.post("http://localhost:3000/mtEncryptTest", {
       key: exportedKey,
       msg,
       encrypted,
@@ -23,7 +23,7 @@ function App() {
     const signature = await sign(signKeys!.private!, msg);
     const exportedKey = await exportKey(encryptKeys!.public);
 
-    axios.post("http://localhost:3001/mtSignTest", {
+    axios.post("http://localhost:3000/mtSignTest", {
       key: exportedKey,
       msg,
       signature,

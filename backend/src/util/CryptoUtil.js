@@ -1,5 +1,6 @@
 import crypto, { createHash } from "crypto";
 import { privateKey, adminKey, adminPrivateKey } from "../../bin/www.js";
+const {subtle} = globalThis.crypto;
 
 export function jsonToBase64(object) {
   const json = JSON.stringify(object);
@@ -82,4 +83,20 @@ function verifyAPIdentity(obj1, obj2) {
     return false;
   }
   return obj1.apId === obj2.apId && obj1.apPub === obj2.apPub;
+}
+
+export async function spkiToCryptoKey(spki) {
+  const encryptAlgorithm = {
+    name: "RSA-OAEP",
+    modulusLength: 2048,
+    publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+    hash: "SHA-256",
+  };
+  
+  const bufferspki = Buffer.from(spki);
+  const subtleKey = await subtle.importKey("spki", bufferspki, encryptAlgorithm, true, ["decrypt"]);
+  console.log(bufferspki);
+  console.log(subtleKey);
+  const keyObject = crypto.KeyObject.from(subtleKey);
+  return keyObject;
 }

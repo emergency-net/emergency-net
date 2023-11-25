@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import app from "../app.js";
 import fs from "node:fs";
 import crypto from "crypto";
+import cors from "cors";
 
 dotenv.config();
 

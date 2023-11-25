@@ -6,6 +6,7 @@ import logger from "morgan";
 import sqlite3 from 'sqlite3';
 import {open} from "sqlite";
 import indexRouter from "./src/routes/index.js";
+import cors from "cors";
 //import AppDataSource from "./database/newDbSetup.js";
 
 const app = express();
@@ -17,6 +18,8 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cors());
+app.options("*", cors());
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
