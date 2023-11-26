@@ -7,37 +7,51 @@
 import http from "http";
 import dotenv from "dotenv";
 import app from "../app.js";
-import fs from "node:fs";
 import crypto from "crypto";
-import cors from "cors";
 
 dotenv.config();
 
+const { privateKey: privKey, publicKey: pubKey } = crypto.generateKeyPairSync(
+  "rsa",
+  {
+    modulusLength: 2048, // Length of the key in bits
+  }
+);
 
-const { privateKey: privKey, publicKey: pubKey } = crypto.generateKeyPairSync("rsa", {
-  modulusLength: 2048, // Length of the key in bits
-});
+const { privateKey: adminPrivKey, publicKey: adminPubKey } =
+  crypto.generateKeyPairSync("rsa", {
+    modulusLength: 2048, // Length of the key in bits
+  });
 
-const { privateKey: adminPrivKey, publicKey: adminPubKey } = crypto.generateKeyPairSync("rsa", {
-  modulusLength: 2048, // Length of the key in bits
-});
+const { privateKey: kardelenPrivKey, publicKey: kardelenPubKey } =
+  crypto.generateKeyPairSync("rsa", {
+    modulusLength: 2048, // Length of the key in bits
+  });
 
-const { privateKey: kardelenPrivKey, publicKey: kardelenPubKey } = crypto.generateKeyPairSync("rsa", {
-  modulusLength: 2048, // Length of the key in bits
-});
+export const karPrivKey = Buffer.from(
+  kardelenPrivKey.export({ format: "pem", type: "pkcs1" })
+);
 
-export const karPrivKey = Buffer.from(kardelenPrivKey.export({ format: "pem", type: "pkcs1" }));
-
-export const karPubKey = Buffer.from(kardelenPubKey.export({ format: "pem", type: "pkcs1" }));
+export const karPubKey = Buffer.from(
+  kardelenPubKey.export({ format: "pem", type: "pkcs1" })
+);
 //export const adminKey = fs.readFileSync(process.env.KEY_PATH);
 
-export const adminPrivateKey = Buffer.from(adminPrivKey.export({ format: "pem", type: "pkcs1" }));
+export const adminPrivateKey = Buffer.from(
+  adminPrivKey.export({ format: "pem", type: "pkcs1" })
+);
 
-export const adminKey = Buffer.from(adminPubKey.export({ format: "pem", type: "pkcs1" }));
+export const adminKey = Buffer.from(
+  adminPubKey.export({ format: "pem", type: "pkcs1" })
+);
 
-export const privateKey = Buffer.from(privKey.export({ format: "pem", type: "pkcs1" }));
+export const privateKey = Buffer.from(
+  privKey.export({ format: "pem", type: "pkcs1" })
+);
 
-export const publicKey = Buffer.from(pubKey.export({ format: "pem", type: "pkcs1" }));
+export const publicKey = Buffer.from(
+  pubKey.export({ format: "pem", type: "pkcs1" })
+);
 
 export const apId = "ortabayir";
 /**
