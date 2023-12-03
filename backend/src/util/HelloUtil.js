@@ -38,8 +38,6 @@ export function verifyToken(token) {
   var signature = fragmentedToken[1];
   var cert = fragmentedToken.slice(2).join(".");
   var APPubKey = verifyAPReg(encodedData, cert);
-  console.log(APPubKey);
-  console.log("FRAGMENTED TOKEN ALPERENE GIRSIN " + fragmentedToken);
   if (APPubKey != -1) {
     return verify(
       JSON.stringify(base64toJson(encodedData)),

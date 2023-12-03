@@ -1,6 +1,7 @@
-import crypto, { createHash } from "crypto";
+import crypto, { createHash, webcrypto } from "crypto";
 import { privateKey, adminKey, adminPrivateKey } from "../../bin/www.js";
-const { subtle } = globalThis.crypto;
+//const { subtle } = globalThis.crypto;
+const { subtle } = webcrypto;
 
 export function jsonToBase64(object) {
   const json = JSON.stringify(object);
