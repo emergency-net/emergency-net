@@ -6,7 +6,7 @@ function useKeys() {
   const { data: keys, isLoading: keysLoading } = useQuery(
     ["myKeys"],
     async () => {
-      if (!localStorage.getItem("encryptPrivateKey")) await initKeys();
+      if (!localStorage.getItem("privateKey")) await initKeys();
 
       // const encryptPrivateKey = await jwkToKey(
       //   JSON.parse(localStorage.getItem("encryptPrivateKey")!) as JsonWebKey,
@@ -17,11 +17,11 @@ function useKeys() {
       //   "encrypt"
       // );
       const signPrivateKey = await jwkToKey(
-        JSON.parse(localStorage.getItem("signPrivateKey")!) as JsonWebKey,
+        JSON.parse(localStorage.getItem("privateKey")!) as JsonWebKey,
         "sign"
       );
       const signPublicKey = await jwkToKey(
-        JSON.parse(localStorage.getItem("signPublicKey")!) as JsonWebKey,
+        JSON.parse(localStorage.getItem("publicKey")!) as JsonWebKey,
         "sign"
       );
 
