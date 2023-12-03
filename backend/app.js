@@ -5,6 +5,7 @@ import logger from "morgan";
 import indexRouter from "./src/routes/index.js";
 import cors from "cors";
 import "reflect-metadata";
+import { AppDataSource } from "./src/database/newDbSetup.js";
 
 //import AppDataSource from "./database/newDbSetup.js";
 
@@ -35,5 +36,7 @@ app.use((err, req, res, next) => {
   console.error(err);
   res.send(err);
 });
+
+const source = AppDataSource;
 
 export default app;
