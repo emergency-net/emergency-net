@@ -22,7 +22,7 @@ export function verifyAPReg(data, cert) {
       adminSignature
     );
   }
-
+  console.log("isVerified " + isVerified);
   var decodedData = base64toJson(data);
   var decodedAPData = base64toJson(encodedAPData);
   //Assume certificates have apId and apPub fields
@@ -35,10 +35,12 @@ export function verifyToken(token) {
   var fragmentedToken = token.split(".");
   //Mt identity
   var encodedData = fragmentedToken[0];
+  console.log("encodedData " + encodedData);
   var signature = fragmentedToken[1];
   var cert = fragmentedToken.slice(2).join(".");
   var APPubKey = verifyAPReg(encodedData, cert);
   if (APPubKey != -1) {
+    console.log("verified APREG");
     return verify(
       JSON.stringify(base64toJson(encodedData)),
       signature,

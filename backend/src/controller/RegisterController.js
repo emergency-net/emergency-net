@@ -1,4 +1,4 @@
-import { adminKey, apId, publicKey } from "../../bin/www.js";
+import { adminKey, apId, karPubKey, publicKey } from "../../bin/www.js";
 import { User } from "../database/entity/User.js";
 import { AppDataSource } from "../database/newDbSetup.js";
 import { keyObjectToJwk } from "../util/CryptoUtil.js";
@@ -35,7 +35,7 @@ class RegisterController {
         .then(() => console.log("User saved to the database"));
 
       const mtPubBuffer = Buffer.from(
-        mtPubKey.export({ format: "pem", type: "pkcs1" })
+        mtPubKey.export({ format: "pem", type: "spki" })
       );
       const token = createToken(username, mtPubBuffer);
 
@@ -47,8 +47,8 @@ class RegisterController {
         tod: tod_reg,
         priority: -1,
         type: "MT_REG_ACK",
-        apPubKey: keyObjectToJwk(publicKey),
-        adminPubKey: keyObjectToJwk(adminKey),
+        apPubKey: publicKey,
+        adminPubKey: adminKey,
         token: token,
       });
     }
