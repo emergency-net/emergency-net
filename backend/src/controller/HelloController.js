@@ -5,34 +5,36 @@ class HelloController {
   async hello(req, res, next) {
     let token = req.header("authorization");
     let tod = Date.now();
+
     if (token != null) {
       if (verifyToken(token)) {
-        res.body = {
+        // Correctly send the response
+        res.status(200).json({
           id: apId,
           tod: tod,
           priority: -1,
           type: "MT_HELLO_ACK",
-        };
-        res.status = 200;
+        });
       } else {
-        res.body = {
+        // Correctly send the response with an error status
+        res.status(400).json({
           id: apId,
           tod: tod,
           priority: -1,
           type: "MT_HELLO_RJT",
           error: "Invalid token.",
-        };
-        res.status = 400;
+        });
       }
     } else {
-      res.body = {
+      // Correctly send the response with a different status
+      res.status(202).json({
         id: apId,
         tod: tod,
         priority: -1,
         type: "MT_REG_PAGE",
-      };
-      res.status = 202;
+      });
     }
   }
 }
+
 export const helloController = new HelloController();
