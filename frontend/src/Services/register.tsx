@@ -8,7 +8,7 @@ export async function register({
   username: string;
   key: CryptoKey;
 }) {
-  const exportedKey = exportKey(key);
+  const exportedKey = await exportKey(key);
   const response = await axios.post(
     import.meta.env.VITE_API_URL + "/register",
     {
