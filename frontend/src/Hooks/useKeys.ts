@@ -8,14 +8,14 @@ function useKeys() {
     async () => {
       if (!localStorage.getItem("encryptPrivateKey")) await initKeys();
 
-      const encryptPrivateKey = await jwkToKey(
-        JSON.parse(localStorage.getItem("encryptPrivateKey")!) as JsonWebKey,
-        "encrypt"
-      );
-      const encryptPublicKey = await jwkToKey(
-        JSON.parse(localStorage.getItem("encryptPublicKey")!) as JsonWebKey,
-        "encrypt"
-      );
+      // const encryptPrivateKey = await jwkToKey(
+      //   JSON.parse(localStorage.getItem("encryptPrivateKey")!) as JsonWebKey,
+      //   "encrypt"
+      // );
+      // const encryptPublicKey = await jwkToKey(
+      //   JSON.parse(localStorage.getItem("encryptPublicKey")!) as JsonWebKey,
+      //   "encrypt"
+      // );
       const signPrivateKey = await jwkToKey(
         JSON.parse(localStorage.getItem("signPrivateKey")!) as JsonWebKey,
         "sign"
@@ -26,14 +26,8 @@ function useKeys() {
       );
 
       return {
-        encryptKeys: {
-          private: encryptPrivateKey,
-          public: encryptPublicKey,
-        },
-        signKeys: {
-          private: signPrivateKey,
-          public: signPublicKey,
-        },
+        MTprivate: signPrivateKey,
+        MTpublic: signPublicKey,
       };
     }
   );
