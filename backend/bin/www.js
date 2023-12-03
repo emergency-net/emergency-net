@@ -12,24 +12,24 @@ import crypto from "crypto";
 dotenv.config();
 
 const { privateKey: privKey, publicKey: pubKey } = crypto.generateKeyPairSync(
-  "rsa",
+  "rsa-pss",
   {
     modulusLength: 2048, // Length of the key in bits
   }
 );
 
 const { privateKey: adminPrivKey, publicKey: adminPubKey } =
-  crypto.generateKeyPairSync("rsa", {
+  crypto.generateKeyPairSync("rsa-pss", {
     modulusLength: 2048, // Length of the key in bits
   });
 
 const { privateKey: kardelenPrivKey, publicKey: kardelenPubKey } =
-  crypto.generateKeyPairSync("rsa", {
+  crypto.generateKeyPairSync("rsa-pss", {
     modulusLength: 2048, // Length of the key in bits
   });
 
 export const karPrivKey = Buffer.from(
-  kardelenPrivKey.export({ format: "pem", type: "pkcs1" })
+  kardelenPrivKey.export({ format: "jwk" })
 );
 
 export const karPubKey = Buffer.from(

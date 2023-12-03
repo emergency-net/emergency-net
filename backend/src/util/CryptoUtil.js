@@ -109,3 +109,7 @@ export async function spkiToCryptoKey(spki) {
   const keyObject = crypto.KeyObject.from(subtleKey);
   return keyObject;
 }
+
+export async function keyObjectToJwk(key) {
+  return key.export({ format: "jwk" });
+}
