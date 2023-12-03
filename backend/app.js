@@ -7,6 +7,9 @@ import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 import indexRouter from "./src/routes/index.js";
 import cors from "cors";
+import "reflect-metadata";
+import { AppDataSource } from "./database/newDbSetup.js";
+
 //import AppDataSource from "./database/newDbSetup.js";
 
 const app = express();
@@ -37,17 +40,6 @@ app.use((err, req, res, next) => {
   res.send(err);
 });
 
-// let db;
-// const func = async () => {
-//   db = await open({
-//     filename: "database/Emergency-Net-DB.db",
-//     driver: sqlite3.Database,
-//   });
-// };
-
-// let sql = "SELECT * from  ap_private_keys";
-// func().then(async () => {
-//   console.log(await db.all(sql));
-// });
+const source = AppDataSource;
 
 export default app;

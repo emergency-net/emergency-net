@@ -8,6 +8,7 @@
     "dev": "nodemon ./bin/www.js"
   },
   "dependencies": {
+    "@types/node": "^20.10.2",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -15,9 +16,10 @@
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
+    "reflect-metadata": "^0.1.13",
     "sqlite": "5.1.1",
-    "sqlite3": "~5.0.0",
-    "typeorm": "~0.2.40"
+    "sqlite3": "~5.0.11",
+    "typeorm": "^0.3.17"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
