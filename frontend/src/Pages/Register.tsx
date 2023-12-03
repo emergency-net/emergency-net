@@ -12,10 +12,12 @@ import { register } from "@/Services/register";
 import useKeys from "@/Hooks/useKeys";
 import { useState } from "react";
 import { setCookie } from "typescript-cookie";
+import useErrorToast from "@/Hooks/useErrorToast";
 
 function Register() {
   const { MTpublic } = useKeys();
   const [username, setUsername] = useState<string>("");
+  const error = useErrorToast();
   const { mutate: sendRegister } = useMutation(
     () => {
       if (username.length < 5) {
@@ -27,6 +29,7 @@ function Register() {
       onSuccess(data) {
         setCookie("token", data.token);
       },
+      onError: error,
     }
   );
   return (

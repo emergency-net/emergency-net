@@ -11,7 +11,7 @@ function HelloWrapper() {
   useEffect(() => {
     const token = getCookie("token");
     if (token) {
-      axios.defaults.headers.common.Authorization = "Bearer " + token;
+      axios.defaults.headers.common.Authorization = token;
     }
     hello()
       .then((res) => {

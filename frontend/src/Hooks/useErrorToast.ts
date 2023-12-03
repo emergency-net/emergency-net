@@ -1,15 +1,28 @@
-// import { useToast } from "@/Components/ui/use-toast";
-// import { AxiosResponse } from "axios";
+import { useToast } from "@/Components/ui/use-toast";
+import { AxiosResponse } from "axios";
 
-// function useErrorToast() {
-//   const toast = useToast();
+function useErrorToast() {
+  const toast = useToast();
 
-//   function error(err: Error | AxiosResponse | string) {
-//     if(typeof err === "string") {
+  function getMsg(err: any): string {
+    if (typeof err === "string") {
+      return err;
+    } else if (err?.response?.data?.message) {
+      return err?.response?.data?.message;
+    } else if (err?.message) {
+      return err?.message;
+    } else {
+      return "Unknown Error";
+    }
+  }
 
-//     }
-//   }
-//   return (  );
-// }
+  function error(err: Error | AxiosResponse | string) {
+    toast.toast({
+      variant: "destructive",
+      description: getMsg(err),
+    });
+  }
+  return error;
+}
 
-// export default useErrorToast;
+export default useErrorToast;
