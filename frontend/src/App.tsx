@@ -8,14 +8,14 @@ function App() {
 
   const { mutate: submitEncrypt } = useMutation(async ({ msg }: any) => {
     //const exportedKey = await exportKey(privateKey!);
-    const encrypted = await encrypt(encryptKeys!.public, msg);
-    const exportedKey = await exportKey(encryptKeys!.private);
+    const exportedKey = await exportKey(encryptKeys!.public);
 
-    axios.post("http://localhost:3000/mtEncryptTest", {
+    const response = await axios.post("http://localhost:3000/mtEncryptTest", {
       key: exportedKey,
       msg,
-      encrypted,
     });
+
+    window.alert(decrypt(encryptKeys?.private!, response.data));
   });
 
   const { mutate: submitSign } = useMutation(async ({ msg }: any) => {
