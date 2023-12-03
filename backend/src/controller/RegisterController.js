@@ -1,6 +1,7 @@
 import { adminKey, apId, publicKey } from "../../bin/www.js";
 import { User } from "../database/entity/User.js";
 import { AppDataSource } from "../database/newDbSetup.js";
+import { keyObjectToJwk } from "../util/CryptoUtil.js";
 import "../util/RegisterUtils.js";
 import { createToken } from "../util/RegisterUtils.js";
 
@@ -42,8 +43,8 @@ class RegisterController {
         tod: tod_reg,
         priority: -1,
         type: "MT_REG_ACK",
-        apPubKey: publicKey,
-        adminPubKey: adminKey,
+        apPubKey: keyObjectToJwk(publicKey),
+        adminPubKey: keyObjectToJwk(adminKey),
         token: token,
       });
     }
