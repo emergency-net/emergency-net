@@ -2,8 +2,11 @@ import express from "express";
 import { privateDecrypt, spkiToCryptoKey } from "../util/CryptoUtil.js";
 
 import { helloController } from "../controller/HelloController.js";
+import { registerController } from "../controller/RegisterController.js";
+
 import { AppDataSource } from "../database/newDbSetup.js";
 import { getUser, putUser } from "../util/DatabaseUtil.js";
+import { register } from "module";
 const router = express.Router();
 
 /* GET home page. */
@@ -12,6 +15,9 @@ router.get("/", (req, res, next) => {
 });
 
 router.get("/hello", helloController.hello);
+
+router.post("/register", registerController.register);
+
 
 router.get("/test", (req, res, next) => {
   // const encrypted = privateEncrypt(privateKey, "slm");

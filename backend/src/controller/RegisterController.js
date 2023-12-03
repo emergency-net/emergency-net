@@ -35,7 +35,7 @@ class RegisterController {
       var token = createToken(username, mtPubKey);
 
       //Put token in the header
-      res.headers.authorization = "Bearer " + token;
+      //res.headers.authorization = "Bearer " + token;
 
       res.status(200).json({
         id: apId,
@@ -44,7 +44,10 @@ class RegisterController {
         type: "MT_REG_ACK",
         apPubKey: publicKey,
         adminPubKey: adminKey,
+        token: token,
       });
     }
   }
 }
+
+export const registerController = new RegisterController();

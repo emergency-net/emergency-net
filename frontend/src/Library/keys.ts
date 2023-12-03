@@ -4,20 +4,20 @@ export async function initKeys() {
   const { sign, encrypt } = await generateKeys();
 
   const keys = [
+    // {
+    //   name: "encryptPrivateKey",
+    //   key: encrypt.privateKey,
+    // },
+    // {
+    //   name: "encryptPublicKey",
+    //   key: encrypt.publicKey,
+    // },
     {
-      name: "encryptPrivateKey",
-      key: encrypt.privateKey,
-    },
-    {
-      name: "encryptPublicKey",
-      key: encrypt.publicKey,
-    },
-    {
-      name: "signPrivateKey",
+      name: "privateKey",
       key: sign.privateKey,
     },
     {
-      name: "signPublicKey",
+      name: "publicKey",
       key: sign.publicKey,
     },
   ];
