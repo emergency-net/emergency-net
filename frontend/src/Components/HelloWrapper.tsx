@@ -1,13 +1,15 @@
 import { hello } from "@/Services/hello";
 import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useToast } from "./ui/use-toast";
 import { getCookie } from "typescript-cookie";
 import axios from "axios";
+import useErrorToast from "@/Hooks/useErrorToast";
 
 function HelloWrapper() {
   const navigate = useNavigate();
-  const toast = useToast();
+  const location = useLocation();
+  const handleError = useErrorToast();
   useEffect(() => {
     const token = getCookie("token");
     if (token) {
@@ -18,15 +20,12 @@ function HelloWrapper() {
         if (res.status === 202) {
           navigate("/register");
         } else if (res.status === 200) {
-          navigate("/home");
+          if (location.pathname == "/" || location.pathname == "") {
+            navigate("/home");
+          }
         }
       })
-      .catch(() => {
-        toast.toast({
-          variant: "destructive",
-          description: "Somethnig went wrong during hello exchange.",
-        });
-      });
+      .catch(handleError);
   }, []);
   return <Outlet />;
 }

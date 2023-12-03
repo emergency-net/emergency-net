@@ -13,15 +13,16 @@ import useKeys from "@/Hooks/useKeys";
 import { useState } from "react";
 import { setCookie } from "typescript-cookie";
 import useErrorToast from "@/Hooks/useErrorToast";
+import { useToast } from "@/Components/ui/use-toast";
 
 function Register() {
   const { MTpublic } = useKeys();
   const [username, setUsername] = useState<string>("");
-  const error = useErrorToast();
+  const handleError = useErrorToast();
   const { mutate: sendRegister } = useMutation(
     () => {
       if (username.length < 5) {
-        throw window.alert("Kullanıcı ismi geçersiz");
+        throw new Error("Kullanıcı ismi geçersiz.");
       }
       return register({ key: MTpublic!, username: username });
     },
@@ -29,7 +30,7 @@ function Register() {
       onSuccess(data) {
         setCookie("token", data.token);
       },
-      onError: error,
+      onError: handleError,
     }
   );
   return (

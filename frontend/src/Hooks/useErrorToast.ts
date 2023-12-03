@@ -2,13 +2,13 @@ import { useToast } from "@/Components/ui/use-toast";
 import { AxiosResponse } from "axios";
 
 function useErrorToast() {
-  const toast = useToast();
+  const { toast } = useToast();
 
   function getMsg(err: any): string {
     if (typeof err === "string") {
       return err;
-    } else if (err?.response?.data?.message) {
-      return err?.response?.data?.message;
+    } else if (err?.response?.data?.error) {
+      return err?.response?.data?.error;
     } else if (err?.message) {
       return err?.message;
     } else {
@@ -16,13 +16,14 @@ function useErrorToast() {
     }
   }
 
-  function error(err: Error | AxiosResponse | string) {
-    toast.toast({
+  function handleError(err: Error | AxiosResponse | string) {
+    console.error("HANDLE_ERROR: ", err);
+    toast({
       variant: "destructive",
       description: getMsg(err),
     });
   }
-  return error;
+  return handleError;
 }
 
 export default useErrorToast;
