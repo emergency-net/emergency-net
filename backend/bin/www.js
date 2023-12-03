@@ -29,28 +29,28 @@ const { privateKey: kardelenPrivKey, publicKey: kardelenPubKey } =
   });
 
 export const karPrivKey = Buffer.from(
-  kardelenPrivKey.export({ format: "jwk" })
+  kardelenPrivKey.export({ format: "pem", type: "pkcs8" })
 );
 
 export const karPubKey = Buffer.from(
-  kardelenPubKey.export({ format: "pem", type: "pkcs1" })
+  kardelenPubKey.export({ format: "pem", type: "spki" })
 );
 //export const adminKey = fs.readFileSync(process.env.KEY_PATH);
 
 export const adminPrivateKey = Buffer.from(
-  adminPrivKey.export({ format: "pem", type: "pkcs1" })
+  adminPrivKey.export({ format: "pem", type: "pkcs8" })
 );
 
 export const adminKey = Buffer.from(
-  adminPubKey.export({ format: "pem", type: "pkcs1" })
+  adminPubKey.export({ format: "pem", type: "spki" })
 );
 
 export const privateKey = Buffer.from(
-  privKey.export({ format: "pem", type: "pkcs1" })
+  privKey.export({ format: "pem", type: "pkcs8" })
 );
 
 export const publicKey = Buffer.from(
-  pubKey.export({ format: "pem", type: "pkcs1" })
+  pubKey.export({ format: "pem", type: "spki" })
 );
 
 export const apId = "ortabayir";

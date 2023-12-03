@@ -11,6 +11,7 @@ import { useMutation } from "react-query";
 import { register } from "@/Services/register";
 import useKeys from "@/Hooks/useKeys";
 import { useState } from "react";
+import { setCookie } from "typescript-cookie";
 
 function Register() {
   const { MTpublic } = useKeys();
@@ -24,7 +25,7 @@ function Register() {
     },
     {
       onSuccess(data) {
-        console.log(data);
+        setCookie("token", data.token);
       },
     }
   );

@@ -2,6 +2,7 @@ import { adminKey, apId, publicKey } from "../../bin/www.js";
 import { User } from "../database/entity/User.js";
 import { AppDataSource } from "../database/newDbSetup.js";
 import { keyObjectToJwk } from "../util/CryptoUtil.js";
+import { jwkToKeyObject } from "../util/CryptoUtil.js";
 import "../util/RegisterUtils.js";
 import { createToken } from "../util/RegisterUtils.js";
 
@@ -9,7 +10,7 @@ class RegisterController {
   async register(req, res, next) {
     const tod_reg = Date.now();
     let username = req.body.username;
-    let mtPubKey = req.body.mtPubKey;
+    let mtPubKey = await jwkToKeyObject(req.body.mtPubKey);
 
     if (
       username === "" ||
@@ -33,7 +34,10 @@ class RegisterController {
         })
         .then(() => console.log("User saved to the database"));
 
-      var token = createToken(username, mtPubKey);
+      const mtPubBuffer = Buffer.from(
+        mtPubKey.export({ format: "pem", type: "pkcs1" })
+      );
+      const token = createToken(username, mtPubBuffer);
 
       //Put token in the header
       //res.headers.authorization = "Bearer " + token;

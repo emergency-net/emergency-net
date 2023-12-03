@@ -114,7 +114,7 @@ export async function keyObjectToJwk(key) {
   return key.export({ format: "jwk" });
 }
 
-export async function jwkToCryptoKey(jwk) {
+export async function jwkToKeyObject(jwk) {
   const signAlgorithm = {
     name: "RSA-PSS",
     modulusLength: 2048,
