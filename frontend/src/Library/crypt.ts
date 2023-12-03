@@ -39,6 +39,12 @@ export async function jwkToKey(key: JsonWebKey, type: "encrypt" | "sign") {
   return await subtleCrypto.importKey("jwk", key, alg, true, keyUsages);
 }
 
+export async function keyToJwk(key: CryptoKey): Promise<JsonWebKey> {
+  // Export the key to the JWK format
+  const jwk = await crypto.subtle.exportKey("jwk", key);
+  return jwk;
+}
+
 export async function encrypt(key: CryptoKey, msg: string) {
   const encoded = new TextEncoder().encode(msg);
 
@@ -79,9 +85,8 @@ export async function verify(key: CryptoKey, signature: string, msg: string) {
   );
 }
 
-export async function exportKey(key: CryptoKey) {
-  const exported = await subtleCrypto.exportKey("spki", key);
-  const base64 = await arrayBufferToBase64(exported);
-
-  return base64;
-}
+// export async function exportKey(key: CryptoKey) {
+//   const exported = await subtleCrypto.exportKey("spki", key);
+//   const base64 = await arrayBufferToBase64(exported);
+//   return base64;
+// }

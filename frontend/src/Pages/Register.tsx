@@ -15,12 +15,19 @@ import { useState } from "react";
 function Register() {
   const { MTpublic } = useKeys();
   const [username, setUsername] = useState<string>("");
-  const { mutate: sendRegister } = useMutation(() => {
-    if (username.length < 5) {
-      throw window.alert("Kullanıcı ismi geçersiz");
+  const { mutate: sendRegister } = useMutation(
+    () => {
+      if (username.length < 5) {
+        throw window.alert("Kullanıcı ismi geçersiz");
+      }
+      return register({ key: MTpublic!, username: username });
+    },
+    {
+      onSuccess(data) {
+        console.log(data);
+      },
     }
-    return register({ key: MTpublic!, username: username });
-  });
+  );
   return (
     <div className="flex flex-col justify-center items-center h-full">
       <Card className="w-[90%]">
@@ -30,8 +37,14 @@ function Register() {
         </CardHeader>
 
         <CardContent className="flex-col flex">
-          <Input value={username} onChange={(e)=>setUsername(e.target.value)} placeholder="Kullanıcı İsmi..." />
-          <Button className="self-end mt-8" onClick={()=>sendRegister()}>Gönder</Button>
+          <Input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Kullanıcı İsmi..."
+          />
+          <Button className="self-end mt-8" onClick={() => sendRegister()}>
+            Gönder
+          </Button>
         </CardContent>
       </Card>
     </div>

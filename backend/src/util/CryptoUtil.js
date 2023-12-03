@@ -109,3 +109,20 @@ export async function spkiToCryptoKey(spki) {
   const keyObject = crypto.KeyObject.from(subtleKey);
   return keyObject;
 }
+
+export async function jwkToCryptoKey(jwk) {
+  const signAlgorithm = {
+    name: "RSA-PSS",
+    modulusLength: 2048,
+    publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+    hash: "SHA-256",
+    saltLength: 0,
+  };
+
+  const CryptoKey = await subtle.importKey("jwk", jwk, signAlgorithm, true, [
+    "verify",
+  ]);
+
+  const keyObject = crypto.KeyObject.from(CryptoKey);
+  return keyObject;
+}
