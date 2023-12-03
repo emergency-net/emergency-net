@@ -13,7 +13,6 @@ import useKeys from "@/Hooks/useKeys";
 import { useState } from "react";
 import { setCookie } from "typescript-cookie";
 import useErrorToast from "@/Hooks/useErrorToast";
-import { useToast } from "@/Components/ui/use-toast";
 
 function Register() {
   const { MTpublic } = useKeys();
