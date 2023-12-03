@@ -1,18 +1,7 @@
 import express from "express";
-import {
-  privateDecrypt,
-  privateEncrypt,
-  publicDecrypt,
-  publicEncrypt,
-  sign,
-  spkiToCryptoKey,
-  verify,
-} from "../util/CryptoUtil.js";
+import { privateDecrypt, spkiToCryptoKey } from "../util/CryptoUtil.js";
 
-import { karPubKey, privateKey, publicKey } from "../../bin/www.js";
 import { helloController } from "../controller/HelloController.js";
-import { createToken } from "../util/RegisterUtils.js";
-import { verifyToken } from "../util/HelloUtil.js";
 const router = express.Router();
 
 /* GET home page. */

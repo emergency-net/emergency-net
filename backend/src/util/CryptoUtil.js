@@ -1,6 +1,6 @@
 import crypto, { createHash } from "crypto";
 import { privateKey, adminKey, adminPrivateKey } from "../../bin/www.js";
-const {subtle} = globalThis.crypto;
+const { subtle } = globalThis.crypto;
 
 export function jsonToBase64(object) {
   const json = JSON.stringify(object);
@@ -45,17 +45,14 @@ export function signByAdmin(data) {
 }
 
 export function verify(data, signature, publicKey) {
-  const verify = crypto.createVerify('RSA-SHA256');
+  const verify = crypto.createVerify("RSA-SHA256");
   verify.update(data);
 
-  const isVerified = verify.verify(publicKey, signature, 'base64');
+  const isVerified = verify.verify(publicKey, signature, "base64");
   return isVerified;
 }
 
-export function hashBase64(
-  base64String,
-  algorithm = "sha256",
-) {
+export function hashBase64(base64String, algorithm = "sha256") {
   return createHash(algorithm).update(base64String).digest();
 }
 
@@ -67,13 +64,18 @@ export function verifyACAP(encodedData, adminSignature) {
 }
 
 // PU-Certified AP
-export function verifyPUAP(encodedAPData, PUsignature, encodedPUData, adminSignature) {
+export function verifyPUAP(
+  encodedAPData,
+  PUsignature,
+  encodedPUData,
+  adminSignature
+) {
   const PUData = base64toJson(encodedPUData);
   const stringifiedPUData = JSON.stringify(PUData);
   if (verify(stringifiedPUData, adminSignature, adminKey)) {
     const stringifiedAPData = JSON.stringify(base64toJson(encodedAPData));
     const PUkey = PUData.pubKey;
-    return verify(stringifiedAPData, PUsignature, PUkey)
+    return verify(stringifiedAPData, PUsignature, PUkey);
   }
   return false;
 }
@@ -92,9 +94,15 @@ export async function spkiToCryptoKey(spki) {
     publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
     hash: "SHA-256",
   };
-  
+
   const bufferspki = Buffer.from(spki);
-  const subtleKey = await subtle.importKey("spki", bufferspki, encryptAlgorithm, true, ["decrypt"]);
+  const subtleKey = await subtle.importKey(
+    "spki",
+    bufferspki,
+    encryptAlgorithm,
+    true,
+    ["decrypt"]
+  );
   console.log(bufferspki);
   console.log(subtleKey);
   const keyObject = crypto.KeyObject.from(subtleKey);

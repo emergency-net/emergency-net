@@ -1,7 +1,7 @@
 import useKeys from "./Hooks/useKeys";
 import { useMutation } from "react-query";
 import axios from "axios";
-import { decrypt, encrypt, exportKey, sign } from "./Library/crypt";
+import { decrypt, exportKey, sign } from "./Library/crypt";
 
 function App() {
   const { encryptKeys, signKeys, keysLoading } = useKeys();

@@ -1,14 +1,10 @@
 import createError from "http-errors";
 import express from "express";
-import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import sqlite3 from "sqlite3";
-import { open } from "sqlite";
 import indexRouter from "./src/routes/index.js";
 import cors from "cors";
 import "reflect-metadata";
-import { AppDataSource } from "./database/newDbSetup.js";
 
 //import AppDataSource from "./database/newDbSetup.js";
 
@@ -39,7 +35,5 @@ app.use((err, req, res, next) => {
   console.error(err);
   res.send(err);
 });
-
-const source = AppDataSource;
 
 export default app;
