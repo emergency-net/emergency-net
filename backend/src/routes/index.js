@@ -2,6 +2,8 @@ import express from "express";
 import { privateDecrypt, spkiToCryptoKey } from "../util/CryptoUtil.js";
 
 import { helloController } from "../controller/HelloController.js";
+import { AppDataSource } from "../database/newDbSetup.js";
+import { getUser, putUser } from "../util/DatabaseUtil.js";
 const router = express.Router();
 
 /* GET home page. */
@@ -30,5 +32,12 @@ router.post("/mtEncryptTest", async (req, res, next) => {
   console.log(req.body.key);
   res.send(JSON.stringify({ decrypted }));
 });
+
+router.get("/test2", async (req, res, next) => {
+  putUser({ username: "kardelen" });
+  res.send(getUser("kardelen"));
+});
+
+router.get("/hello", helloController.hello);
 
 export default router;

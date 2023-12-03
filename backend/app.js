@@ -19,7 +19,8 @@ app.use(cookieParser());
 
 app.use(cors());
 
-app.use(indexRouter);
+const baseUrl = process.env.BASE_URL || "/api";
+app.use(baseUrl, indexRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

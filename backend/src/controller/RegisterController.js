@@ -1,6 +1,8 @@
-import { adminKey, apId, publicKey } from "../../bin/www";
-import { publicEncrypt } from "../util/CryptoUtil";
-import "../util/RegisterUtils";
+import { adminKey, apId, publicKey } from "../../bin/www.js";
+import { User } from "../database/entity/User.js";
+import { AppDataSource } from "../database/newDbSetup.js";
+import { publicEncrypt } from "../util/CryptoUtil.js";
+import "../util/RegisterUtils.js";
 import { createToken } from "../util/RegisterUtils.js";
 
 class RegisterController {
@@ -9,7 +11,12 @@ class RegisterController {
     let username = req.body.username;
     let mtPubKey = req.body.mtPubKey;
 
-    if (username === "" || users.has(username)) {
+    if (
+      username === "" ||
+      AppDataSource.manager.findOneBy(User, {
+        username: username,
+      })
+    ) {
       res.body = {
         id: apId,
         tod: tod_reg,
