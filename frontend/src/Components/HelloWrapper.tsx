@@ -1,7 +1,6 @@
 import { hello } from "@/Services/hello";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useToast } from "./ui/use-toast";
 import { getCookie } from "typescript-cookie";
 import axios from "axios";
 import useErrorToast from "@/Hooks/useErrorToast";
@@ -10,6 +9,7 @@ function HelloWrapper() {
   const navigate = useNavigate();
   const location = useLocation();
   const handleError = useErrorToast();
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const token = getCookie("token");
     if (token) {
@@ -17,6 +17,7 @@ function HelloWrapper() {
     }
     hello()
       .then((res) => {
+        setLoading(false);
         if (res.status === 202) {
           navigate("/register");
         } else if (res.status === 200) {
@@ -27,7 +28,13 @@ function HelloWrapper() {
       })
       .catch(handleError);
   }, []);
-  return <Outlet />;
+  if (loading) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        Yükleniyor...
+      </div>
+    );
+  } else return <Outlet />;
 }
 
 export default HelloWrapper;
