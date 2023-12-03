@@ -5,6 +5,7 @@ const AppDataSource = new DataSource({
   type: "sqlite",
   database: "./Emergency-Net-DB.db",
   entities: [User],
+  synchronize: true,
 });
 
 AppDataSource.initialize()
