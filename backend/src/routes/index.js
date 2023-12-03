@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  privateDecrypt,
   privateEncrypt,
   publicDecrypt,
   publicEncrypt,
@@ -36,7 +37,7 @@ router.get("/test", (req, res, next) => {
 
 router.post("/mtEncryptTest", async (req, res, next) => {
   const theirkey = await spkiToCryptoKey(req.body.key);
-  const decrypted = publicDecrypt(theirkey, req.body.encrypted);
+  const decrypted = privateDecrypt(theirkey, req.body.encrypted);
   console.log(req.body.key);
   res.send(JSON.stringify({ decrypted }));
 });

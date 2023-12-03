@@ -9,7 +9,7 @@ function App() {
   const { mutate: submitEncrypt } = useMutation(async ({ msg }: any) => {
     //const exportedKey = await exportKey(privateKey!);
     const encrypted = await encrypt(encryptKeys!.public, msg);
-    const exportedKey = await exportKey(encryptKeys!.public);
+    const exportedKey = await exportKey(encryptKeys!.private);
 
     axios.post("http://localhost:3000/mtEncryptTest", {
       key: exportedKey,
