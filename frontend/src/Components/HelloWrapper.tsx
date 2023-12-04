@@ -15,14 +15,17 @@ function HelloWrapper() {
     if (token) {
       axios.defaults.headers.common.Authorization = token;
     }
+    if (!import.meta.env.PROD) {
+      setLoading(false);
+    }
     hello()
       .then((res) => {
         setLoading(false);
         if (res.status === 202) {
-          navigate("/register");
+          import.meta.env.PROD && navigate("/register");
         } else if (res.status === 200) {
           if (location.pathname == "/" || location.pathname == "") {
-            navigate("/home");
+            import.meta.env.PROD && navigate("/home");
           }
         }
       })

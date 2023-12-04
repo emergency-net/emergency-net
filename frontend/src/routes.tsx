@@ -1,7 +1,8 @@
 import { RouteObject } from "react-router-dom";
 import Register from "./Pages/Register";
 import HelloWrapper from "./Components/HelloWrapper";
-import { Home } from "lucide-react";
+import Home from "./Pages/Home";
+import Channel from "./Pages/Channel";
 
 export const routes: RouteObject[] = [
   {
@@ -15,6 +16,10 @@ export const routes: RouteObject[] = [
       {
         path: "home",
         element: <Home />,
+      },
+      {
+        path: "channel/:channelName",
+        element: <Channel />,
       },
     ],
   },

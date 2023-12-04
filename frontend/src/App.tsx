@@ -6,7 +6,7 @@ const router = createBrowserRouter(routes);
 
 function App() {
   return (
-    <div className="min-h-screen relative h-0 bg-gray-100">
+    <div className="absolute inset-0 h-0 bg-gray-100">
       <Toaster />
       <RouterProvider router={router} />
     </div>
