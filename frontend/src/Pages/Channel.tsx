@@ -8,10 +8,9 @@ import { Link, useParams } from "react-router-dom";
 
 function Channel() {
   const { channelName } = useParams();
-  const [keyboardFocused, setKeyboardFocused] = useState(false);
 
   return (
-    <div className="grid grid-rows-[60px_1fr_60px] h-screen">
+    <div className="grid grid-rows-[60px_1fr_60px] h-full">
       <div className="border-b border-gray-200 flex items-center  bg-white text-lg">
         <Link
           className="h-full aspect-square flex items-center justify-center transition-transform duration-100 active:scale-95"
@@ -24,21 +23,17 @@ function Channel() {
         </div>
       </div>
 
-      <div className=" shadow-inner flex flex-col justify-end">
-        Mesajlar burada olacak
+      <div className=" shadow-inner flex flex-col gap-4 py-4 px-2">
+        <div className="p-4 rounded-lg shadow-lg bg-white max-w-[80%] self-start">
+          Gelen Mesaj
+        </div>
+        <div className="p-4 rounded-lg shadow-lg bg-gray-200 max-w-[80%] self-end">
+          Giden Mesaj
+        </div>
       </div>
-      <div
-        className={cn(
-          "border-t border-gray-200 bg-white ",
-          keyboardFocused && "static"
-        )}
-      >
+      <div className={cn("border-t border-gray-200 bg-white ")}>
         <form className="flex items-stretch justify-stretch h-full w-full gap-2 p-2 ">
-          <Input
-            className={"flex-1 h-full border-2"}
-            onFocus={() => setKeyboardFocused(true)}
-            onBlur={() => setKeyboardFocused(false)}
-          />
+          <Input className={"flex-1 h-full border-2"} />
           <Button
             type="submit"
             className=" h-full  aspect-square p-0 transition-transform duration-100 active:scale-95"
