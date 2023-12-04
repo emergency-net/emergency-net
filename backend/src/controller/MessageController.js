@@ -44,24 +44,9 @@ class MessageController {
           usernick: usernick,
         });
       } catch(error) {
-        res.status(400).json({
-          id: apId,
-          tod: Date.now(),
-          priority: -1,
-          type: "MT_MSG_RJT",
-          error: error.message,
-        });
         console.log(error);
       }
 
-      
-   
-      
-      if (result) {
-        
-      } else {
-        
-      }
       return res;
     }
   }
