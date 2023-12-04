@@ -1,13 +1,24 @@
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
+import useKeys from "@/Hooks/useKeys";
 import { cn } from "@/Library/cn";
+import { message } from "@/Services/message";
 import clsx from "clsx";
 import { ArrowLeftCircle, MessagesSquare, SendHorizonal } from "lucide-react";
 import { useState } from "react";
+import { useMutation } from "react-query";
 import { Link, useParams } from "react-router-dom";
 
 function Channel() {
   const { channelName } = useParams();
+  const { MTpublic, setAdminKey } = useKeys();
+  const [input, setInput] = useState("");
+
+  const { mutate: sendMessage } = useMutation(
+    ({ messageStr }: { messageStr: string }) => {
+      return message({ key: MTpublic!, message: messageStr });
+    }
+  );
 
   return (
     <div className="grid grid-rows-[60px_1fr_60px] h-full">
@@ -32,8 +43,18 @@ function Channel() {
         </div>
       </div>
       <div className={"border-t border-gray-200 bg-white "}>
-        <form className="flex items-stretch justify-stretch h-full w-full gap-2 p-2 ">
-          <Input className={"flex-1 h-full border-2"} />
+        <form
+          className="flex items-stretch justify-stretch h-full w-full gap-2 p-2 "
+          onSubmit={(e) => {
+            e.preventDefault();
+            sendMessage({ messageStr: input });
+          }}
+        >
+          <Input
+            className={"flex-1 h-full border-2"}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
           <Button
             type="submit"
             className=" h-full  aspect-square p-0 transition-transform duration-100 active:scale-95"
