@@ -6,13 +6,11 @@
 
 import http from "http";
 import dotenv from "dotenv";
-import rsaPemToJwk from 'rsa-pem-to-jwk';
 import app from "../app.js";
 import crypto, { createPublicKey } from "crypto";
-import fs from "fs"; 
-import jwt from 'jsonwebtoken';
-import jwkToPem from 'jwk-to-pem';
-
+import fs from "fs";
+import jwt from "jsonwebtoken";
+import { pem2jwk } from "pem-jwk";
 
 dotenv.config();
 
@@ -53,8 +51,7 @@ export const adminKey = Buffer.from(
 export const privateKey = fs.readFileSync(process.env.PRIVATE_KEY_PATH);
 export const publicKey = fs.readFileSync(process.env.PUBLIC_KEY_PATH);
 
-
-createPublicKey({key: publicKey, format: 'pem', type: 'spki'}).export({format: 'jwk'});
+console.log("Public", pem2jwk(publicKey.toString()));
 
 export const apId = "ortabayir";
 /**

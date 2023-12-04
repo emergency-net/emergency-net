@@ -1,7 +1,5 @@
-import crypto, { createHash, webcrypto } from "crypto";
+import crypto, { createHash } from "crypto";
 import { privateKey, adminKey, adminPrivateKey } from "../../bin/www.js";
-//const { subtle } = globalThis.crypto;
-const { subtle } = webcrypto;
 
 export function jsonToBase64(object) {
   const json = JSON.stringify(object);
@@ -97,7 +95,7 @@ export async function spkiToCryptoKey(spki) {
   };
 
   const bufferspki = Buffer.from(spki);
-  const subtleKey = await subtle.importKey(
+  const subtleKey = await crypto.subtle.importKey(
     "spki",
     bufferspki,
     encryptAlgorithm,
@@ -123,9 +121,13 @@ export async function jwkToKeyObject(jwk) {
     saltLength: 0,
   };
 
-  const CryptoKey = await subtle.importKey("jwk", jwk, signAlgorithm, true, [
-    "verify",
-  ]);
+  const CryptoKey = await crypto.subtle.importKey(
+    "jwk",
+    jwk,
+    signAlgorithm,
+    true,
+    ["verify"]
+  );
 
   const keyObject = crypto.KeyObject.from(CryptoKey);
   return keyObject;

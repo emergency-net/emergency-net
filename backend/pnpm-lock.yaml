@@ -35,12 +35,12 @@ dependencies:
   morgan:
     specifier: ~1.9.1
     version: 1.9.1
+  pem-jwk:
+    specifier: ^2.0.0
+    version: 2.0.0
   reflect-metadata:
     specifier: ^0.1.13
     version: 0.1.13
-  rsa-pem-to-jwk:
-    specifier: ^1.1.3
-    version: 1.1.3
   sqlite:
     specifier: 5.1.1
     version: 5.1.1
@@ -1502,11 +1502,6 @@ packages:
     dev: false
     optional: true
 
-  /object-assign@2.1.1:
-    resolution: {integrity: sha512-CdsOUYIh5wIiozhJ3rLQgmUTgcyzFwZZrqhkKhODMoGtPKM+wt0h0CNIoauJWMsS9822EdzPsF/6mb4nLvPN5g==}
-    engines: {node: '>=0.10.0'}
-    dev: false
-
   /object-assign@4.1.1:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
     engines: {node: '>=0.10.0'}
@@ -1573,6 +1568,14 @@ packages:
 
   /path-to-regexp@0.1.7:
     resolution: {integrity: sha512-5DFkuoqlv1uYQKxy8omFBeJPQcdoE07Kv2sferDCrAq1ohOU+MSDswDIbnx3YAM60qIOnYa53wBhXW0EbMonrQ==}
+    dev: false
+
+  /pem-jwk@2.0.0:
+    resolution: {integrity: sha512-rFxu7rVoHgQ5H9YsP50dDWf0rHjreVA2z0yPiWr5WdH/UHb29hKtF7h6l8vNd1cbYR1t0QL+JKhW55a2ZV4KtA==}
+    engines: {node: '>=5.10.0'}
+    hasBin: true
+    dependencies:
+      asn1.js: 5.4.1
     dev: false
 
   /picomatch@2.3.1:
@@ -1698,20 +1701,6 @@ packages:
     hasBin: true
     dependencies:
       glob: 7.2.3
-    dev: false
-
-  /rsa-pem-to-jwk@1.1.3:
-    resolution: {integrity: sha512-ZlVavEvTnD8Rzh/pdB8NH4VF5GNEtF6biGQcTtC4GKFMsbZR08oHtOYefbhCN+JnJIuMItiCDCMycdcMrw6blA==}
-    dependencies:
-      object-assign: 2.1.1
-      rsa-unpack: 0.0.6
-    dev: false
-
-  /rsa-unpack@0.0.6:
-    resolution: {integrity: sha512-HRrl8GHjjPziPFRDJPq/v5OxZ3IPdksV5h3cime/oHgcgM1k1toO5OdtzClgBqRf5dF6IgptOB0g/zFb0w5zQw==}
-    hasBin: true
-    dependencies:
-      optimist: 0.3.7
     dev: false
 
   /safe-buffer@5.1.2:
