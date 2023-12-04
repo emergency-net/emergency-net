@@ -8,9 +8,9 @@ export function verifyMessage(message, mtPubKey, signature) {
 }
 
 export function verifyMT(token, mtPubKey) {
-    var fragmentedToken = token.split(".");
-    var encodedData = fragmentedToken[0];
-   return verifyToken(token) && base64toJson(encodedData).mtPubKey.toString() == mtPubKey.toString();
+    const fragmentedToken = token.split(".");
+    const encodedData = fragmentedToken[0];
+    return base64toJson(encodedData).mtPubKey.toString() == mtPubKey.toString();
 }
 
 export function createMessageCert(message) {
