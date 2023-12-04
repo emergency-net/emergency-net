@@ -31,7 +31,7 @@ function Channel() {
           Giden Mesaj
         </div>
       </div>
-      <div className={cn("border-t border-gray-200 bg-white ")}>
+      <div className={"border-t border-gray-200 bg-white "}>
         <form className="flex items-stretch justify-stretch h-full w-full gap-2 p-2 ">
           <Input className={"flex-1 h-full border-2"} />
           <Button
