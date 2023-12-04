@@ -20,9 +20,11 @@ export function verifyAPReg(data, cert) {
           reason: "No certificate",
         };
       }
+    } else {
       isVerified = verifyACAP(encodedAPData, adminSignature);
       console.log(encodedAPData);
-    } else if (fragmentedCert.length === 4) {
+    }
+  } else if (fragmentedCert.length === 4) {
       //PU certified AP
       encodedAPData = fragmentedCert[0];
       const PUsignature = fragmentedCert[1];
@@ -58,7 +60,7 @@ export function verifyAPReg(data, cert) {
     }
     return { isApVerified: true, apPub: decodedAPData.apPub };
   }
-}
+
 
 export function verifyToken(token) {
   //Token is in the form of payload.signature.certificate
