@@ -13,11 +13,13 @@ import useKeys from "@/Hooks/useKeys";
 import { useState } from "react";
 import { setCookie } from "typescript-cookie";
 import useErrorToast from "@/Hooks/useErrorToast";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
-  const { MTpublic } = useKeys();
+  const { MTpublic, setAdminKey } = useKeys();
   const [username, setUsername] = useState<string>("");
   const handleError = useErrorToast();
+  const navigate = useNavigate();
   const { mutate: sendRegister } = useMutation(
     () => {
       if (username.length < 5) {
@@ -27,7 +29,15 @@ function Register() {
     },
     {
       onSuccess(data) {
+        // https://datatracker.ietf.org/doc/html/rfc7518#section-6.3.1.2
+        setAdminKey({
+          ...data.adminPubKey,
+          e: "AQAB",
+          ext: true,
+          key_ops: ["verify"],
+        });
         setCookie("token", data.token);
+        navigate("/home");
       },
       onError: handleError,
     }

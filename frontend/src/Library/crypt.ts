@@ -31,7 +31,10 @@ export async function generateKeys() {
   return { encrypt: encryptKeypair, sign: signKeypair };
 }
 
-export async function jwkToKey(key: JsonWebKey, type: "encrypt" | "sign") {
+export async function jwkToKey(
+  key: JsonWebKey,
+  type: "encrypt" | "sign" = "sign"
+) {
   const keyUsages = key.key_ops;
   const alg = type === "encrypt" ? encryptAlgorithm : signAlgorithm;
 
