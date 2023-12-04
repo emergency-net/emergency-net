@@ -16,7 +16,11 @@ function Channel() {
 
   const { mutate: sendMessage } = useMutation(
     ({ messageStr }: { messageStr: string }) => {
-      return message({ key: MTpublic!, message: messageStr });
+      return message({
+        key: MTpublic!,
+        content: messageStr,
+        channel: channelName!,
+      });
     }
   );
 
