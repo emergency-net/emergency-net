@@ -16,6 +16,5 @@ export function apCert() {
   };
   const encodedApContent = jsonToBase64(apContent);
   const signedApContent = signByAdmin(JSON.stringify(apContent));
-  const cert = `${encodedApContent}.${signedApContent}`;
-  return cert;
+  return `${encodedApContent}.${signedApContent}`;
 }

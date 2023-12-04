@@ -2,7 +2,7 @@ import { EntitySchema } from "typeorm";
 
 export const Message = new EntitySchema({
   name: "Message",
-  tableName: "message", // Optional: Provide `tableName` property to override the default behaviour for table name.
+  tableName: "message", 
   columns: {
     content: {
       type: "varchar",
@@ -25,6 +25,9 @@ export const Message = new EntitySchema({
     hashKey: {
       primary: true,
       type: "varchar",
+    },
+    isSafe: {
+      type: "boolean",
     },
   },
 });

@@ -17,12 +17,14 @@ const { privateKey: privKey, publicKey: pubKey } = crypto.generateKeyPairSync(
   "rsa-pss",
   {
     modulusLength: 2048, // Length of the key in bits
+    hashAlgorithm: "sha256", // Hash algorithm to use
   }
 );
 
 const { privateKey: adminPrivKey, publicKey: adminPubKey } =
   crypto.generateKeyPairSync("rsa-pss", {
     modulusLength: 2048, // Length of the key in bits
+    hashAlgorithm: "sha256", // Hash algorithm to use
   });
 
 const { privateKey: kardelenPrivKey, publicKey: kardelenPubKey } =
@@ -38,6 +40,12 @@ export const karPubKey = Buffer.from(
   kardelenPubKey.export({ format: "pem", type: "spki" })
 );
 //export const adminKey = fs.readFileSync(process.env.KEY_PATH);
+
+//fs.writeFileSync(process.env.PUBLIC_KEY_PATH, pubKey.export({ format: "pem", type:"spki"}));
+//fs.writeFileSync(process.env.PRIVATE_KEY_PATH, privKey.export({ format: "pem", type:"pkcs8"}));
+
+//fs.writeFileSync(process.env.ADMIN_PUBLIC_KEY_PATH, adminPubKey.export({ format: "pem", type:"spki"}));
+//fs.writeFileSync(process.env.ADMIN_PRIVATE_KEY_PATH, adminPrivKey.export({ format: "pem", type:"pkcs8"}));
 
 export const privateKey = fs.readFileSync(process.env.PRIVATE_KEY_PATH);
 export const publicKey = fs.readFileSync(process.env.PUBLIC_KEY_PATH);

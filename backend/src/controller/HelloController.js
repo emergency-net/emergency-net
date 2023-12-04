@@ -8,7 +8,8 @@ class HelloController {
     let tod = Date.now();
 
     if (token != null) {
-      if (verifyToken(token)) {
+      const verificationResult = verifyToken(token);
+      if (verificationResult.isTokenVerified) {
         // Correctly send the response
         res.status(200).json({
           id: apId,
@@ -25,7 +26,9 @@ class HelloController {
           tod: tod,
           priority: -1,
           type: "MT_HELLO_RJT",
-          error: "Invalid token.",
+          error: verificationResult.reason
+            ? verificationResult.reason
+            : "Signature check is failed",
         });
       }
     } else {

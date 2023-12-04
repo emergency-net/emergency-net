@@ -2,50 +2,111 @@ import { base64toJson, verify, verifyACAP, verifyPUAP } from "./CryptoUtil.js";
 
 export function verifyAPReg(data, cert) {
   let isVerified = false;
-  var fragmentedCert = cert.split(".");
-  var encodedAPData;
+  const fragmentedCert = cert.split(".");
+  let encodedAPData;
+  const decodedData = base64toJson(data);
   console.log("fragmented cert " + fragmentedCert);
   if (fragmentedCert.length === 2) {
+    //Admin certified AP
     encodedAPData = fragmentedCert[0];
-    var adminSignature = fragmentedCert[1];
-    isVerified = verifyACAP(encodedAPData, adminSignature);
-    console.log(encodedAPData);
-  } else if (fragmentedCert.length === 4) {
-    encodedAPData = fragmentedCert[0];
-    var PUsignature = fragmentedCert[1];
-    var encodedPUData = fragmentedCert[2];
-    var adminSignature = fragmentedCert[3];
-    isVerified = verifyPUAP(
-      encodedAPData,
-      PUsignature,
-      encodedPUData,
-      adminSignature
-    );
+    let adminSignature = fragmentedCert[1];
+    if (adminSignature === "NO_CERT") {
+      const decodedAPData = base64toJson(encodedAPData);
+      //THINK: Can't anyone change this?
+      if (decodedAPData.apId === decodedData.apReg) {
+        return {
+          isApVerified: false,
+          apPubKey: decodedAPData.apPub,
+          reason: "No certificate",
+        };
+      }
+      isVerified = verifyACAP(encodedAPData, adminSignature);
+      console.log(encodedAPData);
+    } else if (fragmentedCert.length === 4) {
+      //PU certified AP
+      encodedAPData = fragmentedCert[0];
+      const PUsignature = fragmentedCert[1];
+      const encodedPUData = fragmentedCert[2];
+      const adminSignature = fragmentedCert[3];
+      isVerified = verifyPUAP(
+        encodedAPData,
+        PUsignature,
+        encodedPUData,
+        adminSignature
+      );
+    } else {
+      return {
+        isApVerified: false,
+        reason: "Certificate is not in the correct format",
+      };
+    }
+    console.log("isVerified " + isVerified);
+
+    var decodedAPData = base64toJson(encodedAPData);
+
+    //Assume certificates have apId and apPub fields
+    if (decodedData.apReg !== decodedAPData.apId) {
+      return {
+        isApVerified: false,
+        reason: "Registered AP id does not match",
+      };
+    } else if (!isVerified) {
+      return {
+        isApVerified: false,
+        reason: "Certificate is not valid",
+      };
+    }
+    return { isApVerified: true, apPub: decodedAPData.apPub };
   }
-  console.log("isVerified " + isVerified);
-  var decodedData = base64toJson(data);
-  var decodedAPData = base64toJson(encodedAPData);
-  //Assume certificates have apId and apPub fields
-  return isVerified && decodedData.apReg == decodedAPData.apId
-    ? decodedAPData.apPub
-    : -1;
 }
 
 export function verifyToken(token) {
-  var fragmentedToken = token.split(".");
-  //Mt identity
-  var encodedData = fragmentedToken[0];
+  //Token is in the form of payload.signature.certificate
+  const fragmentedToken = token.split(".");
+  if (fragmentedToken.length < 3) {
+    return {
+      isApVerified: false,
+      isTokenVerified: false,
+      reason: "Token is not in the correct format",
+    };
+  }
+  //Mt identity is the first part of the token, base64 encoded
+  const encodedData = fragmentedToken[0];
   console.log("encodedData " + encodedData);
-  var signature = fragmentedToken[1];
-  var cert = fragmentedToken.slice(2).join(".");
-  var APPubKey = verifyAPReg(encodedData, cert);
-  if (APPubKey != -1) {
+  //Signature is the second part of the token
+  const signature = fragmentedToken[1];
+  //Certificate is the third part of the token
+  const cert = fragmentedToken.slice(2).join(".");
+  const verificationResult = verifyAPReg(encodedData, cert);
+  if (verificationResult.isApVerified === true) {
     console.log("verified APREG");
-    return verify(
+    let isTokenVerified = verify(
       JSON.stringify(base64toJson(encodedData)),
       signature,
-      Buffer.from(APPubKey)
+      Buffer.from(verificationResult.apPub, "base64")
     );
+    return {
+      isApVerified: true,
+      isTokenVerified: isTokenVerified,
+    };
+  } //This is the case where the AP has no certificate but correct format
+  else if (
+    verificationResult.isApVerified === false &&
+    verificationResult.reason === "No certificate"
+  ) {
+    let isTokenVerified = verify(
+      JSON.stringify(base64toJson(encodedData)),
+      signature,
+      Buffer.from(verificationResult.apPub, "base64")
+    );
+    return {
+      isApVerified: false,
+      isTokenVerified: isTokenVerified,
+    };
   }
-  return false;
+  return {
+    isApVerified: false,
+    isTokenVerified: false,
+    reason: verificationResult.reason,
+  };
 }
