@@ -17,6 +17,42 @@ const signAlgorithm = {
   saltLength: 0,
 } as any;
 
+function pemToArrayBuffer(pem: string) {
+  const b64Lines = pem
+    .replace(/-----[A-Z ]+-----/g, "")
+    .replace(/\n/g, "")
+    .replace(/\r/g, "");
+  const binaryString = window.atob(b64Lines);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+export async function importPublicKeyPem(pem: string) {
+  const arrayBuffer = pemToArrayBuffer(pem);
+
+  try {
+    const key = await window.crypto.subtle.importKey(
+      "spki", // for public key
+      arrayBuffer,
+      {
+        name: "RSA-PSS", // or another algorithm
+        hash: "SHA-256", // hash used with your key
+      },
+      true, // whether the key is extractable
+      ["verify"] // the use of your key, e.g., 'encrypt'
+    );
+
+    return key;
+  } catch (e) {
+    console.error("Import failed:", e);
+    throw e;
+  }
+}
+
 export async function generateKeys() {
   const encryptKeypair = await subtleCrypto.generateKey(
     encryptAlgorithm,

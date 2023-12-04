@@ -1,5 +1,6 @@
 import { verifyToken } from "../util/HelloUtil.js";
-import { apId } from "../../bin/www.js";
+import { adminPublicKeyJwk, apId } from "../../bin/www.js";
+import { apCert } from "../util/Util.js";
 
 class HelloController {
   async hello(req, res, next) {
@@ -14,6 +15,8 @@ class HelloController {
           tod: tod,
           priority: -1,
           type: "MT_HELLO_ACK",
+          cert: apCert(),
+          adminPubKey: adminPublicKeyJwk,
         });
       } else {
         // Correctly send the response with an error status
@@ -32,6 +35,8 @@ class HelloController {
         tod: tod,
         priority: -1,
         type: "MT_REG_PAGE",
+        cert: apCert(),
+        adminPubKey: adminPublicKeyJwk,
       });
     }
   }

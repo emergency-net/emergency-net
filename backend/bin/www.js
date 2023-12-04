@@ -39,15 +39,30 @@ export const karPubKey = Buffer.from(
 );
 //export const adminKey = fs.readFileSync(process.env.KEY_PATH);
 
-
-
-
 export const privateKey = fs.readFileSync(process.env.PRIVATE_KEY_PATH);
 export const publicKey = fs.readFileSync(process.env.PUBLIC_KEY_PATH);
 export const adminKey = fs.readFileSync(process.env.ADMIN_PUBLIC_KEY_PATH);
-export const adminPrivateKey = fs.readFileSync(process.env.ADMIN_PRIVATE_KEY_PATH);
+export const adminPrivateKey = fs.readFileSync(
+  process.env.ADMIN_PRIVATE_KEY_PATH
+);
 
 //console.log("Public", pem2jwk(publicKey.toString()));
+function pemToPrivateKeyObject(pemFilePath) {
+  try {
+    const pemContent = fs.readFileSync(pemFilePath, "utf8");
+    const privateKey = crypto.createPublicKey({
+      key: pemContent,
+      format: "pem",
+      type: "spki",
+    });
+    return privateKey;
+  } catch (error) {
+    console.error("Error converting PEM to Private KeyObject:", error);
+    return null;
+  }
+}
+console.log(pemToPrivateKeyObject(process.env.PUBLIC_KEY_PATH));
+console.log("HERE");
 export const publicKeyJwk = pem2jwk(publicKey.toString());
 export const adminPublicKeyJwk = pem2jwk(adminKey.toString());
 

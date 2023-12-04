@@ -17,3 +17,16 @@ export function base64ToArrayBuffer(base64: string) {
   }
   return bytes.buffer;
 }
+
+export function base64ToJson(base64String: string): any {
+  try {
+    // Decode the Base64 string
+    const decodedString = atob(base64String);
+
+    // Parse the decoded string as JSON
+    return JSON.parse(decodedString);
+  } catch (error) {
+    console.error("Error parsing Base64 string:", error);
+    throw error;
+  }
+}
