@@ -58,7 +58,7 @@ export function verifyAPReg(data, cert) {
         reason: "Certificate is not valid",
       };
     }
-    return { isApVerified: true, apPub: decodedAPData.apPub };
+    return { isApVerified: true, apPubKey: decodedAPData.apPub };
   }
 
 
@@ -85,7 +85,7 @@ export function verifyToken(token) {
     let isTokenVerified = verify(
       JSON.stringify(base64toJson(encodedData)),
       signature,
-      Buffer.from(verificationResult.apPub, "base64")
+      Buffer.from(verificationResult.apPubKey)
     );
     return {
       isApVerified: true,
@@ -99,7 +99,7 @@ export function verifyToken(token) {
     let isTokenVerified = verify(
       JSON.stringify(base64toJson(encodedData)),
       signature,
-      Buffer.from(verificationResult.apPub, "base64")
+      Buffer.from(verificationResult.apPubKey)
     );
     return {
       isApVerified: false,

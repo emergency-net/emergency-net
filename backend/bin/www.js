@@ -24,7 +24,7 @@ const { privateKey: privKey, publicKey: pubKey } = crypto.generateKeyPairSync(
 const { privateKey: adminPrivKey, publicKey: adminPubKey } =
   crypto.generateKeyPairSync("rsa-pss", {
     modulusLength: 2048, // Length of the key in bits
-    hashAlgorithm: "sha256", // Hash algorithm to use
+  //  hashAlgorithm: "sha256", // Hash algorithm to use
   });
 
 const { privateKey: kardelenPrivKey, publicKey: kardelenPubKey } =
