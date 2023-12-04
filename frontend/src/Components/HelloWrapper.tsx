@@ -4,6 +4,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { getCookie } from "typescript-cookie";
 import axios from "axios";
 import useErrorToast from "@/Hooks/useErrorToast";
+import { verifyApCert } from "@/Library/cert";
 
 function HelloWrapper() {
   const navigate = useNavigate();
@@ -28,6 +29,13 @@ function HelloWrapper() {
             import.meta.env.PROD && navigate("/home");
           }
         }
+
+        verifyApCert(res.data.cert, {
+          ...res.data.adminPubKey,
+          e: "AQAB",
+          ext: true,
+          key_ops: ["verify"],
+        });
       })
       .catch(handleError);
   }, []);
