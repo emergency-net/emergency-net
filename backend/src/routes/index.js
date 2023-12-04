@@ -6,6 +6,7 @@ import { registerController } from "../controller/RegisterController.js";
 
 import { AppDataSource } from "../database/newDbSetup.js";
 import { getUser, putUser } from "../util/DatabaseUtil.js";
+import { messageController } from "../controller/MessageController.js";
 const router = express.Router();
 
 /* GET home page. */
@@ -43,5 +44,6 @@ router.get("/test2", async (req, res, next) => {
 });
 
 router.get("/hello", helloController.hello);
+router.post("/message", messageController.receiveMessage);
 
 export default router;

@@ -13,7 +13,7 @@ class MessageController {
       let usernick = req.body.usernick;
       let tod_received = req.body.tod;
       let message = req.body.message;
-      let signature = req.body.signature;
+      //let signature = req.body.signature;
       let mtPubKey = req.body.mtPubKey;
 
       const messageToSave = {
@@ -39,7 +39,8 @@ class MessageController {
           type: "MT_MSG_RJT",
           error: "MT Public Keys do not match.",
         });
-      } else if (!verify(message, signature, mtPubKey)) {
+      } 
+      /*else if (!verify(message, signature, mtPubKey)) {
         res.status(400).json({
           id: apId,
           tod: Date.now(),
@@ -47,7 +48,7 @@ class MessageController {
           type: "MT_MSG_RJT",
           error: "Message could not verified.",
         });
-      } else {
+      }*/ else {
         const isVerified = verifyToken(token);
         const isTokenVerified = isVerified.isTokenVerified;
         const isAPVerified = isVerified.isAPVerified;
