@@ -14,5 +14,5 @@ function apCert() {
   const signedApContent = signByAdmin(JSON.stringify(apContent));
   return `${encodedApContent}.${signedApContent}`;
 }
-
 fs.writeFileSync(process.env.CERT_PATH, apCert());
+console.log("CERT SAVED");
