@@ -1,4 +1,6 @@
 import fs from "fs";
+import dotenv from "dotenv";
+dotenv.config();
 
 export const privateKey = fs.readFileSync(process.env.PRIVATE_KEY_PATH);
 export const publicKey = fs.readFileSync(process.env.PUBLIC_KEY_PATH);
