@@ -1,5 +1,5 @@
-import { jwkToKey, keyToJwk } from "../Library/crypt";
-import { initKeys } from "../Library/keys";
+import { keyToJwk } from "../Library/crypt";
+import { readAdminKey, readPrivateKey, readPublicKey } from "../Library/keys";
 import { useQuery, useQueryClient } from "react-query";
 
 function useKeys() {
@@ -7,22 +7,8 @@ function useKeys() {
   const { data: keys, isLoading: keysLoading } = useQuery(
     ["keys"],
     async () => {
-      if (!localStorage.getItem("privateKey")) await initKeys();
-
-      // const encryptPrivateKey = await jwkToKey(
-      //   JSON.parse(localStorage.getItem("encryptPrivateKey")!) as JsonWebKey,
-      //   "encrypt"
-      // );
-      // const encryptPublicKey = await jwkToKey(
-      //   JSON.parse(localStorage.getItem("encryptPublicKey")!) as JsonWebKey,
-      //   "encrypt"
-      // );
-      const privateKey = await jwkToKey(
-        JSON.parse(localStorage.getItem("privateKey")!) as JsonWebKey
-      );
-      const publicKey = await jwkToKey(
-        JSON.parse(localStorage.getItem("publicKey")!) as JsonWebKey
-      );
+      const privateKey = await readPrivateKey();
+      const publicKey = await readPublicKey();
 
       return {
         MTprivate: privateKey,
@@ -34,13 +20,7 @@ function useKeys() {
   const { data: adminKey, isLoading: adminKeyLoading } = useQuery(
     ["adminKey"],
     async () => {
-      const adminKeyString = localStorage.getItem("adminKey");
-
-      if (adminKeyString) {
-        return await jwkToKey(
-          JSON.parse(localStorage.getItem("adminKey")!) as JsonWebKey
-        );
-      }
+      return await readAdminKey();
     }
   );
 

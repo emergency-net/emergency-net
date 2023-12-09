@@ -4,7 +4,6 @@ import { privateDecrypt, sign, spkiToCryptoKey } from "../util/CryptoUtil.js";
 import { helloController } from "../controller/HelloController.js";
 import { registerController } from "../controller/RegisterController.js";
 
-import { AppDataSource } from "../database/newDbSetup.js";
 import { getUser, putUser } from "../util/DatabaseUtil.js";
 import { messageController } from "../controller/MessageController.js";
 const router = express.Router();

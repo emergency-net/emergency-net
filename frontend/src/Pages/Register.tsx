@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "../Components/ui/card";
 import { Input } from "../Components/ui/input";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { register } from "@/Services/register";
 import useKeys from "@/Hooks/useKeys";
 import { useState } from "react";
@@ -15,13 +15,14 @@ import { setCookie } from "typescript-cookie";
 import useErrorToast from "@/Hooks/useErrorToast";
 import { useNavigate } from "react-router-dom";
 import { importPublicKeyPem } from "@/Library/crypt";
-import axios from "axios";
+import { APResponseVerifier } from "@/Library/interceptors";
 
 function Register() {
   const { MTpublic, setAdminKey } = useKeys();
   const [username, setUsername] = useState<string>("");
   const handleError = useErrorToast();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { mutate: sendRegister } = useMutation(
     () => {
       if (username.length < 5) {
@@ -30,14 +31,15 @@ function Register() {
       return register({ key: MTpublic!, username: username });
     },
     {
-      onSuccess(data) {
-        importPublicKeyPem(data.content.adminPubKey).then((res) =>
-          setAdminKey(res)
-        );
-        setCookie("token", data.content.token);
-        if (data.content.token) {
-          axios.defaults.headers.common.Authorization = data.content.token;
-        }
+      async onSuccess(data) {
+        const content = await APResponseVerifier(data);
+        const adminKey = await importPublicKeyPem(content.adminPubKey);
+
+        setAdminKey(adminKey);
+        queryClient.invalidateQueries(["adminKey"]);
+
+        setCookie("token", content.token);
+
         navigate("/home");
       },
       onError: handleError,

@@ -1,12 +1,11 @@
 import { apId } from "../../bin/www.js";
-import { createMessageCert, getKeyFromToken } from "../util/MessageUtil.js";
+import { createMessageCert } from "../util/MessageUtil.js";
 import { AppDataSource } from "../database/newDbSetup.js";
 import { Message } from "../database/entity/Message.js";
 import {
   base64toJson,
   hashBase64,
   jsonToBase64,
-  jwkToKeyObject,
   verify,
 } from "../util/CryptoUtil.js";
 import { checkTod } from "../util/Util.js";

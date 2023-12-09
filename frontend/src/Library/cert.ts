@@ -1,39 +1,36 @@
-import { importPublicKeyPem, jwkToKey } from "./crypt";
-import { base64ToArrayBuffer, base64ToJson, stringToArrayBuffer } from "./util";
+import { APData } from "./APData";
+import { importPublicKeyPem, verify } from "./crypt";
+import { readAdminKey } from "./keys";
+import { base64ToJson } from "./util";
 
 const subtleCrypto = window.crypto.subtle;
 
-export async function verifyApCert(cert: string, adminJwk: JsonWebKey) {
+export async function verifyApCert(cert: string): Promise<APData> {
+  const adminKey = await readAdminKey();
+
   const splitCert = cert.split(".");
-  const adminKey = await jwkToKey(adminJwk);
 
   const content = base64ToJson(splitCert[0]);
   const signature = splitCert[1];
 
   if (signature === "NO_CERT") {
     return {
-      apPublicKey: await importPublicKeyPem(content.apPub),
-      apId: content.apId as string,
-      apType: "lonely",
+      key: await importPublicKeyPem(content.apPub),
+      id: content.apId as string,
+      type: "lonely",
     };
   }
 
   const stringContent = JSON.stringify(content);
 
-  const verified = await subtleCrypto.verify(
-    { name: "RSA-PSS", saltLength: 0 },
-    adminKey,
-    base64ToArrayBuffer(signature),
-    stringToArrayBuffer(stringContent)
-  );
-
+  const verified = await verify(adminKey, signature, stringContent);
   if (verified) {
     return {
-      apPublicKey: await importPublicKeyPem(content.apPub),
-      apId: content.apId as string,
-      apType: "infrastructure",
+      key: await importPublicKeyPem(content.apPub),
+      id: content.apId as string,
+      type: "infrastructure",
     };
   } else {
-    throw new Error("Certificate Invalid");
+    throw new Error("AP Certificate Invalid");
   }
 }
