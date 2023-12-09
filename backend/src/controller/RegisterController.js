@@ -1,10 +1,10 @@
-import { adminPublicKeyJwk, apId, publicKeyJwk } from "../../bin/www.js";
+import { apId } from "../../bin/www.js";
 import { User } from "../database/entity/User.js";
 import { AppDataSource } from "../database/newDbSetup.js";
-import { keyObjectToJwk } from "../util/CryptoUtil.js";
 import { jwkToKeyObject } from "../util/CryptoUtil.js";
 import "../util/RegisterUtils.js";
 import { createToken } from "../util/RegisterUtils.js";
+import { adminPublicKey } from "../util/readkeys.js";
 
 class RegisterController {
   async register(req, res, next) {
@@ -39,16 +39,12 @@ class RegisterController {
       );
       const token = createToken(username, mtPubBuffer);
 
-      //Put token in the header
-      //res.headers.authorization = "Bearer " + token;
-
       res.status(200).json({
         id: apId,
         tod: tod_reg,
         priority: -1,
         type: "MT_REG_ACK",
-        apPubKey: publicKeyJwk,
-        adminPubKey: adminPublicKeyJwk,
+        adminPubKey: adminPublicKey.toString(),
         token: token,
       });
     }

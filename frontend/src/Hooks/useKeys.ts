@@ -1,4 +1,4 @@
-import { jwkToKey } from "../Library/crypt";
+import { jwkToKey, keyToJwk } from "../Library/crypt";
 import { initKeys } from "../Library/keys";
 import { useQuery, useQueryClient } from "react-query";
 
@@ -44,8 +44,8 @@ function useKeys() {
     }
   );
 
-  async function setAdminKey(key: JsonWebKey) {
-    localStorage.setItem("adminKey", JSON.stringify(key));
+  async function setAdminKey(key: CryptoKey) {
+    localStorage.setItem("adminKey", JSON.stringify(await keyToJwk(key)));
     queryClient.invalidateQueries(["adminKey"]);
   }
 

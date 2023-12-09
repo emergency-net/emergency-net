@@ -7,7 +7,14 @@ export function arrayBufferToBase64(buffer: ArrayBuffer) {
   }
   return window.btoa(binary);
 }
+export function stringToArrayBuffer(str: string): ArrayBuffer {
+  // Encode the string as a Uint8Array
+  const utf8Encoder = new TextEncoder();
+  const uint8Array = utf8Encoder.encode(str);
 
+  // Convert the Uint8Array to an ArrayBuffer
+  return uint8Array.buffer;
+}
 export function base64ToArrayBuffer(base64: string) {
   const binaryString = window.atob(base64);
   const len = binaryString.length;

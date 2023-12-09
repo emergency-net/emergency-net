@@ -14,6 +14,8 @@ import { useState } from "react";
 import { setCookie } from "typescript-cookie";
 import useErrorToast from "@/Hooks/useErrorToast";
 import { useNavigate } from "react-router-dom";
+import { importPublicKeyPem } from "@/Library/crypt";
+import axios from "axios";
 
 function Register() {
   const { MTpublic, setAdminKey } = useKeys();
@@ -29,14 +31,11 @@ function Register() {
     },
     {
       onSuccess(data) {
-        // https://datatracker.ietf.org/doc/html/rfc7518#section-6.3.1.2
-        setAdminKey({
-          ...data.adminPubKey,
-          e: "AQAB",
-          ext: true,
-          key_ops: ["verify"],
-        });
+        importPublicKeyPem(data.adminPubKey).then((res) => setAdminKey(res));
         setCookie("token", data.token);
+        if (data.token) {
+          axios.defaults.headers.common.Authorization = data.token;
+        }
         navigate("/home");
       },
       onError: handleError,

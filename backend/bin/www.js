@@ -7,32 +7,8 @@
 import http from "http";
 import dotenv from "dotenv";
 import app from "../app.js";
-import crypto, { createPublicKey } from "crypto";
-import fs from "fs";
-import { pem2jwk } from "pem-jwk";
-import { adminKey, publicKey } from "../src/util/readkeys.js";
 
 dotenv.config();
-
-//console.log("Public", pem2jwk(publicKey.toString()));
-function pemToPrivateKeyObject(pemFilePath) {
-  try {
-    const pemContent = fs.readFileSync(pemFilePath, "utf8");
-    const privateKey = crypto.createPublicKey({
-      key: pemContent,
-      format: "pem",
-      type: "spki",
-    });
-    return privateKey;
-  } catch (error) {
-    console.error("Error converting PEM to Private KeyObject:", error);
-    return null;
-  }
-}
-console.log(pemToPrivateKeyObject(process.env.PUBLIC_KEY_PATH));
-console.log("HERE");
-export const publicKeyJwk = pem2jwk(publicKey.toString());
-export const adminPublicKeyJwk = pem2jwk(adminKey.toString());
 
 export const apId = "ortabayir";
 /**
@@ -40,6 +16,31 @@ export const apId = "ortabayir";
  */
 const port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
+
+/**
+ * Basic Error Handling.
+ */
+
+// 404 Error Handler
+app.use((req, res, next) => {
+  res.status(404).send("Page not found");
+});
+
+// Generic Error Handler
+app.use((err, req, res, next) => {
+  console.error(err); // Log the error for debugging
+
+  // Customize error message and status based on the error
+  const status = err.status || 500;
+  const message = err.message || "Internal Server Error";
+
+  res.status(status).send({
+    error: {
+      status,
+      message,
+    },
+  });
+});
 
 /**
  * Create HTTP server.

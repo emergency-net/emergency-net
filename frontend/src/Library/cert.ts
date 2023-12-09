@@ -1,5 +1,5 @@
 import { importPublicKeyPem, jwkToKey } from "./crypt";
-import { base64ToJson } from "./util";
+import { base64ToArrayBuffer, base64ToJson, stringToArrayBuffer } from "./util";
 
 const subtleCrypto = window.crypto.subtle;
 
@@ -8,10 +8,32 @@ export async function verifyApCert(cert: string, adminJwk: JsonWebKey) {
   const adminKey = await jwkToKey(adminJwk);
 
   const content = base64ToJson(splitCert[0]);
+  const signature = splitCert[1];
 
-  console.log(content);
+  if (signature === "NO_CERT") {
+    return {
+      apPublicKey: await importPublicKeyPem(content.apPub),
+      apId: content.apId as string,
+      apType: "lonely",
+    };
+  }
 
-  const apPubKey = await importPublicKeyPem(content.apPub);
+  const stringContent = JSON.stringify(content);
 
-  console.log(apPubKey);
+  const verified = await subtleCrypto.verify(
+    { name: "RSA-PSS", saltLength: 0 },
+    adminKey,
+    base64ToArrayBuffer(signature),
+    stringToArrayBuffer(stringContent)
+  );
+
+  if (verified) {
+    return {
+      apPublicKey: await importPublicKeyPem(content.apPub),
+      apId: content.apId as string,
+      apType: "infrastructure",
+    };
+  } else {
+    throw new Error("Certificate Invalid");
+  }
 }

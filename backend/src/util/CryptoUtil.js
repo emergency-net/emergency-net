@@ -1,5 +1,6 @@
 import crypto, { createHash } from "crypto";
-import { adminKey, adminPrivateKey, privateKey } from "./readkeys.js";
+import { adminPublicKey, adminPrivateKey, privateKey } from "./readkeys.js";
+import fs from "fs";
 
 export function jsonToBase64(object) {
   const json = JSON.stringify(object);
@@ -37,10 +38,31 @@ export function sign(data) {
   return sign.sign(privateKey, "base64");
 }
 
+export function pemToPrivateKeyObject(pemContent) {
+  try {
+    const privateKey = crypto.createPublicKey({
+      key: pemContent,
+      format: "pem",
+      type: "spki",
+    });
+    return privateKey;
+  } catch (error) {
+    console.error("Error converting PEM to Private KeyObject:", error);
+    return null;
+  }
+}
+
 export function signByAdmin(data) {
   const sign = crypto.createSign("RSA-SHA256");
+
   sign.update(data);
-  return sign.sign(adminPrivateKey, "base64");
+  const signAlgorithm = {
+    key: adminPrivateKey,
+    saltLength: 0,
+    padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+  };
+  sign.end();
+  return sign.sign(signAlgorithm, "base64");
 }
 
 export function verify(data, signature, publicKey) {
@@ -59,7 +81,7 @@ export function hashBase64(base64String, algorithm = "sha256") {
 // TO-DO:: object equality check will be implemented
 export function verifyACAP(encodedData, adminSignature) {
   const stringifiedData = JSON.stringify(base64toJson(encodedData));
-  return verify(stringifiedData, adminSignature, adminKey);
+  return verify(stringifiedData, adminSignature, adminPublicKey);
 }
 
 // PU-Certified AP
@@ -71,7 +93,7 @@ export function verifyPUAP(
 ) {
   const PUData = base64toJson(encodedPUData);
   const stringifiedPUData = JSON.stringify(PUData);
-  if (verify(stringifiedPUData, adminSignature, adminKey)) {
+  if (verify(stringifiedPUData, adminSignature, adminPublicKey)) {
     const stringifiedAPData = JSON.stringify(base64toJson(encodedAPData));
     const PUkey = PUData.pubKey;
     return verify(stringifiedAPData, PUsignature, PUkey);

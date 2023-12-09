@@ -5,7 +5,6 @@ export function verifyAPReg(data, cert) {
   const fragmentedCert = cert.split(".");
   let encodedAPData;
   const decodedData = base64toJson(data);
-  console.log("fragmented cert " + fragmentedCert);
   if (fragmentedCert.length === 2) {
     //Admin certified AP
     encodedAPData = fragmentedCert[0];
@@ -25,42 +24,41 @@ export function verifyAPReg(data, cert) {
       console.log(encodedAPData);
     }
   } else if (fragmentedCert.length === 4) {
-      //PU certified AP
-      encodedAPData = fragmentedCert[0];
-      const PUsignature = fragmentedCert[1];
-      const encodedPUData = fragmentedCert[2];
-      const adminSignature = fragmentedCert[3];
-      isVerified = verifyPUAP(
-        encodedAPData,
-        PUsignature,
-        encodedPUData,
-        adminSignature
-      );
-    } else {
-      return {
-        isApVerified: false,
-        reason: "Certificate is not in the correct format",
-      };
-    }
-    console.log("isVerified " + isVerified);
-
-    var decodedAPData = base64toJson(encodedAPData);
-
-    //Assume certificates have apId and apPub fields
-    if (decodedData.apReg !== decodedAPData.apId) {
-      return {
-        isApVerified: false,
-        reason: "Registered AP id does not match",
-      };
-    } else if (!isVerified) {
-      return {
-        isApVerified: false,
-        reason: "Certificate is not valid",
-      };
-    }
-    return { isApVerified: true, apPubKey: decodedAPData.apPub };
+    //PU certified AP
+    encodedAPData = fragmentedCert[0];
+    const PUsignature = fragmentedCert[1];
+    const encodedPUData = fragmentedCert[2];
+    const adminSignature = fragmentedCert[3];
+    isVerified = verifyPUAP(
+      encodedAPData,
+      PUsignature,
+      encodedPUData,
+      adminSignature
+    );
+  } else {
+    return {
+      isApVerified: false,
+      reason: "Certificate is not in the correct format",
+    };
   }
+  console.log("isVerified " + isVerified);
 
+  var decodedAPData = base64toJson(encodedAPData);
+
+  //Assume certificates have apId and apPub fields
+  if (decodedData.apReg !== decodedAPData.apId) {
+    return {
+      isApVerified: false,
+      reason: "Registered AP id does not match",
+    };
+  } else if (!isVerified) {
+    return {
+      isApVerified: false,
+      reason: "Certificate is not valid",
+    };
+  }
+  return { isApVerified: true, apPubKey: decodedAPData.apPub };
+}
 
 export function verifyToken(token) {
   //Token is in the form of payload.signature.certificate
