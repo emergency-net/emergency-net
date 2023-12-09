@@ -16,7 +16,7 @@ function Channel() {
   const { mutate: sendMessage } = useMutation(
     ({ messageStr }: { messageStr: string }) => {
       return message({
-        message: messageStr,
+        msgContent: messageStr,
         channel: channelName!,
       });
     }

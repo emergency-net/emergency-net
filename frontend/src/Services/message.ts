@@ -2,17 +2,22 @@ import { keyToJwk, sign, signByMT } from "@/Library/crypt";
 import axios from "axios";
 
 export async function message({
-  message,
+  msgContent,
   channel,
 }: {
-  message: string;
+  msgContent: string;
   channel: string;
 }) {
   const content = {
-    content: message,
-    channel,
+    message: {
+      channel,
+      tod: Date.now(),
+      content: msgContent,
+      usernick: "test",
+    },
     tod: Date.now(),
-    usernick: `test123`,
+    priority: 1,
+    type: "MT_MSG",
   };
 
   const response = await axios.post(import.meta.env.VITE_API_URL + "/message", {
