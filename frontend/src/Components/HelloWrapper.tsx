@@ -25,17 +25,11 @@ function HelloWrapper() {
         if (res.status === 202) {
           import.meta.env.PROD && navigate("/register");
         } else if (res.status === 200) {
+          verifyApCert(res.data.cert);
           if (location.pathname == "/" || location.pathname == "") {
             import.meta.env.PROD && navigate("/home");
           }
         }
-
-        verifyApCert(res.data.cert, {
-          ...res.data.adminPubKey,
-          e: "AQAB",
-          ext: true,
-          key_ops: ["verify"],
-        });
       })
       .catch(handleError);
   }, []);

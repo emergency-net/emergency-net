@@ -5,7 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 const CHANNELS = ["Genel"];
 
 function Home() {
-  const navigate = useNavigate();
   return (
     <div>
       <div className="flex flex-col m-5 items-stretch gap-4">

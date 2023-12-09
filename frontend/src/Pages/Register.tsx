@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "../Components/ui/card";
 import { Input } from "../Components/ui/input";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { register } from "@/Services/register";
 import useKeys from "@/Hooks/useKeys";
 import { useState } from "react";
@@ -22,6 +22,7 @@ function Register() {
   const [username, setUsername] = useState<string>("");
   const handleError = useErrorToast();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { mutate: sendRegister } = useMutation(
     () => {
       if (username.length < 5) {
@@ -31,9 +32,10 @@ function Register() {
     },
     {
       onSuccess(data) {
-        importPublicKeyPem(data.content.adminPubKey).then((res) =>
-          setAdminKey(res)
-        );
+        importPublicKeyPem(data.content.adminPubKey).then((res) => {
+          setAdminKey(res);
+          queryClient.invalidateQueries(["adminKey"]);
+        });
         setCookie("token", data.content.token);
         if (data.content.token) {
           axios.defaults.headers.common.Authorization = data.content.token;
