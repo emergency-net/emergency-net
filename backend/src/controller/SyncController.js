@@ -33,5 +33,16 @@ class SyncController {
         });
       });
     });
+
+    return res.status(200).json({
+      tod: Date.now(),
+      priority: -1,
+      type: "MT_SYNC_ACK",
+      content: {
+        messages: Array.from(messageMap),
+      },
+    });
   }
 }
+
+export const syncController = new SyncController();
