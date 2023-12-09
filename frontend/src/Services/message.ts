@@ -1,27 +1,23 @@
-import { keyToJwk } from "@/Library/crypt";
+import { keyToJwk, sign, signByMT } from "@/Library/crypt";
 import axios from "axios";
 
 export async function message({
-  key,
-  content,
+  message,
   channel,
 }: {
-  content: string;
+  message: string;
   channel: string;
-
-  key: CryptoKey;
 }) {
-  const jwk = await keyToJwk(key);
-
-  const response = await axios.post(import.meta.env.VITE_API_URL + "/message", {
-    message: {
-      tod: Date.now(),
-      content,
-      channel,
-    },
-    mtPubKey: jwk,
+  const content = {
+    content: message,
+    channel,
     tod: Date.now(),
     usernick: `test123`,
+  };
+
+  const response = await axios.post(import.meta.env.VITE_API_URL + "/message", {
+    content,
+    signature: await signByMT(JSON.stringify(content)),
   });
 
   return response.data;

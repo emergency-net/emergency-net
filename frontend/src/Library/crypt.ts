@@ -110,6 +110,14 @@ export async function sign(key: CryptoKey, msg: string) {
   return arrayBufferToBase64(signature);
 }
 
+export async function signByMT(msg: string) {
+  const privateKey = await jwkToKey(
+    JSON.parse(localStorage.getItem("privateKey")!) as JsonWebKey
+  );
+
+  return sign(privateKey, msg);
+}
+
 export async function verify(key: CryptoKey, signature: string, msg: string) {
   const encoder = new TextEncoder();
   const encoded = encoder.encode(msg);

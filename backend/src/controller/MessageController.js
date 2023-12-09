@@ -1,5 +1,5 @@
 import { apId } from "../../bin/www.js";
-import { createMessageCert, verifyMT } from "../util/MessageUtil.js";
+import { createMessageCert, getKeyFromToken } from "../util/MessageUtil.js";
 import { AppDataSource } from "../database/newDbSetup.js";
 import { Message } from "../database/entity/Message.js";
 import {
@@ -20,10 +20,7 @@ class MessageController {
     //let signature = req.body.signature;
     let mtPubKeyJwk = req.body.mtPubKey;
     const key = await jwkToKeyObject(mtPubKeyJwk);
-    const mtPubKey = key
-      .export({ format: "pem", type: "spki" })
-      .toString()
-      .trim();
+    const mtPubKey = getKeyFromToken(token);
 
     const messageToSave = {
       content: message.content,
@@ -40,23 +37,7 @@ class MessageController {
         type: "MT_MSG_RJT",
         error: "Timeout error.",
       });
-    } else if (!verifyMT(token, mtPubKey)) {
-      res.status(400).json({
-        id: apId,
-        tod: Date.now(),
-        priority: -1,
-        type: "MT_MSG_RJT",
-        error: "MT Public Keys do not match.",
-      });
-    } /*else if (!verify(JSON.stringify(message), signature, mtPubKey)) {
-      res.status(400).json({
-        id: apId,
-        tod: Date.now(),
-        priority: -1,
-        type: "MT_MSG_RJT",
-        error: "Message could not verified.",
-      });
-    } */ else {
+    } else {
       const isVerified = verifyToken(token);
       const isTokenVerified = isVerified.isTokenVerified;
       const isAPVerified = isVerified.isApVerified;

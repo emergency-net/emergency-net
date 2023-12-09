@@ -11,14 +11,12 @@ import { Link, useParams } from "react-router-dom";
 
 function Channel() {
   const { channelName } = useParams();
-  const { MTpublic, setAdminKey } = useKeys();
   const [input, setInput] = useState("");
 
   const { mutate: sendMessage } = useMutation(
     ({ messageStr }: { messageStr: string }) => {
       return message({
-        key: MTpublic!,
-        content: messageStr,
+        message: messageStr,
         channel: channelName!,
       });
     }

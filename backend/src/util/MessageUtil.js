@@ -5,12 +5,11 @@ export function verifyMessage(message, mtPubKey, signature) {
   return verify(message, signature, mtPubKey);
 }
 
-export async function verifyMT(token, mtPubKey) {
+export async function getKeyFromToken(token) {
   const fragmentedToken = token.split(".");
   const encodedData = fragmentedToken[0];
   const mtPubKeyToken = base64toJson(encodedData).mtPubKey.toString().trim();
-  console.log(mtPubKeyToken);
-  return mtPubKeyToken === mtPubKey;
+  return mtPubKeyToken;
 }
 
 export function createMessageCert(message) {
