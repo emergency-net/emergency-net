@@ -3,6 +3,7 @@ import { createMessageCert, getKeyFromToken } from "../util/MessageUtil.js";
 import { AppDataSource } from "../database/newDbSetup.js";
 import { Message } from "../database/entity/Message.js";
 import {
+  base64toJson,
   hashBase64,
   jsonToBase64,
   jwkToKeyObject,
@@ -14,18 +15,20 @@ import { verifyToken } from "../util/HelloUtil.js";
 class MessageController {
   async receiveMessage(req, res, next) {
     let token = req.header("authorization");
-    let usernick = req.body.usernick;
-    let tod_received = req.body.tod;
-    let message = req.body.message;
+    const { content, signature } = req.body;
+    let usernick = content.usernick;
+    let tod_received = content.tod;
+    let message = content.message;
+    console.log("Message received:", message);
     //let signature = req.body.signature;
-    let mtPubKeyJwk = req.body.mtPubKey;
-    const key = await jwkToKeyObject(mtPubKeyJwk);
-    const mtPubKey = getKeyFromToken(token);
+    //let mtPubKeyJwk = req.body.mtPubKey;
+    //const key = await jwkToKeyObject(mtPubKeyJwk);
+    //const mtPubKey = getKeyFromToken(token);
 
     const messageToSave = {
       content: message.content,
       tod: message.tod,
-      usernick: usernick,
+      usernick: message.usernick,
       origin: apId,
     };
 
@@ -41,6 +44,10 @@ class MessageController {
       const isVerified = verifyToken(token);
       const isTokenVerified = isVerified.isTokenVerified;
       const isAPVerified = isVerified.isApVerified;
+
+      const encodedData = token.split(".")[0];
+      const mtPubKey = base64toJson(encodedData).mtPubKey.toString().trim();
+
       if (!isTokenVerified) {
         res.status(400).json({
           id: apId,
@@ -52,10 +59,19 @@ class MessageController {
             : "Signature check is failed.",
         });
       } else {
+        if (!verify(JSON.stringify(content), signature, mtPubKey)) {
+          res.status(400).json({
+            id: apId,
+            tod: Date.now(),
+            priority: -1,
+            type: "MT_MSG_RJT",
+            error: "Message could not be verified.",
+          });
+        }
         AppDataSource.manager
           .save(Message, {
             content: message.content,
-            usernick: usernick,
+            usernick: message.usernick,
             origin: apId,
             certificate: createMessageCert(messageToSave),
             hashKey: hashBase64(jsonToBase64(messageToSave)),
@@ -70,7 +86,7 @@ class MessageController {
               tod: Date.now(),
               priority: -1,
               type: "MT_MSG_ACK",
-              usernick: usernick,
+              usernick: message.usernick,
             });
           })
           .catch((error) => {
