@@ -3,6 +3,7 @@ import Register from "./Pages/Register";
 import HelloWrapper from "./Components/HelloWrapper";
 import Home from "./Pages/Home";
 import Channel from "./Pages/Channel";
+import SyncWrapper from "./Components/SyncWrapper";
 
 export const routes: RouteObject[] = [
   {
@@ -10,16 +11,22 @@ export const routes: RouteObject[] = [
     element: <HelloWrapper />,
     children: [
       {
-        path: "register",
-        element: <Register />,
-      },
-      {
-        path: "home",
-        element: <Home />,
-      },
-      {
-        path: "channel/:channelName",
-        element: <Channel />,
+        path: "",
+        element: <SyncWrapper />,
+        children: [
+          {
+            path: "register",
+            element: <Register />,
+          },
+          {
+            path: "home",
+            element: <Home />,
+          },
+          {
+            path: "channel/:channelName",
+            element: <Channel />,
+          },
+        ],
       },
     ],
   },

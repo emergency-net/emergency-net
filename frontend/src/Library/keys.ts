@@ -1,7 +1,7 @@
 import { generateKeys, jwkToKey } from "./crypt";
 
 export async function initKeys() {
-  const { sign, encrypt } = await generateKeys();
+  const { sign } = await generateKeys();
 
   const keys = [
     // {

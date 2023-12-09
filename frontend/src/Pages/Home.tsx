@@ -6,7 +6,7 @@ const CHANNELS = ["Genel"];
 
 function Home() {
   return (
-    <div>
+    <div className="p-1">
       <div className="flex flex-col m-5 items-stretch gap-4">
         <Card className="p-4 flex gap-4 ">
           <MessagesSquare /> Kanallar

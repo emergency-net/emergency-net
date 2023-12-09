@@ -20,7 +20,7 @@ function Channel() {
   );
 
   return (
-    <div className="grid grid-rows-[60px_1fr_60px] h-full">
+    <div className="grid grid-rows-[60px_1fr_60px] h-full ">
       <div className="border-b border-gray-200 flex items-center  bg-white text-lg">
         <Link
           className="h-full aspect-square flex items-center justify-center transition-transform duration-100 active:scale-95"

@@ -1,6 +1,6 @@
-import { Message } from "../database/entity/Message";
-import { AppDataSource } from "../database/newDbSetup";
-import { base64toJson, verify, verifyACAP, verifyPUAP } from "./CryptoUtil";
+import { Message } from "../database/entity/Message.js";
+import { AppDataSource } from "../database/newDbSetup.js";
+import { base64toJson, verify, verifyACAP, verifyPUAP } from "./CryptoUtil.js";
 
 export function verifyMessage(message) {
   const certificate = message.certificate;
