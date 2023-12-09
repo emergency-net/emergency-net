@@ -32,4 +32,5 @@ fs.writeFileSync(
   process.env.ADMIN_PRIVATE_KEY_PATH,
   adminPrivKey.export({ format: "pem", type: "pkcs8" })
 );
+
 console.log("KEYS SAVED");

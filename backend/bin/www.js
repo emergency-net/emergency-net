@@ -10,7 +10,12 @@ import app from "../app.js";
 
 dotenv.config();
 
-export const apId = "ortabayir";
+export const apId = process.env.AP_ID;
+
+if (!apId) {
+  console.error("Please provide an AP_ID in your .env file.");
+  process.exit(-1);
+}
 /**
  * Get port from environment and store in Express.
  */

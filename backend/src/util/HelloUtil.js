@@ -21,7 +21,7 @@ export function verifyAPReg(data, cert) {
       }
     } else {
       isVerified = verifyACAP(encodedAPData, adminSignature);
-      console.log(encodedAPData);
+      //console.log(encodedAPData);
     }
   } else if (fragmentedCert.length === 4) {
     //PU certified AP
@@ -41,7 +41,7 @@ export function verifyAPReg(data, cert) {
       reason: "Certificate is not in the correct format",
     };
   }
-  console.log("isVerified " + isVerified);
+  //console.log("isVerified " + isVerified);
 
   var decodedAPData = base64toJson(encodedAPData);
 
@@ -72,14 +72,14 @@ export function verifyToken(token) {
   }
   //Mt identity is the first part of the token, base64 encoded
   const encodedData = fragmentedToken[0];
-  console.log("encodedData " + encodedData);
+  //console.log("encodedData " + encodedData);
   //Signature is the second part of the token
   const signature = fragmentedToken[1];
   //Certificate is the third part of the token
   const cert = fragmentedToken.slice(2).join(".");
   const verificationResult = verifyAPReg(encodedData, cert);
   if (verificationResult.isApVerified === true) {
-    console.log("verified APREG");
+    //console.log("verified APREG");
     let isTokenVerified = verify(
       JSON.stringify(base64toJson(encodedData)),
       signature,

@@ -34,7 +34,7 @@ router.get("/test", (req, res, next) => {
 router.post("/mtEncryptTest", async (req, res, next) => {
   const theirkey = await spkiToCryptoKey(req.body.key);
   const decrypted = privateDecrypt(theirkey, req.body.encrypted);
-  console.log(req.body.key);
+  //console.log(req.body.key);
   res.send(JSON.stringify({ decrypted }));
 });
 

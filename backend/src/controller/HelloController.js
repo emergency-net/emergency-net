@@ -1,7 +1,7 @@
 import { verifyToken } from "../util/HelloUtil.js";
 import { apId } from "../../bin/www.js";
-import { apCert } from "../util/Util.js";
 import { adminPublicKey } from "../util/readkeys.js";
+import { apCert } from "../util/readcert.js";
 
 class HelloController {
   async hello(req, res, next) {
@@ -17,7 +17,7 @@ class HelloController {
           tod: tod,
           priority: -1,
           type: "MT_HELLO_ACK",
-          cert: apCert(),
+          cert: apCert,
           adminPubKey: adminPublicKey.toString(),
         });
       } else {
@@ -39,7 +39,7 @@ class HelloController {
         tod: tod,
         priority: -1,
         type: "MT_REG_PAGE",
-        cert: apCert(),
+        cert: apCert,
         adminPubKey: adminPublicKey.toString(),
       });
     }
