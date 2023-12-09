@@ -8,17 +8,15 @@ import { AppDataSource } from "../database/newDbSetup.js";
 import { getUser, putUser } from "../util/DatabaseUtil.js";
 import { messageController } from "../controller/MessageController.js";
 const router = express.Router();
-
 export const responseInterceptor = (req, res, next) => {
-  const json = res.json;
-
-  res.json = function () {
-    const oldBody = arguments[0];
-    arguments[0] = {
+  const json = res.json.bind(res);
+  res.json = function (body) {
+    const oldBody = body;
+    const newBody = {
       content: oldBody,
       signature: sign(JSON.stringify(oldBody)),
     };
-    json.apply(res, arguments[0]);
+    return json(newBody);
   };
   next();
 };
@@ -26,8 +24,6 @@ export const responseInterceptor = (req, res, next) => {
 router.get("/", (req, res, next) => {
   res.send("<html><body><h1>Hello World!</h1></body></html>");
 });
-
-router.get("/hello", helloController.hello);
 
 router.post("/register", registerController.register);
 
@@ -56,7 +52,7 @@ router.get("/test2", async (req, res, next) => {
   res.send(getUser("kardelen"));
 });
 
-router.get("/hello", responseInterceptor, helloController.hello);
+router.get("/hello", helloController.hello);
 router.post("/message", messageController.receiveMessage);
 
 export default router;
