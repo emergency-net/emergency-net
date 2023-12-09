@@ -1,4 +1,4 @@
-import crypto, { createPublicKey } from "crypto";
+import crypto from "crypto";
 import fs from "fs";
 import dotenv from "dotenv";
 dotenv.config();

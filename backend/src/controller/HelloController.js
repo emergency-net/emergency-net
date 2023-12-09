@@ -1,7 +1,6 @@
 import { verifyToken } from "../util/HelloUtil.js";
 import { apId } from "../../bin/www.js";
-import { adminPublicKey, privateKey } from "../util/readkeys.js";
-import { sign } from "../util/CryptoUtil.js";
+import { adminPublicKey } from "../util/readkeys.js";
 import { apCert } from "../util/readcert.js";
 
 class HelloController {

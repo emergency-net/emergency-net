@@ -1,4 +1,4 @@
-import { signByMT } from "@/Library/crypt";
+import { MTResponseSigner } from "@/Library/interceptors";
 import axios from "axios";
 
 export async function message({
@@ -20,10 +20,10 @@ export async function message({
     type: "MT_MSG",
   };
 
-  const response = await axios.post(import.meta.env.VITE_API_URL + "/message", {
-    content,
-    signature: await signByMT(JSON.stringify(content)),
-  });
+  const response = await axios.post(
+    import.meta.env.VITE_API_URL + "/message",
+    await MTResponseSigner(content)
+  );
 
   return response.data;
 }

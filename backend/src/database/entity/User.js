@@ -10,4 +10,3 @@ export const User = new EntitySchema({
     },
   },
 });
-

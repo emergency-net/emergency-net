@@ -15,7 +15,7 @@ import { setCookie } from "typescript-cookie";
 import useErrorToast from "@/Hooks/useErrorToast";
 import { useNavigate } from "react-router-dom";
 import { importPublicKeyPem } from "@/Library/crypt";
-import axios from "axios";
+import { APResponseVerifier } from "@/Library/interceptors";
 
 function Register() {
   const { MTpublic, setAdminKey } = useKeys();
@@ -31,15 +31,15 @@ function Register() {
       return register({ key: MTpublic!, username: username });
     },
     {
-      onSuccess(data) {
-        importPublicKeyPem(data.content.adminPubKey).then((res) => {
-          setAdminKey(res);
-          queryClient.invalidateQueries(["adminKey"]);
-        });
-        setCookie("token", data.content.token);
-        if (data.content.token) {
-          axios.defaults.headers.common.Authorization = data.content.token;
-        }
+      async onSuccess(data) {
+        const content = await APResponseVerifier(data);
+        const adminKey = await importPublicKeyPem(content.adminPubKey);
+
+        setAdminKey(adminKey);
+        queryClient.invalidateQueries(["adminKey"]);
+
+        setCookie("token", content.token);
+
         navigate("/home");
       },
       onError: handleError,

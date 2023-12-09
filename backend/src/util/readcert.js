@@ -1,4 +1,3 @@
-import fs from "fs";
 import dotenv from "dotenv";
 import { jsonToBase64, signByAdmin } from "./CryptoUtil.js";
 import { publicKey } from "./readkeys.js";

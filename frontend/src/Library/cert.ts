@@ -1,10 +1,11 @@
-import { importPublicKeyPem } from "./crypt";
+import { APData } from "./APData";
+import { importPublicKeyPem, verify } from "./crypt";
 import { readAdminKey } from "./keys";
-import { base64ToArrayBuffer, base64ToJson, stringToArrayBuffer } from "./util";
+import { base64ToJson } from "./util";
 
 const subtleCrypto = window.crypto.subtle;
 
-export async function verifyApCert(cert: string) {
+export async function verifyApCert(cert: string): Promise<APData> {
   const adminKey = await readAdminKey();
 
   const splitCert = cert.split(".");
@@ -14,26 +15,20 @@ export async function verifyApCert(cert: string) {
 
   if (signature === "NO_CERT") {
     return {
-      apPublicKey: await importPublicKeyPem(content.apPub),
-      apId: content.apId as string,
-      apType: "lonely",
+      key: await importPublicKeyPem(content.apPub),
+      id: content.apId as string,
+      type: "lonely",
     };
   }
 
   const stringContent = JSON.stringify(content);
 
-  const verified = await subtleCrypto.verify(
-    { name: "RSA-PSS", saltLength: 0 },
-    adminKey,
-    base64ToArrayBuffer(signature),
-    stringToArrayBuffer(stringContent)
-  );
-
+  const verified = await verify(adminKey, signature, stringContent);
   if (verified) {
     return {
-      apPublicKey: await importPublicKeyPem(content.apPub),
-      apId: content.apId as string,
-      apType: "infrastructure",
+      key: await importPublicKeyPem(content.apPub),
+      id: content.apId as string,
+      type: "infrastructure",
     };
   } else {
     throw new Error("AP Certificate Invalid");
