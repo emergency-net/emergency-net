@@ -1,11 +1,4 @@
-import {
-  adminKey,
-  adminPublicKeyJwk,
-  apId,
-  karPubKey,
-  publicKey,
-  publicKeyJwk,
-} from "../../bin/www.js";
+import { adminPublicKeyJwk, apId, publicKeyJwk } from "../../bin/www.js";
 import { User } from "../database/entity/User.js";
 import { AppDataSource } from "../database/newDbSetup.js";
 import { keyObjectToJwk } from "../util/CryptoUtil.js";

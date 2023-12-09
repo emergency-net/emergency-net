@@ -1,5 +1,5 @@
 import crypto, { createHash } from "crypto";
-import { privateKey, adminKey, adminPrivateKey } from "../../bin/www.js";
+import { adminKey, adminPrivateKey, privateKey } from "./readkeys.js";
 
 export function jsonToBase64(object) {
   const json = JSON.stringify(object);

@@ -1,6 +1,7 @@
 const DELAY = 3;
-import { apId, publicKey } from "../../bin/www.js";
+import { apId } from "../../bin/www.js";
 import { jsonToBase64, signByAdmin } from "./CryptoUtil.js";
+import { publicKey } from "./readkeys.js";
 
 export function checkTod(tod) {
   if ((Date.now() - tod) / 1000 > DELAY) {

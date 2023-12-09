@@ -1,5 +1,6 @@
-import { apId, publicKey } from "../../bin/www.js";
+import { apId } from "../../bin/www.js";
 import { jsonToBase64, sign, signByAdmin } from "./CryptoUtil.js";
+import { publicKey } from "./readkeys.js";
 
 export function createToken(mtUsername, mtPubKey) {
   const tod = Date.now();
