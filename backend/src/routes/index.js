@@ -4,8 +4,10 @@ import { privateDecrypt, sign, spkiToCryptoKey } from "../util/CryptoUtil.js";
 import { helloController } from "../controller/HelloController.js";
 import { registerController } from "../controller/RegisterController.js";
 
+import { AppDataSource } from "../database/newDbSetup.js";
 import { getUser, putUser } from "../util/DatabaseUtil.js";
 import { messageController } from "../controller/MessageController.js";
+import { syncController } from "../controller/SyncController.js";
 const router = express.Router();
 export const responseInterceptor = (req, res, next) => {
   const json = res.json.bind(res);
@@ -53,5 +55,7 @@ router.get("/test2", async (req, res, next) => {
 
 router.get("/hello", helloController.hello);
 router.post("/message", messageController.receiveMessage);
+
+router.post("/sync", syncController.sync);
 
 export default router;
