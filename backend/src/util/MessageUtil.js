@@ -1,23 +1,22 @@
-import { apId } from "../../bin/www.js";
 import { base64toJson, sign, verify } from "./CryptoUtil.js";
-import { verifyAPReg, verifyToken } from "./HelloUtil.js";
 import { apCert } from "./Util.js";
 
 export function verifyMessage(message, mtPubKey, signature) {
-    return verify(message, signature, mtPubKey);
+  return verify(message, signature, mtPubKey);
 }
 
-export function verifyMT(token, mtPubKey) {
-    const fragmentedToken = token.split(".");
-    const encodedData = fragmentedToken[0];
-    return base64toJson(encodedData).mtPubKey.toString() == mtPubKey.toString();
+export async function verifyMT(token, mtPubKey) {
+  const fragmentedToken = token.split(".");
+  const encodedData = fragmentedToken[0];
+  const mtPubKeyToken = base64toJson(encodedData).mtPubKey.toString().trim();
+  console.log(mtPubKeyToken);
+  return mtPubKeyToken === mtPubKey;
 }
 
 export function createMessageCert(message) {
-    
-    const signed = sign(message);
-    const cert = apCert();
+  const messageStringified = JSON.stringify(message);
+  const signed = sign(messageStringified);
+  const cert = apCert();
 
-    return `${signed}.${cert}`;
-}  
-
+  return `${signed}.${cert}`;
+}
