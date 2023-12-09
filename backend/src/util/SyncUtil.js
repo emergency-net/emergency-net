@@ -1,7 +1,12 @@
+import { Message } from "../database/entity/Message";
+import { AppDataSource } from "../database/newDbSetup";
 import { base64toJson, verify, verifyACAP, verifyPUAP } from "./CryptoUtil";
 
-export function verifyMessage(message, certificate, signature) {
-  const verificationResult = verifyAPSource(certificate);
+export function verifyMessage(message) {
+  const certificate = message.certificate;
+  const signature = certificate.split(".")[0];
+  const apCert = certificate.split(".")[1];
+  const verificationResult = verifyAPSource(apCert);
   let apPubKey;
   let isSafe = true;
   if (verificationResult?.apPubKey) {
@@ -66,4 +71,25 @@ export function verifyAPSource(certificate) {
     };
   }
   return { isApVerified: isVerified, apPubKey: decodedAPData.apPub };
+}
+
+export function messagesToMap() {
+  const messageMap = new Map();
+  AppDataSource.manager
+    .find(Message)
+    .then((allMessages) => {
+      allMessages.map((message) => messageMap.set(message.hashKey, message));
+    })
+    .catch((error) => console.log("TypeORM connection error: ", error));
+  return messageMap;
+}
+
+export function findMissingMessages(receivedMessages, messageMap) {
+  const missingMessages = [];
+  receivedMessages.forEach((message) => {
+    if (!messageMap.has(message.hashKey)) {
+      missingMessages.push(message);
+    }
+  });
+  return missingMessages;
 }
