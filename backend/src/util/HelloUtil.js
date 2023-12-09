@@ -3,6 +3,7 @@ import { base64toJson, verify, verifyACAP, verifyPUAP } from "./CryptoUtil.js";
 export function verifyAPReg(data, cert) {
   let isVerified = false;
   const fragmentedCert = cert.split(".");
+
   let encodedAPData;
   const decodedData = base64toJson(data);
   if (fragmentedCert.length === 2) {

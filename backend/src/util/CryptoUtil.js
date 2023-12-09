@@ -35,7 +35,12 @@ export function privateDecrypt(privateKey, encryptedToken) {
 export function sign(data) {
   const sign = crypto.createSign("RSA-SHA256");
   sign.update(data);
-  return sign.sign(privateKey, "base64");
+  const signAlgorithm = {
+    key: privateKey,
+    saltLength: 0,
+    padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+  };
+  return sign.sign(signAlgorithm, "base64");
 }
 
 export function pemToPrivateKeyObject(pemContent) {
@@ -68,8 +73,12 @@ export function signByAdmin(data) {
 export function verify(data, signature, publicKey) {
   const verify = crypto.createVerify("RSA-SHA256");
   verify.update(data);
-
-  const isVerified = verify.verify(publicKey, signature, "base64");
+  const signAlgorithm = {
+    key: publicKey,
+    saltLength: 0,
+    padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+  };
+  const isVerified = verify.verify(signAlgorithm, signature, "base64");
   return isVerified;
 }
 

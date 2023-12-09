@@ -31,10 +31,12 @@ function Register() {
     },
     {
       onSuccess(data) {
-        importPublicKeyPem(data.adminPubKey).then((res) => setAdminKey(res));
-        setCookie("token", data.token);
-        if (data.token) {
-          axios.defaults.headers.common.Authorization = data.token;
+        importPublicKeyPem(data.content.adminPubKey).then((res) =>
+          setAdminKey(res)
+        );
+        setCookie("token", data.content.token);
+        if (data.content.token) {
+          axios.defaults.headers.common.Authorization = data.content.token;
         }
         navigate("/home");
       },
