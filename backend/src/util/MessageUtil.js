@@ -1,5 +1,5 @@
 import { base64toJson, sign, verify } from "./CryptoUtil.js";
-import { apCert } from "./Util.js";
+import { apCert } from "./readcert.js";
 
 export function verifyMessage(message, mtPubKey, signature) {
   return verify(message, signature, mtPubKey);
@@ -16,7 +16,7 @@ export async function verifyMT(token, mtPubKey) {
 export function createMessageCert(message) {
   const messageStringified = JSON.stringify(message);
   const signed = sign(messageStringified);
-  const cert = apCert();
+  const cert = apCert;
 
   return `${signed}.${cert}`;
 }

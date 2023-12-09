@@ -1,5 +1,5 @@
 import express from "express";
-import { privateDecrypt, spkiToCryptoKey } from "../util/CryptoUtil.js";
+import { privateDecrypt, sign, spkiToCryptoKey } from "../util/CryptoUtil.js";
 
 import { helloController } from "../controller/HelloController.js";
 import { registerController } from "../controller/RegisterController.js";
@@ -9,6 +9,19 @@ import { getUser, putUser } from "../util/DatabaseUtil.js";
 import { messageController } from "../controller/MessageController.js";
 const router = express.Router();
 
+export const responseInterceptor = (req, res, next) => {
+  const json = res.json;
+
+  res.json = function () {
+    const oldBody = arguments[0];
+    arguments[0] = {
+      content: oldBody,
+      signature: sign(JSON.stringify(oldBody)),
+    };
+    json.apply(res, arguments[0]);
+  };
+  next();
+};
 /* GET home page. */
 router.get("/", (req, res, next) => {
   res.send("<html><body><h1>Hello World!</h1></body></html>");
@@ -43,7 +56,7 @@ router.get("/test2", async (req, res, next) => {
   res.send(getUser("kardelen"));
 });
 
-router.get("/hello", helloController.hello);
+router.get("/hello", responseInterceptor, helloController.hello);
 router.post("/message", messageController.receiveMessage);
 
 export default router;
