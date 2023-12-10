@@ -13,7 +13,6 @@ import { verifyToken } from "../util/HelloUtil.js";
 
 class MessageController {
   async receiveMessage(req, res, next) {
-    let usernick = req.body.usernick;
     let tod_received = req.body.tod;
     let message = req.body.message;
     console.log("Message received:", message);
@@ -25,7 +24,7 @@ class MessageController {
     const messageToSave = {
       content: message.content,
       tod: message.tod,
-      usernick: message.usernick,
+      usernick: req.auth.mtUsername + "@" + req.auth.apReg,
       origin: apId,
     };
 

@@ -13,7 +13,6 @@ export async function message({
       channel,
       tod: Date.now(),
       content: msgContent,
-      usernick: "test",
     },
     tod: Date.now(),
     priority: 1,

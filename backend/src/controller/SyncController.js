@@ -6,8 +6,8 @@ import { checkTod } from "../util/Util.js";
 
 class SyncController {
   async sync(req, res, next) {
-    const receivedMessages = req.body.content.messages;
-    const tod_received = req.body.content.tod;
+    const receivedMessages = req.body.messages;
+    const tod_received = req.body.tod;
 
     if (!checkTod(tod_received)) {
       return res.status(408).json({

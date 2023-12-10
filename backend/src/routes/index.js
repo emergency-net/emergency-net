@@ -71,13 +71,13 @@ export const authMiddleware = async (req, res, next) => {
     req.body = req.body.content;
     req.auth = auth;
 
-    console.log(auth);
+    console.log("AUTH: ", auth);
 
     next();
   } catch (err) {
     auth.errorMessage = err.message;
     req.auth = auth;
-    console.log(auth);
+    console.log("AUTH: ", auth);
 
     next();
   }
