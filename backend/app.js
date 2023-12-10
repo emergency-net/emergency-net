@@ -2,7 +2,10 @@ import createError from "http-errors";
 import express from "express";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import indexRouter, { responseInterceptor } from "./src/routes/index.js";
+import indexRouter, {
+  authMiddleware,
+  responseInterceptor,
+} from "./src/routes/index.js";
 import cors from "cors";
 import "reflect-metadata";
 import { AppDataSource } from "./src/database/newDbSetup.js";
@@ -18,6 +21,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use(cors());
+app.use(authMiddleware);
 
 const baseUrl = process.env.BASE_URL || "/api";
 app.use(baseUrl, indexRouter);

@@ -11,6 +11,13 @@ export async function verifyApCert(cert: string): Promise<APData> {
   const splitCert = cert.split(".");
 
   const content = base64ToJson(splitCert[0]);
+  if (!adminKey) {
+    return {
+      key: await importPublicKeyPem(content.apPub),
+      id: content.apId as string,
+      type: "uknown",
+    };
+  }
   const signature = splitCert[1];
 
   if (signature === "NO_CERT") {

@@ -7,8 +7,8 @@ function useErrorToast() {
   function getMsg(err: any): string {
     if (typeof err === "string") {
       return err;
-    } else if (err?.response?.data?.error) {
-      return err?.response?.data?.error;
+    } else if (err?.response?.data?.content?.error?.message) {
+      return err?.response?.data?.error?.message;
     } else if (err?.message) {
       return err?.message;
     } else {

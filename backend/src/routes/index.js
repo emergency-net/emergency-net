@@ -1,5 +1,11 @@
 import express from "express";
-import { privateDecrypt, sign, spkiToCryptoKey } from "../util/CryptoUtil.js";
+import {
+  getTokenData,
+  privateDecrypt,
+  sign,
+  spkiToCryptoKey,
+  verify,
+} from "../util/CryptoUtil.js";
 
 import { helloController } from "../controller/HelloController.js";
 import { registerController } from "../controller/RegisterController.js";
@@ -8,6 +14,7 @@ import { AppDataSource } from "../database/newDbSetup.js";
 import { getUser, putUser } from "../util/DatabaseUtil.js";
 import { messageController } from "../controller/MessageController.js";
 import { syncController } from "../controller/SyncController.js";
+import { verifyToken } from "../util/HelloUtil.js";
 const router = express.Router();
 export const responseInterceptor = (req, res, next) => {
   const json = res.json.bind(res);
@@ -21,37 +28,66 @@ export const responseInterceptor = (req, res, next) => {
   };
   next();
 };
+
+export const authMiddleware = async (req, res, next) => {
+  let auth = {
+    tokenVerified: false,
+    contentVerified: false,
+    apVerified: false,
+    errorMessage: "",
+  };
+  try {
+    const token = req.header("authorization");
+
+    if (!token) {
+      throw new Error("Token does not exist");
+    }
+    const tokenData = await getTokenData(token);
+
+    const tokenVerification = verifyToken(token);
+    auth.tokenVerified = tokenVerification.isTokenVerified;
+    auth.apVerified = tokenVerification.isApVerified;
+    if (!auth.tokenVerified) {
+      throw new Error(tokenVerification.reason);
+    }
+
+    if (!req.body) {
+      throw new Error("There is no body.");
+    }
+
+    if (!req.body.signature || !req.body.content) {
+      throw new Error("There is no content or signature in body.");
+    }
+    auth.contentVerified = verify(
+      JSON.stringify(req.body.content),
+      req.body.signature,
+      tokenData.mtPubKey
+    );
+    if (!auth.contentVerified) {
+      throw new Error("Content signature is invalid.");
+    }
+
+    auth = { ...tokenData, ...auth };
+    req.body = req.body.content;
+    req.auth = auth;
+
+    console.log(auth);
+
+    next();
+  } catch (err) {
+    auth.errorMessage = err.message;
+    req.auth = auth;
+    console.log(auth);
+
+    next();
+  }
+};
 /* GET home page. */
 router.get("/", (req, res, next) => {
   res.send("<html><body><h1>Hello World!</h1></body></html>");
 });
 
 router.post("/register", registerController.register);
-
-router.get("/test", (req, res, next) => {
-  // const encrypted = privateEncrypt(privateKey, "slm");
-  //const decrypted = publicDecrypt(publicKey, encrypted);
-  //const token = createToken("kardelen", karPubKey);
-  //const verified = verifyToken(token);
-  //const signed = sign("slm");
-  //const verified = verify("slm", signed, publicKey);
-  const mykey = spkiToCryptoKey(
-    "P+m9h3l/jytEpa0Djri+aDwNw+CbD3sYTNS3gD3THfN1Ysfalwt9dYCZNnAWpAw0wavxtiRCV0FMpnlLXMVyq+iZvtqWtK0+ipnw5dqftBJuiwTjtm5PnSrk9Kv7xGE5mP+mQOnS3ilXxSTBgVpL4h+vc+dzstXingRXbFCANxqvIHfiVTBH+ayYNqO8CIOYID5trlATcsoJ+bn+NojI9AKK4VEkbfZWzrWALdHRkA+Pv/QfSMXdlYMrXTSicggE4M+C4rJZvHRdJBleFlKpa1+m4tyjOboHFhln/mRQAQbEgarJlK1wVEy8cLlKuarFhLSowmqb/KOzOehpR1AAUg=="
-  );
-  res.send(JSON.stringify({ mykey }));
-});
-
-router.post("/mtEncryptTest", async (req, res, next) => {
-  const theirkey = await spkiToCryptoKey(req.body.key);
-  const decrypted = privateDecrypt(theirkey, req.body.encrypted);
-  //console.log(req.body.key);
-  res.send(JSON.stringify({ decrypted }));
-});
-
-router.get("/test2", async (req, res, next) => {
-  putUser({ username: "kardelen" });
-  res.send(getUser("kardelen"));
-});
 
 router.get("/hello", helloController.hello);
 router.post("/message", messageController.receiveMessage);

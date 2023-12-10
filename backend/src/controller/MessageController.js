@@ -13,11 +13,9 @@ import { verifyToken } from "../util/HelloUtil.js";
 
 class MessageController {
   async receiveMessage(req, res, next) {
-    let token = req.header("authorization");
-    const { content, signature } = req.body;
-    let usernick = content.usernick;
-    let tod_received = content.tod;
-    let message = content.message;
+    let usernick = req.body.usernick;
+    let tod_received = req.body.tod;
+    let message = req.body.message;
     console.log("Message received:", message);
     //let signature = req.body.signature;
     //let mtPubKeyJwk = req.body.mtPubKey;
@@ -40,12 +38,10 @@ class MessageController {
         error: "Timeout error.",
       });
     } else {
-      const isVerified = verifyToken(token);
-      const isTokenVerified = isVerified.isTokenVerified;
-      const isAPVerified = isVerified.isApVerified;
+      const isTokenVerified = req.auth.apVerified;
+      const isAPVerified = req.auth.tokenVerified;
 
-      const encodedData = token.split(".")[0];
-      const mtPubKey = base64toJson(encodedData).mtPubKey.toString().trim();
+      const mtPubKey = req.auth.mtPubKey;
 
       if (!isTokenVerified) {
         res.status(400).json({
@@ -53,12 +49,12 @@ class MessageController {
           tod: Date.now(),
           priority: -1,
           type: "MT_MSG_RJT",
-          error: isVerified.reason
-            ? isVerified.reason
+          error: req.auth.errorMessage
+            ? req.auth.errorMessage
             : "Signature check is failed.",
         });
       } else {
-        if (!verify(JSON.stringify(content), signature, mtPubKey)) {
+        if (!req.auth.contentVerified) {
           res.status(400).json({
             id: apId,
             tod: Date.now(),

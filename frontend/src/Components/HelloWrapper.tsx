@@ -25,6 +25,9 @@ function HelloWrapper() {
       .then(async (res) => {
         setLoading(false);
         if (res.status === 202) {
+          const APData = await verifyApCert(res.data.content.cert);
+          APDataReference.current = APData;
+
           import.meta.env.PROD && navigate("/register");
         } else if (res.status === 200) {
           const APData = await verifyApCert(res.data.content.cert);

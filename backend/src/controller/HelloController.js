@@ -28,7 +28,7 @@ class HelloController {
           type: "MT_HELLO_RJT",
           error: verificationResult.reason
             ? verificationResult.reason
-            : "Signature check is failed",
+            : "Signature check for token has failed",
         });
       }
     } else {

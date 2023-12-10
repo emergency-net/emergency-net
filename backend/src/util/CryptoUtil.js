@@ -162,3 +162,11 @@ export async function jwkToKeyObject(jwk) {
   const keyObject = crypto.KeyObject.from(CryptoKey);
   return keyObject;
 }
+
+export async function getTokenData(token) {
+  const fragmentedToken = token.split(".");
+  const encodedData = fragmentedToken[0];
+  const data = base64toJson(encodedData);
+  data.mtPubKey = data.mtPubKey.toString().trim();
+  return data;
+}
