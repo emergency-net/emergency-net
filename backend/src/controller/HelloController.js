@@ -8,8 +8,7 @@ class HelloController {
     let token = req.header("authorization");
     let tod = Date.now();
     if (token != null) {
-      const verificationResult = verifyToken(token);
-      if (verificationResult.isTokenVerified) {
+      if (req.auth.tokenVerified) {
         // Correctly send the response
         res.status(200).json({
           id: apId,
@@ -26,8 +25,8 @@ class HelloController {
           tod: tod,
           priority: -1,
           type: "MT_HELLO_RJT",
-          error: verificationResult.reason
-            ? verificationResult.reason
+          error: req.auth.errorMessage
+            ? req.auth.errorMessage
             : "Signature check for token has failed",
         });
       }
