@@ -37,8 +37,8 @@ class MessageController {
         error: "Timeout error.",
       });
     } else {
-      const isTokenVerified = req.auth.apVerified;
-      const isAPVerified = req.auth.tokenVerified;
+      const isTokenVerified = req.auth.tokenVerified;
+      const isAPVerified = req.auth.apVerified;
 
       const mtPubKey = req.auth.mtPubKey;
 
