@@ -65,7 +65,7 @@ class MessageController {
         AppDataSource.manager
           .save(Message, {
             content: message.content,
-            usernick: message.usernick,
+            usernick: messageToSave.usernick,
             origin: apId,
             certificate: createMessageCert(messageToSave),
             hashKey: hashBase64(jsonToBase64(messageToSave)),
