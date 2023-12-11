@@ -26,7 +26,7 @@ function Message({
         loading && "opacity-50"
       )}
     >
-      <div className={cn("w-full text-xs font-bold mb-2", my && "text-right")}>
+      <div className={cn("w-full text-xs font-bold mb-1", my && "text-right")}>
         {msg.usernick}
       </div>
       {msg.content + `       `}
