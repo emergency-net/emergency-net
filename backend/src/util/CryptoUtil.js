@@ -82,7 +82,7 @@ export function verify(data, signature, publicKey) {
 }
 
 export function hashBase64(base64String, algorithm = "sha256") {
-  return createHash(algorithm).update(base64String).digest();
+  return createHash(algorithm).update(base64String).digest("base64");
 }
 
 // Admin-Certified AP

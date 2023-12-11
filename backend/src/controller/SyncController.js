@@ -17,9 +17,9 @@ class SyncController {
         error: "Timeout error.",
       });
     }
-    const messageMap = await messagesToMap();
+    const channelMap = await messagesToMap();
 
-    const missingMessages = findMissingMessages(receivedMessages, messageMap);
+    const missingMessages = await findMissingMessages(receivedMessages);
 
     missingMessages.forEach((message) => {
       verifyMessage(message);
@@ -39,7 +39,7 @@ class SyncController {
       priority: -1,
       type: "MT_SYNC_ACK",
       content: {
-        messages: Array.from(messageMap),
+        messages: channelMap,
       },
     });
   }

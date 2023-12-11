@@ -73,26 +73,38 @@ export function verifyAPSource(certificate) {
   return { isApVerified: isVerified, apPubKey: decodedAPData.apPub };
 }
 
-export function messagesToMap() {
-  /*return AppDataSource.manager.find(Message).then((allMessages) => {
-    const messageMap = new Map();
 
-    allMessages.map((message) => messageMap.set(message.hashKey, message));
-    return messageMap;
+export async function messagesToMap() {
+  const channelMap = {};
 
-  });*/
-  return AppDataSource.manager
-    .createQueryBuilder(Message, "message")
-    .select("*") // Use array_agg to aggregate hashKeys into an array
-    .from(Message, "message")
-    .groupBy("channel")
-    .getRawMany()
-    .then((result) => {
-      const messageMapByChannel = {};
-      console.log("result", result);
-      return messageMapByChannel;
-    });
+  const channels = ["Genel"];
+  await Promise.all(channels.map(async (channel) => {
+    try {
+     /* const result = await AppDataSource.manager.query(
+        "SELECT * FROM Message m WHERE m.channel = ?",
+        [channel]
+      );*/
+
+      const result = await AppDataSource.manager.find(Message, { where: {channel: channel}});
+
+      const messageMap = {};
+
+      result.forEach((row) => {
+        const hashkey = row.hashKey;
+        const message = row;
+
+        messageMap[hashkey] = message;
+      });
+
+      channelMap[channel] = messageMap;
+    } catch (error) {
+      console.error(`Error fetching messages for channel ${channel}:`, error);
+    }
+  }));
+//console.log("kardi", channelMap);
+  return channelMap;
 }
+
 
 /*export function findMissingMessages(receivedMessages, messageMap) {
   const missingMessages = [];
@@ -104,7 +116,7 @@ export function messagesToMap() {
   return missingMessages;
 }*/
 
-export function findMissingMessagesDb(receivedMessages) {
+export function findMissingMessages(receivedMessages) {
   const missingMessages = [];
   receivedMessages.forEach((message) => {
     AppDataSource.manager
