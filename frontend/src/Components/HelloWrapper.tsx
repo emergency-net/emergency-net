@@ -1,5 +1,4 @@
-import { hello } from "@/Services/hello";
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { getCookie } from "typescript-cookie";
 import axios from "axios";
@@ -7,20 +6,34 @@ import useErrorToast from "@/Hooks/useErrorToast";
 import { verifyApCert } from "@/Library/cert";
 import { APDataReference } from "@/Library/APData";
 import { APResponseVerifier } from "@/Library/interceptors";
+import { getTokenData } from "@/Library/token";
+import { hello } from "@/Services/hello";
+
+// Create the context
+const TokenDataContext = createContext<any>(null);
+
+// Custom hook to use the context
+export const useTokenData = () => useContext(TokenDataContext);
 
 function HelloWrapper() {
   const navigate = useNavigate();
   const location = useLocation();
   const handleError = useErrorToast();
   const [loading, setLoading] = useState(true);
+  const [tokenData, setTokenData] = useState(null);
+
   useEffect(() => {
     const token = getCookie("token");
     if (token) {
       axios.defaults.headers.common.Authorization = token;
+      const data = getTokenData(token);
+      setTokenData(data);
     }
+
     if (!import.meta.env.PROD) {
       setLoading(false);
     }
+
     hello()
       .then(async (res) => {
         setLoading(false);
@@ -33,20 +46,27 @@ function HelloWrapper() {
           const APData = await verifyApCert(res.data.content.cert);
           APDataReference.current = APData;
           APResponseVerifier(res.data);
-          if (location.pathname == "/" || location.pathname == "") {
+          if (location.pathname === "/" || location.pathname === "") {
             import.meta.env.PROD && navigate("/home");
           }
         }
       })
       .catch(handleError);
   }, []);
+
   if (loading) {
     return (
       <div className="h-full w-full flex items-center justify-center">
         Yükleniyor...
       </div>
     );
-  } else return <Outlet />;
+  } else {
+    return (
+      <TokenDataContext.Provider value={tokenData}>
+        <Outlet />
+      </TokenDataContext.Provider>
+    );
+  }
 }
 
 export default HelloWrapper;
