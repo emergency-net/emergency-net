@@ -21,7 +21,7 @@ function Message({
   return (
     <div
       className={cn(
-        "p-4 pt-2 rounded-lg relative flex-none bg-gray-200 shadow-lg dark:bg-gray-900 max-w-[80%] self-start overflow-hidden dark:text-gray-400",
+        "p-4 pt-2 rounded-lg relative flex-none bg-gray-200 shadow-lg dark:bg-gray-900 max-w-[80%] self-start overflow-hidden dark:text-gray-300",
         my && "dark:bg-gray-4a00 bg-gray-100 self-end dark:text-gray-900",
         loading && "opacity-50"
       )}
@@ -99,9 +99,8 @@ function Channel() {
         className=" shadow-inner flex flex-col gap-4 py-4 px-2 overflow-auto"
         ref={messagesRef}
       >
-        {store
-          ?.map((a: any) => a[1])
-          ?.map((msg: any) => (
+        {store &&
+          Object.values(store.Genel)?.map((msg: any) => (
             <Message msg={msg} my={msg.usernick === usernick} />
           ))}
         {loadingMsg && <Message msg={loadingMsg} my={true} loading={true} />}

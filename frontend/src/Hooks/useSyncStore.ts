@@ -22,8 +22,8 @@ function useSyncStore() {
     () => {
       let storeString = localStorage.getItem("store");
       if (!storeString) {
-        localStorage.setItem("store", "[]");
-        storeString = "[]";
+        localStorage.setItem("store", "{}");
+        storeString = "{}";
       }
 
       return JSON.parse(storeString);
