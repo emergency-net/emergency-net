@@ -74,20 +74,53 @@ export function verifyAPSource(certificate) {
 }
 
 export function messagesToMap() {
-  return AppDataSource.manager.find(Message).then((allMessages) => {
+  /*return AppDataSource.manager.find(Message).then((allMessages) => {
     const messageMap = new Map();
 
     allMessages.map((message) => messageMap.set(message.hashKey, message));
     return messageMap;
-  });
+
+  });*/
+  return AppDataSource.manager
+    .createQueryBuilder(Message, "message")
+    .select("*") // Use array_agg to aggregate hashKeys into an array
+    .from(Message, "message")
+    .groupBy("channel")
+    .getRawMany()
+    .then((result) => {
+      const messageMapByChannel = {};
+      console.log("result", result);
+      return messageMapByChannel;
+    });
 }
 
-export function findMissingMessages(receivedMessages, messageMap) {
+/*export function findMissingMessages(receivedMessages, messageMap) {
   const missingMessages = [];
   receivedMessages.forEach((message) => {
     if (!messageMap.has(message.hashKey)) {
       missingMessages.push(message);
     }
+  });
+  return missingMessages;
+}*/
+
+export function findMissingMessagesDb(receivedMessages) {
+  const missingMessages = [];
+  receivedMessages.forEach((message) => {
+    AppDataSource.manager
+      .findOneBy(Message, {
+        hashKey: message.hashKey,
+      })
+      .then((result) => {
+        console.log("result", result);
+        if (!result) {
+          missingMessages.push(message);
+        }
+      })
+      .catch((error) => {
+        console.log("Error while finding message");
+        throw error;
+      });
   });
   return missingMessages;
 }
