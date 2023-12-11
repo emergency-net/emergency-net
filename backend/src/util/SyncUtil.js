@@ -104,23 +104,21 @@ export function messagesToMap() {
   return missingMessages;
 }*/
 
-export function findMissingMessagesDb(receivedMessages) {
+export async function findMissingMessages(receivedMessages) {
   const missingMessages = [];
-  receivedMessages.forEach((message) => {
-    AppDataSource.manager
-      .findOneBy(Message, {
+
+  await receivedMessages.forEach(async (message) => {
+    try {
+      const result = await AppDataSource.manager.findOneBy(Message, {
         hashKey: message.hashKey,
-      })
-      .then((result) => {
-        console.log("result", result);
-        if (!result) {
-          missingMessages.push(message);
-        }
-      })
-      .catch((error) => {
-        console.log("Error while finding message");
-        throw error;
       });
+      if (!result) {
+        missingMessages.push(message);
+      }
+    } catch (error) {
+      console.log("Error while finding message");
+      throw error;
+    }
   });
   return missingMessages;
 }
