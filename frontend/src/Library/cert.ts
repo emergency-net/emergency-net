@@ -6,7 +6,10 @@ import { base64ToJson } from "./util";
 const subtleCrypto = window.crypto.subtle;
 
 export async function verifyApCert(cert: string): Promise<APData> {
-  const adminKey = await readAdminKey();
+  let adminKey;
+  try {
+    adminKey = await readAdminKey();
+  } catch (err) {}
 
   const splitCert = cert.split(".");
 
