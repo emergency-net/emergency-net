@@ -19,7 +19,7 @@ class SyncController {
     }
     const messageMap = await messagesToMap();
 
-    const missingMessages = findMissingMessages(receivedMessages, messageMap);
+    const missingMessages = await findMissingMessages(receivedMessages);
 
     missingMessages.forEach((message) => {
       verifyMessage(message);
