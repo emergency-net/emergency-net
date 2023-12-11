@@ -74,14 +74,12 @@ export function verifyAPSource(certificate) {
 }
 
 export function messagesToMap() {
-  const messageMap = new Map();
-  AppDataSource.manager
-    .find(Message)
-    .then((allMessages) => {
-      allMessages.map((message) => messageMap.set(message.hashKey, message));
-    })
-    .catch((error) => console.log("TypeORM connection error: ", error));
-  return messageMap;
+  return AppDataSource.manager.find(Message).then((allMessages) => {
+    const messageMap = new Map();
+
+    allMessages.map((message) => messageMap.set(message.hashKey, message));
+    return messageMap;
+  });
 }
 
 export function findMissingMessages(receivedMessages, messageMap) {

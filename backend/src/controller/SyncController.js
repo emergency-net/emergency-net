@@ -17,7 +17,7 @@ class SyncController {
         error: "Timeout error.",
       });
     }
-    const messageMap = messagesToMap();
+    const messageMap = await messagesToMap();
 
     const missingMessages = findMissingMessages(receivedMessages, messageMap);
 
