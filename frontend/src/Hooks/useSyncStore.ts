@@ -8,39 +8,40 @@ function useSyncStore() {
   const tokenExists = !!getCookie("token");
 
   const { data: syncStore, isLoading: isSyncLoading } = useQuery(
-    ["store", "sync"],
-    () => sync().then((res) => res.content.messages),
+    ["store"],
+    () => {
+      let storeString = localStorage.getItem("store");
+      if (!storeString) {
+        localStorage.setItem("store", "[]");
+        storeString = "[]";
+      }
+      return sync({ localStore: JSON.parse(storeString) }).then(
+        (res) => res.content.messages
+      );
+    },
     {
       enabled: tokenExists,
     }
   );
   function initSync() {
-    queryClient.invalidateQueries(["store", "sync"]);
+    queryClient.invalidateQueries(["store"]);
   }
-  const { data: localStore, isLoading: isLocalLoading } = useQuery(
-    ["store", "sync"],
-    () => {
-      let storeString = localStorage.getItem("store");
-      if (!storeString) {
-        localStorage.setItem("store", "{}");
-        storeString = "{}";
-      }
-
-      return JSON.parse(storeString);
-    }
-  );
 
   useEffect(() => {
     if (syncStore) {
-      localStorage.setItem("store", JSON.stringify(syncStore));
-      queryClient.invalidateQueries(["store", "store"]);
+      const channels = Object.values(syncStore);
+      const messages = channels.flatMap((channel: any) =>
+        Object.values(channel)
+      );
+      localStorage.setItem("store", JSON.stringify(messages));
+      queryClient.invalidateQueries(["store"]);
     }
   }, [syncStore]);
 
   return {
-    store: localStore,
+    store: syncStore,
     sync: initSync,
-    isLoading: isLocalLoading || isSyncLoading,
+    isLoading: isSyncLoading,
   };
 }
 
