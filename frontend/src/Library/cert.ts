@@ -18,7 +18,7 @@ export async function verifyApCert(cert: string): Promise<APData> {
     return {
       key: await importPublicKeyPem(content.apPub),
       id: content.apId as string,
-      type: "uknown",
+      type: "unknown",
     };
   }
   const signature = splitCert[1];
@@ -27,7 +27,7 @@ export async function verifyApCert(cert: string): Promise<APData> {
     return {
       key: await importPublicKeyPem(content.apPub),
       id: content.apId as string,
-      type: "lonely",
+      type: "non_certified",
     };
   }
 
@@ -38,7 +38,7 @@ export async function verifyApCert(cert: string): Promise<APData> {
     return {
       key: await importPublicKeyPem(content.apPub),
       id: content.apId as string,
-      type: "infrastructure",
+      type: "admin_certified",
     };
   } else {
     throw new Error("AP Certificate Invalid");

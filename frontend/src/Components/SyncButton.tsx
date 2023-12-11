@@ -13,7 +13,7 @@ function SyncButton({
   return (
     <div
       className={cn(
-        "bg-gray-400 p-2 rounded-br-lg group rounded-bl-lg shadow-xl z-50 border border-gray-300 border-t-0 text-white",
+        "dark:bg-gray-800 bg-gray-400 p-2 rounded-br-lg group rounded-bl-lg shadow-xl z-50 border dark:border-gray-600 border-gray-300 border-t-0 dark:text-gray-400 text-white",
         className
       )}
       onClick={onClick}
