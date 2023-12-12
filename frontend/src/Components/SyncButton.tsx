@@ -23,8 +23,8 @@ function SyncButton({
       <RefreshCcw
         size={36}
         className={cn(
-          "transition-transform duration-100 group-active:scale-95",
-          isLoading && "animate-spin"
+          "transition-transform group-active:scale-95",
+          isLoading && "animate-spin-slow"
         )}
       />
 
