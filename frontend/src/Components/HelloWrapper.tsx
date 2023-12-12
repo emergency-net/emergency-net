@@ -41,13 +41,17 @@ function HelloWrapper() {
           const APData = await verifyApCert(res.data.content.cert);
           APDataReference.current = APData;
 
-          import.meta.env.PROD && navigate("/register");
+          navigate("/register");
         } else if (res.status === 200) {
           const APData = await verifyApCert(res.data.content.cert);
           APDataReference.current = APData;
           APResponseVerifier(res.data);
-          if (location.pathname === "/" || location.pathname === "") {
-            import.meta.env.PROD && navigate("/home");
+          if (
+            location.pathname === "/" ||
+            location.pathname === "" ||
+            location.pathname === "/register"
+          ) {
+            navigate("/home");
           }
         }
       })

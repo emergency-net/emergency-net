@@ -40,7 +40,7 @@ function Register() {
 
         setCookie("token", content.token);
 
-        navigate("/home");
+        window.location.reload();
       },
       onError: handleError,
     }

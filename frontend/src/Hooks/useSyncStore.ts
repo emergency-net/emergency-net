@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import { getCookie } from "typescript-cookie";
 
-function useSyncStore() {
+function useSyncStore(onSuccess?: () => void) {
   const queryClient = useQueryClient();
   const tokenExists = !!getCookie("token");
 
@@ -21,6 +21,7 @@ function useSyncStore() {
     },
     {
       enabled: tokenExists,
+      onSuccess,
     }
   );
   function initSync() {
@@ -34,7 +35,6 @@ function useSyncStore() {
         Object.values(channel)
       );
       localStorage.setItem("store", JSON.stringify(messages));
-      queryClient.invalidateQueries(["store"]);
     }
   }, [syncStore]);
 
