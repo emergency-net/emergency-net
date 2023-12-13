@@ -25,7 +25,7 @@ function Register() {
   const queryClient = useQueryClient();
   const { mutate: sendRegister } = useMutation(
     () => {
-      if (username.length < 5) {
+      if (username.length < 3) {
         throw new Error("Kullanıcı ismi geçersiz.");
       }
       return register({ key: MTpublic!, username: username });

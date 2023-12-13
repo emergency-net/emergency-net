@@ -21,16 +21,21 @@ function Message({
   return (
     <div
       className={cn(
-        "p-4 pt-2 rounded-lg relative flex-none bg-gray-200 shadow-lg dark:bg-gray-900 max-w-[80%] self-start overflow-hidden dark:text-gray-300",
-        my && "dark:bg-gray-4a00 bg-gray-100 self-end dark:text-gray-900",
+        "p-4 pt-2 rounded-lg relative flex-none bg-gray-200 text-sm pb-6 shadow-lg dark:bg-gray-900 max-w-[80%] self-start overflow-hidden dark:text-gray-300",
+        my && "dark:bg-gray-4a00 bg-gray-200 self-end dark:text-gray-900",
         loading && "opacity-50"
       )}
     >
-      <div className={cn("w-full text-xs font-bold mb-1", my && "text-right")}>
+      <div
+        className={cn(
+          "w-full text-xs font-bold mb-1 overflow-hidden whitespace-nowrap text-ellipsis",
+          my && "text-right"
+        )}
+      >
         {msg.usernick}
       </div>
       {msg.content + `       `}
-      <span className="absolute bottom-1 right-1 text-sm text-gray-400 font-light">
+      <span className="absolute bottom-0 right-2 text-[10px] text-gray-400 font-light">
         {msg.tod && convertTodToDate(msg.tod)}
       </span>
     </div>
@@ -41,7 +46,17 @@ function Channel() {
   const [input, setInput] = useState("");
   const tokenData = useTokenData();
   const usernick = `${tokenData?.mtUsername}@${tokenData?.apReg}`;
-  const { store, sync } = useSyncStore();
+  const { store, sync } = useSyncStore(() => {
+    setTimeout(
+      () =>
+        messagesRef.current &&
+        messagesRef.current.scrollTo({
+          top: messagesRef.current.scrollHeight,
+          behavior: "smooth", // Optional: define the scrolling behavior (smooth or auto)
+        }),
+      500
+    );
+  });
   const [loadingMsg, setLoadingMsg] = useState<any | null>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
 
@@ -67,7 +82,7 @@ function Channel() {
               top: messagesRef.current.scrollHeight,
               behavior: "smooth", // Optional: define the scrolling behavior (smooth or auto)
             }),
-          200
+          1000
         );
       },
     }
