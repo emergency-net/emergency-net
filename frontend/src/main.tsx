@@ -9,6 +9,8 @@ axios.defaults.headers.common = {
   "Content-Type": "application/json", // Sets content type to JSON
   "Access-Control-Allow-Origin": "*",
 };
+
+console.log("ENV: ", import.meta.env);
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryProvider>

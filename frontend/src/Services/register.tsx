@@ -1,4 +1,5 @@
 import { keyToJwk } from "@/Library/crypt";
+import { getApiURL } from "@/Library/getApiURL";
 import axios from "axios";
 
 export async function register({
@@ -9,13 +10,10 @@ export async function register({
   key: CryptoKey;
 }) {
   const jwk = await keyToJwk(key);
-  const response = await axios.post(
-    import.meta.env.VITE_API_URL + "/register",
-    {
-      username,
-      mtPubKey: jwk,
-    }
-  );
+  const response = await axios.post(getApiURL() + "/register", {
+    username,
+    mtPubKey: jwk,
+  });
 
   return response.data;
 }

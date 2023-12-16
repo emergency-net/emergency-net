@@ -1,3 +1,4 @@
+import { getApiURL } from "@/Library/getApiURL";
 import { MTResponseSigner } from "@/Library/interceptors";
 import axios from "axios";
 
@@ -20,7 +21,7 @@ export async function message({
   };
 
   const response = await axios.post(
-    import.meta.env.VITE_API_URL + "/message",
+    getApiURL() + "/message",
     await MTResponseSigner(content)
   );
 

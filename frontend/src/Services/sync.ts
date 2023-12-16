@@ -1,9 +1,10 @@
+import { getApiURL } from "@/Library/getApiURL";
 import { APResponseVerifier, MTResponseSigner } from "@/Library/interceptors";
 import axios from "axios";
 
 export async function sync({ localStore }: { localStore: any }) {
   const response = await axios.post(
-    import.meta.env.VITE_API_URL + "/sync",
+    getApiURL() + "/sync",
     await MTResponseSigner({
       tod: Date.now(),
       messages: localStore ?? {},

@@ -29,7 +29,7 @@ app.set("port", port);
 
 // 404 Error Handler
 app.use((req, res, next) => {
-  res.status(404).send("Page not found");
+  res.status(404).send("Not found");
 });
 
 // Generic Error Handler

@@ -5,18 +5,18 @@ import { registerController } from "../controller/RegisterController.js";
 
 import { messageController } from "../controller/MessageController.js";
 import { syncController } from "../controller/SyncController.js";
-const router = express.Router();
+import { authMiddleware } from "../middleware/authMiddleware.js";
+import { responseInterceptor } from "../middleware/responseInterceptor.js";
+const indexRouter = express.Router();
 
-/* GET home page. */
-router.get("/", (req, res, next) => {
-  res.send("<html><body><h1>Hello World!</h1></body></html>");
-});
+indexRouter.use(authMiddleware);
+indexRouter.use(responseInterceptor);
 
-router.post("/register", registerController.register);
+indexRouter.post("/register", registerController.register);
 
-router.get("/hello", helloController.hello);
-router.post("/message", messageController.receiveMessage);
+indexRouter.get("/hello", helloController.hello);
+indexRouter.post("/message", messageController.receiveMessage);
 
-router.post("/sync", syncController.sync);
+indexRouter.post("/sync", syncController.sync);
 
-export default router;
+export default indexRouter;

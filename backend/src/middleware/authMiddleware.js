@@ -48,6 +48,10 @@ export const authMiddleware = async (req, res, next) => {
     next();
   } catch (err) {
     auth.errorMessage = err.message;
+    if (req.body && req.body.content) {
+      req.body = req.body.content;
+    }
+
     req.auth = auth;
     console.log("AUTH: ", auth);
 
