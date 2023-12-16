@@ -1,6 +1,5 @@
 import { APResponseVerifier, MTResponseSigner } from "@/Library/interceptors";
 import axios from "axios";
-import { message } from "./message";
 
 export async function sync({ localStore }: { localStore: any }) {
   const response = await axios.post(

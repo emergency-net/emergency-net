@@ -1,7 +1,6 @@
 import { APDataReference } from "./APData";
 import { sign, verify } from "./crypt";
 import { readPrivateKey } from "./keys";
-const subtleCrypto = window.crypto.subtle;
 
 export async function APResponseVerifier({
   content,

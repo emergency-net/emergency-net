@@ -13,7 +13,6 @@ import useKeys from "@/Hooks/useKeys";
 import { useState } from "react";
 import { setCookie } from "typescript-cookie";
 import useErrorToast from "@/Hooks/useErrorToast";
-import { useNavigate } from "react-router-dom";
 import { importPublicKeyPem } from "@/Library/crypt";
 import { APResponseVerifier } from "@/Library/interceptors";
 
@@ -21,7 +20,6 @@ function Register() {
   const { MTpublic, setAdminKey } = useKeys();
   const [username, setUsername] = useState<string>("");
   const handleError = useErrorToast();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { mutate: sendRegister } = useMutation(
     () => {

@@ -3,8 +3,6 @@ import { importPublicKeyPem, verify } from "./crypt";
 import { readAdminKey } from "./keys";
 import { base64ToJson } from "./util";
 
-const subtleCrypto = window.crypto.subtle;
-
 export async function verifyApCert(cert: string): Promise<APData> {
   let adminKey;
   try {
