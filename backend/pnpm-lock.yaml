@@ -35,9 +35,6 @@ dependencies:
   morgan:
     specifier: ~1.9.1
     version: 1.9.1
-  pem-jwk:
-    specifier: ^2.0.0
-    version: 2.0.0
   reflect-metadata:
     specifier: ^0.1.13
     version: 0.1.13
@@ -1606,14 +1603,6 @@ packages:
 
   /path-to-regexp@3.2.0:
     resolution: {integrity: sha512-jczvQbCUS7XmS7o+y1aEO9OBVFeZBQ1MDSEqmO7xSoPgOPoowY/SxLpZ6Vh97/8qHZOteiCKb7gkG9gA2ZUxJA==}
-    dev: false
-
-  /pem-jwk@2.0.0:
-    resolution: {integrity: sha512-rFxu7rVoHgQ5H9YsP50dDWf0rHjreVA2z0yPiWr5WdH/UHb29hKtF7h6l8vNd1cbYR1t0QL+JKhW55a2ZV4KtA==}
-    engines: {node: '>=5.10.0'}
-    hasBin: true
-    dependencies:
-      asn1.js: 5.4.1
     dev: false
 
   /picomatch@2.3.1:

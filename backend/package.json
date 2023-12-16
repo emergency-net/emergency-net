@@ -7,6 +7,7 @@
     "start": "node ./bin/www.js",
     "genkeys": "node ./src/util/genkeys.js",
     "gencert": "node ./src/util/gencert.js",
+    "genpu": "node ./src/util/genpu.js",
     "copy-dist": "shx cp -r ../frontend/dist ./",
     "dev": "nodemon ./bin/www.js"
   },
@@ -21,7 +22,6 @@
     "jsonwebtoken": "^9.0.2",
     "jwk-to-pem": "^2.0.5",
     "morgan": "~1.9.1",
-    "pem-jwk": "^2.0.0",
     "reflect-metadata": "^0.1.13",
     "sqlite": "5.1.1",
     "sqlite3": "~5.0.11",
