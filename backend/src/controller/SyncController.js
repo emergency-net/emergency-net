@@ -17,6 +17,17 @@ class SyncController {
         error: "Timeout error.",
       });
     }
+
+    if (!req.auth.contentVerified) {
+      res.status(400).json({
+        tod: Date.now(),
+        priority: -1,
+        type: "MT_SYNC_RJT",
+        error: req.auth.errorMessage
+            ? req.auth.errorMessage
+            : "Signature check is failed.",
+      });
+    }
     const channelMap = await messagesToMap();
 
     const missingMessages = await findMissingMessages(receivedMessages);
