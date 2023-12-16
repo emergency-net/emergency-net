@@ -2,14 +2,8 @@ import { apId } from "../../bin/www.js";
 import { createMessageCert } from "../util/MessageUtil.js";
 import { AppDataSource } from "../database/newDbSetup.js";
 import { Message } from "../database/entity/Message.js";
-import {
-  base64toJson,
-  hashBase64,
-  jsonToBase64,
-  verify,
-} from "../util/CryptoUtil.js";
+import { hashBase64, jsonToBase64 } from "../util/CryptoUtil.js";
 import { checkTod } from "../util/Util.js";
-import { verifyToken } from "../util/HelloUtil.js";
 
 class MessageController {
   async receiveMessage(req, res, next) {

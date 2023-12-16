@@ -2,13 +2,11 @@ import createError from "http-errors";
 import express from "express";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import indexRouter, {
-  authMiddleware,
-  responseInterceptor,
-} from "./src/routes/index.js";
+
 import cors from "cors";
 import "reflect-metadata";
-import { AppDataSource } from "./src/database/newDbSetup.js";
+import { responseInterceptor } from "./src/middleware/responseInterceptor.js";
+import { authMiddleware } from "./src/middleware/authMiddleware.js";
 
 //import AppDataSource from "./database/newDbSetup.js";
 
@@ -24,6 +22,7 @@ app.use(cors());
 app.use(authMiddleware);
 
 const baseUrl = process.env.BASE_URL || "/api";
+// @ts-ignore
 app.use(baseUrl, indexRouter);
 
 // catch 404 and forward to error handler

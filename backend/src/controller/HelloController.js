@@ -1,4 +1,3 @@
-import { verifyToken } from "../util/HelloUtil.js";
 import { apId } from "../../bin/www.js";
 import { adminPublicKey } from "../util/readkeys.js";
 import { apCert } from "../util/readcert.js";

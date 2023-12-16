@@ -73,38 +73,40 @@ export function verifyAPSource(certificate) {
   return { isApVerified: isVerified, apPubKey: decodedAPData.apPub };
 }
 
-
 export async function messagesToMap() {
   const channelMap = {};
 
   const channels = ["Genel"];
-  await Promise.all(channels.map(async (channel) => {
-    try {
-     /* const result = await AppDataSource.manager.query(
+  await Promise.all(
+    channels.map(async (channel) => {
+      try {
+        /* const result = await AppDataSource.manager.query(
         "SELECT * FROM Message m WHERE m.channel = ?",
         [channel]
       );*/
 
-      const result = await AppDataSource.manager.find(Message, { where: {channel: channel}});
+        const result = await AppDataSource.manager.find(Message, {
+          where: { channel: channel },
+        });
 
-      const messageMap = {};
+        const messageMap = {};
 
-      result.forEach((row) => {
-        const hashkey = row.hashKey;
-        const message = row;
+        result.forEach((row) => {
+          const hashkey = row.hashKey;
+          const message = row;
 
-        messageMap[hashkey] = message;
-      });
+          messageMap[hashkey] = message;
+        });
 
-      channelMap[channel] = messageMap;
-    } catch (error) {
-      console.error(`Error fetching messages for channel ${channel}:`, error);
-    }
-  }));
-//console.log("kardi", channelMap);
+        channelMap[channel] = messageMap;
+      } catch (error) {
+        console.error(`Error fetching messages for channel ${channel}:`, error);
+      }
+    })
+  );
+  //console.log("kardi", channelMap);
   return channelMap;
 }
-
 
 /*export function findMissingMessages(receivedMessages, messageMap) {
   const missingMessages = [];
