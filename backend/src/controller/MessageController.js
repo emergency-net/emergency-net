@@ -65,7 +65,7 @@ class MessageController {
             hashKey: hashBase64(jsonToBase64(messageToSave)),
             channel: message.channel,
             tod: tod_received,
-            isSafe: isAPVerified,
+            isSafe: (isAPVerified === "VALID") || (isAPVerified === "NO_CERT"),
           })
           .then((savedMessage) => {
             console.log("Message saved successfully:", savedMessage);

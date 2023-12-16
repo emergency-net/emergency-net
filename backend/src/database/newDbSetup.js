@@ -1,11 +1,12 @@
 import { DataSource } from "typeorm";
 import { User } from "./entity/User.js";
 import { Message } from "./entity/Message.js";
+import { Channel } from "./entity/Channel.js";
 
 const AppDataSource = new DataSource({
   type: "sqlite",
   database: "./Emergency-Net-DB.db",
-  entities: [User, Message],
+  entities: [User, Message, Channel],
   synchronize: true,
 });
 

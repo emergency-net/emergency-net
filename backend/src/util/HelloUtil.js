@@ -15,7 +15,7 @@ export function verifyAPReg(data, cert) {
       //THINK: Can't anyone change this?
       if (decodedAPData.apId === decodedData.apReg) {
         return {
-          isApVerified: false,
+          isApVerified: "NO_CERT",
           apPubKey: decodedAPData.apPub,
           reason: "No certificate",
         };
@@ -38,7 +38,7 @@ export function verifyAPReg(data, cert) {
     );
   } else {
     return {
-      isApVerified: false,
+      isApVerified: "INVALID",
       reason: "Certificate is not in the correct format",
     };
   }
@@ -49,16 +49,16 @@ export function verifyAPReg(data, cert) {
   //Assume certificates have apId and apPub fields
   if (decodedData.apReg !== decodedAPData.apId) {
     return {
-      isApVerified: false,
+      isApVerified: "INVALID",
       reason: "Registered AP id does not match",
     };
   } else if (!isVerified) {
     return {
-      isApVerified: false,
+      isApVerified: "INVALID",
       reason: "Certificate is not valid",
     };
   }
-  return { isApVerified: true, apPubKey: decodedAPData.apPub };
+  return { isApVerified: "VALID", apPubKey: decodedAPData.apPub };
 }
 
 export function verifyToken(token) {
@@ -66,7 +66,7 @@ export function verifyToken(token) {
   const fragmentedToken = token.split(".");
   if (fragmentedToken.length < 3) {
     return {
-      isApVerified: false,
+      isApVerified: "INVALID",
       isTokenVerified: false,
       reason: "Token is not in the correct format",
     };
@@ -79,7 +79,8 @@ export function verifyToken(token) {
   //Certificate is the third part of the token
   const cert = fragmentedToken.slice(2).join(".");
   const verificationResult = verifyAPReg(encodedData, cert);
-  if (verificationResult.isApVerified === true) {
+  const decodedData = base64toJson(encodedData);
+  if (verificationResult.isApVerified === "VALID") {
     //console.log("verified APREG");
     let isTokenVerified = verify(
       JSON.stringify(base64toJson(encodedData)),
@@ -87,12 +88,13 @@ export function verifyToken(token) {
       Buffer.from(verificationResult.apPubKey)
     );
     return {
-      isApVerified: true,
+      isApVerified: "VALID",
       isTokenVerified: isTokenVerified,
+      mtPubKey: decodedData.mtPubKey ? decodedData.mtPubKey : "",
     };
   } //This is the case where the AP has no certificate but correct format
   else if (
-    verificationResult.isApVerified === false &&
+    verificationResult.isApVerified === "NO_CERT" &&
     verificationResult.reason === "No certificate"
   ) {
     let isTokenVerified = verify(
@@ -101,12 +103,13 @@ export function verifyToken(token) {
       Buffer.from(verificationResult.apPubKey)
     );
     return {
-      isApVerified: false,
+      isApVerified: "NO_CERT",
       isTokenVerified: isTokenVerified,
+      mtPubKey: decodedData.mtPubKey ? decodedData.mtPubKey : "",
     };
   }
   return {
-    isApVerified: false,
+    isApVerified: "INVALID",
     isTokenVerified: false,
     reason: verificationResult.reason,
   };
