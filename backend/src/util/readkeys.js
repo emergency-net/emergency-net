@@ -10,5 +10,7 @@ export const adminPublicKey = fs.readFileSync(
 export const adminPrivateKey = fs.readFileSync(
   process.env.ADMIN_PRIVATE_KEY_PATH
 );
+export const puPublicKey = fs.readFileSync(process.env.PU_PUBLIC_KEY_PATH);
+export const puPrivateKey = fs.readFileSync(process.env.PU_PRIVATE_KEY_PATH);
 
 console.log("KEYS READ");

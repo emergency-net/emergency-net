@@ -14,6 +14,13 @@ const { privateKey: adminPrivKey, publicKey: adminPubKey } =
   crypto.generateKeyPairSync("rsa", {
     modulusLength: 2048, // Length of the key in bits
   });
+
+  
+const { privateKey: puPrivKey, publicKey: puPubKey } =
+  crypto.generateKeyPairSync("rsa", {
+    modulusLength: 2048, // Length of the key in bits
+  });  
+
 console.log("KEYS GENERATED");
 fs.writeFileSync(
   process.env.PUBLIC_KEY_PATH,
@@ -31,6 +38,15 @@ fs.writeFileSync(
 fs.writeFileSync(
   process.env.ADMIN_PRIVATE_KEY_PATH,
   adminPrivKey.export({ format: "pem", type: "pkcs8" })
+);
+
+fs.writeFileSync(
+  process.env.PU_PUBLIC_KEY_PATH,
+  puPubKey.export({ format: "pem", type: "spki" })
+);
+fs.writeFileSync(
+  process.env.PU_PRIVATE_KEY_PATH,
+  puPrivKey.export({ format: "pem", type: "pkcs8" })
 );
 
 console.log("KEYS SAVED");
