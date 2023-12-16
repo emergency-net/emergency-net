@@ -55,38 +55,49 @@ class MessageController {
             type: "MT_MSG_RJT",
             error: "Message could not be verified.",
           });
-        }
-        AppDataSource.manager
-          .save(Message, {
-            content: message.content,
-            usernick: messageToSave.usernick,
-            origin: apId,
-            certificate: createMessageCert(messageToSave),
-            hashKey: hashBase64(jsonToBase64(messageToSave)),
-            channel: message.channel,
-            tod: tod_received,
-            isSafe: (isAPVerified === "VALID") || (isAPVerified === "NO_CERT"),
-          })
-          .then((savedMessage) => {
-            console.log("Message saved successfully:", savedMessage);
-            res.status(200).json({
-              id: apId,
-              tod: Date.now(),
-              priority: -1,
-              type: "MT_MSG_ACK",
-              usernick: message.usernick,
-            });
-          })
-          .catch((error) => {
-            console.error("Error saving message:", error);
-            res.status(500).json({
+        } else {
+          if(isAPVerified === "INVALID") {
+            res.status(400).json({
               id: apId,
               tod: Date.now(),
               priority: -1,
               type: "MT_MSG_RJT",
-              error: "Database error while saving message.",
+              error: "AP verification is invalid.",
             });
-          });
+          } else {
+            AppDataSource.manager
+            .save(Message, {
+              content: message.content,
+              usernick: messageToSave.usernick,
+              origin: apId,
+              certificate: createMessageCert(messageToSave),
+              hashKey: hashBase64(jsonToBase64(messageToSave)),
+              channel: message.channel,
+              tod: tod_received,
+              isSafe: isAPVerified === "VALID",
+            })
+            .then((savedMessage) => {
+              console.log("Message saved successfully:", savedMessage);
+              res.status(200).json({
+                id: apId,
+                tod: Date.now(),
+                priority: -1,
+                type: "MT_MSG_ACK",
+                usernick: message.usernick,
+              });
+            })
+            .catch((error) => {
+              console.error("Error saving message:", error);
+              res.status(500).json({
+                id: apId,
+                tod: Date.now(),
+                priority: -1,
+                type: "MT_MSG_RJT",
+                error: "Database error while saving message.",
+              });
+            });
+          }
+        }
       }
     }
   }
