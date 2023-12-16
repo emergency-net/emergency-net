@@ -8,6 +8,11 @@ class ChannelController {
   async createChannel(req, res) {
     let tod_received = req.body.tod;
 
+    const channelInfo = {
+        channelName: req.body.channelName,
+        operation: "$$OPEN$$"
+    }
+
     if (!checkTod(tod_received)) {
       res.status(408).json({
         id: apId,
@@ -51,9 +56,9 @@ class ChannelController {
             });
           } else {
             if (
-              req.channel_name === "" ||
+              req.channelName === "" ||
               (await AppDataSource.manager.findOneBy(Channel, {
-                channelName: req.channel_name,
+                channelName: req.channelName,
               }))
             ) {
               res.status(409).json({
@@ -67,9 +72,9 @@ class ChannelController {
               //Save channel to the database
               AppDataSource.manager
                 .save(Channel, {
-                  channelName: req.channel_name,
+                  channelName: req.channelName,
                   isActive: true,
-                  channelCert: createMessageCert("$$OPEN_CHANNEL$$"),
+                  channelCert: createMessageCert(channelInfo),
                 })
                 .then(() => console.log("Channel saved to the database"));
 
@@ -132,9 +137,9 @@ class ChannelController {
             });
           } else {
             if (
-              req.channel_name === "" ||
+              req.channelName === "" ||
               !(await AppDataSource.manager.findOneBy(Channel, {
-                channelName: req.channel_name,
+                channelName: req.channelName,
               }))
             ) {
               res.status(409).json({
@@ -149,7 +154,7 @@ class ChannelController {
               AppDataSource.manager
                 .update(
                   Channel,
-                  { channelName: req.channel_name },
+                  { channelName: req.channelName },
                   { isActive: false }
                 )
                 .then(() => console.log("Channel deleted from the database"));
