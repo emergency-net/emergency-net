@@ -1,0 +1,4 @@
+e.local {
+    reverse_proxy localhost:3000
+    tls alperen.bircak@boun.edu.tr 
+}
