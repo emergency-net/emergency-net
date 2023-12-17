@@ -7,7 +7,7 @@
 import dotenv from "dotenv";
 import app from "../app.js";
 import fs from "fs";
-import https from "https";
+import http from "http";
 
 dotenv.config();
 
@@ -51,13 +51,15 @@ app.use((err, req, res, next) => {
 /**
  * Create HTTP server.
  */
-var key = fs.readFileSync("./testcert/selfsigned.key");
-var cert = fs.readFileSync("./testcert/selfsigned.crt");
-var options = {
-  key: key,
-  cert: cert,
-};
-export const server = https.createServer(options, app);
+// var key = fs.readFileSync("./testcert/selfsigned.key");
+// var cert = fs.readFileSync("./testcert/selfsigned.crt");
+// var options = {
+//   key: key,
+//   cert: cert,
+// };
+// export const server = https.createServer(options, app);
+
+export const server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
