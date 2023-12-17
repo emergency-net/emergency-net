@@ -36,7 +36,7 @@ function Register() {
         setAdminKey(adminKey);
         queryClient.invalidateQueries(["adminKey"]);
 
-        setCookie("token", content.token);
+        setCookie("token", content.token, { sameSite: "Strict", secure: true });
 
         window.location.reload();
       },
