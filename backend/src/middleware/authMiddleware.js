@@ -46,21 +46,24 @@ export const authMiddleware = async (req, res, next) => {
       if (fragmentedPUCert.length != 2) {
         throw new Error("PU certificate is not in the correct format.");
       }
-      let puContent =  base64toJson(fragmentedPUCert[0]);
+      let puContent = base64toJson(fragmentedPUCert[0]);
       let puSignature = fragmentedPUCert[1];
       if (!puContent.pubKey) {
         throw new Error("PU certificate does not contain public key.");
       }
       let pu_pub_cert = puContent.pubKey;
-      let pu_pub_token = tokenVerification.mtPubKey ? tokenVerification.mtPubKey : "";
-      if (pu_pub_cert === pu_pub_token) {
+      let pu_pub_token = tokenVerification.mtPubKey
+        ? tokenVerification.mtPubKey
+        : "";
+      if (pu_pub_cert !== pu_pub_token) {
         throw new Error("PU certificate does not match token.");
       }
 
       auth.puVerified = verify(
-        JSON.stringify(req.body.pu_cert), 
-        puSignature, 
-        adminPublicKey);
+        JSON.stringify(req.body.pu_cert),
+        puSignature,
+        adminPublicKey
+      );
 
       if (!auth.puVerified) {
         throw new Error("PU certificate is invalid.");
