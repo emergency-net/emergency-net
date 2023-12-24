@@ -6,7 +6,6 @@ export async function sync({ localStore }: { localStore: any }) {
   const response = await axios.post(
     getApiURL() + "/sync",
     await MTResponseSigner({
-      tod: Date.now(),
       messages: localStore ?? {},
     })
   );

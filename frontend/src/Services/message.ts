@@ -15,7 +15,6 @@ export async function message({
       tod: Date.now(),
       content: msgContent,
     },
-    tod: Date.now(),
     priority: 1,
     type: "MT_MSG",
   };

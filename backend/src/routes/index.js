@@ -22,6 +22,6 @@ indexRouter.post("/message", messageController.receiveMessage);
 indexRouter.post("/sync", syncController.sync);
 
 indexRouter.post("/channel", channelController.createChannel);
-indexRouter.delete("/delete", channelController.destroyChannel);
+indexRouter.delete("/channel", channelController.destroyChannel);
 
 export default indexRouter;

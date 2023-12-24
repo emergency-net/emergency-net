@@ -28,6 +28,7 @@ export async function APResponseVerifier({
 }
 
 export async function MTResponseSigner(content: Record<string, any>) {
+  content.tod = Date.now();
   const MTKey = await readPrivateKey();
   const signature = await sign(MTKey, JSON.stringify(content));
 

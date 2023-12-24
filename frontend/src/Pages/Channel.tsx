@@ -135,13 +135,15 @@ function Channel() {
           }}
         >
           <Input
-            className={"flex-1 h-full border-2 dark:bg-gray-200 bg-white"}
+            className={
+              "flex-1 h-full border-2 dark:bg-gray-200 bg-white text-gray-950"
+            }
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />
           <Button
             type="submit"
-            className=" h-full  aspect-square p-0 transition-transform duration-100 active:scale-95 dark:bg-gray-700 dark:text-gray-100"
+            className=" h-full  aspect-square p-0 transition-transform duration-100 active:scale-95 dark:bg-gray-700 dark:text-gray-100 "
           >
             <SendHorizonal />
           </Button>
