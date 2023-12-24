@@ -7,6 +7,7 @@ import { checkTod } from "../util/Util.js";
 class ChannelController {
   async createChannel(req, res) {
     let tod_received = req.body.tod;
+    console.log("BADİİİ", req.body);
 
     const channelInfo = {
       channelName: req.body.channelName,
