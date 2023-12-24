@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { keyToJwk } from "../Library/crypt";
 import { readAdminKey, readPrivateKey, readPublicKey } from "../Library/keys";
 import { useQuery, useQueryClient } from "react-query";
@@ -29,11 +30,16 @@ function useKeys() {
     queryClient.invalidateQueries(["adminKey"]);
   }
 
+  const isPU = useMemo(() => {
+    return !!localStorage.getItem("pu_cert");
+  }, []);
+
   return {
     ...keys,
     adminKey,
     keysLoading: keysLoading || adminKeyLoading,
     setAdminKey,
+    isPU,
   };
 }
 

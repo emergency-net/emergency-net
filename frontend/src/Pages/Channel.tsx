@@ -114,10 +114,12 @@ function Channel() {
         className=" shadow-inner flex flex-col gap-4 py-4 px-2 overflow-auto"
         ref={messagesRef}
       >
-        {store?.[channelName!] &&
-          Object.values(store?.[channelName!])?.map((msg: any) => (
-            <Message msg={msg} my={msg.usernick === usernick} />
-          ))}
+        {store?.messages?.[channelName!] &&
+          Object.values(store?.messages?.[channelName!])
+            ?.sort((a, b) => a.tod - b.tod)
+            ?.map((msg: any) => (
+              <Message msg={msg} my={msg.usernick === usernick} />
+            ))}
         {loadingMsg && <Message msg={loadingMsg} my={true} loading={true} />}
       </div>
       <div

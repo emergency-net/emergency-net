@@ -31,5 +31,11 @@ export async function MTResponseSigner(content: Record<string, any>) {
   const MTKey = await readPrivateKey();
   const signature = await sign(MTKey, JSON.stringify(content));
 
-  return { content, signature };
+  const result: any = { content, signature };
+  const cert = await localStorage.getItem("pu_cert");
+  if (cert) {
+    result.pu_cert = cert;
+  }
+
+  return result;
 }

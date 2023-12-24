@@ -12,7 +12,7 @@ function Home() {
           <MessagesSquare /> Kanallar
         </Card>
         {store &&
-          Object.keys(store!)?.map((channel) => (
+          Object.keys(store)?.map((channel) => (
             <Link to={`/channel/${channel}`}>
               <Card className="p-8 flex gap-8 transition-transform duration-100 active:scale-95">
                 {channel}

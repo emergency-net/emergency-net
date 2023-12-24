@@ -1,4 +1,9 @@
-import { base64toJson, getTokenData, verify } from "../util/CryptoUtil.js";
+import {
+  base64toJson,
+  comparePEMStrings,
+  getTokenData,
+  verify,
+} from "../util/CryptoUtil.js";
 import { verifyToken } from "../util/HelloUtil.js";
 import { adminPublicKey } from "../util/readkeys.js";
 
@@ -23,10 +28,6 @@ export const authMiddleware = async (req, res, next) => {
     auth.apVerified = tokenVerification.isApVerified;
     if (!auth.tokenVerified) {
       throw new Error(tokenVerification.reason);
-    }
-
-    if (!req.body) {
-      throw new Error("There is no body.");
     }
 
     if (!req.body.signature || !req.body.content) {
@@ -55,7 +56,8 @@ export const authMiddleware = async (req, res, next) => {
       let pu_pub_token = tokenVerification.mtPubKey
         ? tokenVerification.mtPubKey
         : "";
-      if (pu_pub_cert !== pu_pub_token) {
+
+      if (!comparePEMStrings(pu_pub_cert, pu_pub_token)) {
         throw new Error("PU certificate does not match token.");
       }
 
@@ -64,6 +66,10 @@ export const authMiddleware = async (req, res, next) => {
         puSignature,
         adminPublicKey
       );
+
+      if (!req.body) {
+        throw new Error("There is no body.");
+      }
 
       if (!auth.puVerified) {
         throw new Error("PU certificate is invalid.");

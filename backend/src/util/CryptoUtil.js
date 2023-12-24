@@ -116,6 +116,23 @@ function verifyAPIdentity(obj1, obj2) {
   return obj1.apId === obj2.apId && obj1.apPub === obj2.apPub;
 }
 
+export function comparePEMStrings(pem1, pem2) {
+  // Function to remove whitespace, headers, and footers
+  const sanitizePEM = (pem) => {
+    return pem
+      .replace(/-----(BEGIN|END)[^-]*-----/g, "") // Remove headers and footers
+      .replace(/\s+/g, ""); // Remove all whitespace
+  };
+
+  // Sanitize both PEM strings
+  const sanitizedPem1 = sanitizePEM(pem1);
+  const sanitizedPem2 = sanitizePEM(pem2);
+
+  // Compare sanitized strings
+
+  return sanitizedPem1 === sanitizedPem2;
+}
+
 export async function spkiToCryptoKey(spki) {
   const encryptAlgorithm = {
     name: "RSA-OAEP",
