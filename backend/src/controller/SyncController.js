@@ -65,7 +65,7 @@ class SyncController {
       priority: -1,
       type: "MT_SYNC_ACK",
       content: {
-        messages: messagesToSend,
+        missingMessages: messagesToSend,
         unverifiedMessages: unverifiedMessages,
       },
     });

@@ -23,9 +23,11 @@ function useSyncStore(onSuccess?: () => void) {
 
       const localStore: Store = JSON.parse(storeString);
 
-      const { missingMessages, unverifiedMessages } = await sync({
+      const resonse = await sync({
         localStore,
       });
+
+      const { missingMessages, unverifiedMessages } = resonse.content;
 
       const sterileMessages = removeMessages(
         localStore.messages,
@@ -34,7 +36,7 @@ function useSyncStore(onSuccess?: () => void) {
       const newMessages = combineMessages(sterileMessages, missingMessages);
 
       const newStore = { ...localStore, messages: newMessages };
-      localStorage.setItem("store", JSON.parse(storeString));
+      localStorage.setItem("store", JSON.stringify(newStore));
 
       return newStore;
     },

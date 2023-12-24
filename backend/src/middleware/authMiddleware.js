@@ -70,10 +70,6 @@ export const authMiddleware = async (req, res, next) => {
       if (!req.body) {
         throw new Error("There is no body.");
       }
-
-      if (!auth.puVerified) {
-        throw new Error("PU certificate is invalid.");
-      }
     }
 
     auth = { ...tokenData, ...auth };
