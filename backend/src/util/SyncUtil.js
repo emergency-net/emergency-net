@@ -73,18 +73,13 @@ export function verifyAPSource(certificate) {
   return { isApVerified: isVerified, apPubKey: decodedAPData.apPub };
 }
 
-export async function messagesToMap() {
+export async function getMessagesToSend(receivedMessages) {
   const channelMap = {};
 
   const channels = ["Genel"];
   await Promise.all(
     channels.map(async (channel) => {
       try {
-        /* const result = await AppDataSource.manager.query(
-        "SELECT * FROM Message m WHERE m.channel = ?",
-        [channel]
-      );*/
-
         const result = await AppDataSource.manager.find(Message, {
           where: { channel: channel },
         });
@@ -92,10 +87,15 @@ export async function messagesToMap() {
         const messageMap = {};
 
         result.forEach((row) => {
-          const hashkey = row.hashKey;
-          const message = row;
+          if (
+            receivedMessages[channel] === undefined ||
+            !Object.keys(receivedMessages[channel]).includes(row.hashKey)
+          ) {
+            const hashkey = row.hashKey;
+            const message = row;
 
-          messageMap[hashkey] = message;
+            messageMap[hashkey] = message;
+          }
         });
 
         channelMap[channel] = messageMap;

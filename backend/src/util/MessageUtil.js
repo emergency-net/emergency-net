@@ -1,10 +1,6 @@
 import { base64toJson, sign, verify } from "./CryptoUtil.js";
 import { apCert } from "./readcert.js";
 
-export function verifyMessage(message, mtPubKey, signature) {
-  return verify(message, signature, mtPubKey);
-}
-
 export async function getKeyFromToken(token) {
   const fragmentedToken = token.split(".");
   const encodedData = fragmentedToken[0];
