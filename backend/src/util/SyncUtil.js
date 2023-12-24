@@ -1,3 +1,4 @@
+import { Channel } from "../database/entity/Channel.js";
 import { Message } from "../database/entity/Message.js";
 import { AppDataSource } from "../database/newDbSetup.js";
 import { base64toJson, verify, verifyACAP, verifyPUAP } from "./CryptoUtil.js";
@@ -76,20 +77,21 @@ export function verifyAPSource(certificate) {
 export async function getMessagesToSend(receivedMessages) {
   const channelMap = {};
 
-  const channels = ["Genel"];
+  const channels = await AppDataSource.manager.find(Channel);
   await Promise.all(
     channels.map(async (channel) => {
+      const channelName = channel.channelName;
       try {
         const result = await AppDataSource.manager.find(Message, {
-          where: { channel: channel },
+          where: { channel: channelName },
         });
 
         const messageMap = {};
 
         result.forEach((row) => {
           if (
-            receivedMessages[channel] === undefined ||
-            !Object.keys(receivedMessages[channel]).includes(row.hashKey)
+            receivedMessages[channelName] === undefined ||
+            !Object.keys(receivedMessages[channelName]).includes(row.hashKey)
           ) {
             const hashkey = row.hashKey;
             const message = row;
@@ -98,9 +100,12 @@ export async function getMessagesToSend(receivedMessages) {
           }
         });
 
-        channelMap[channel] = messageMap;
+        channelMap[channelName] = messageMap;
       } catch (error) {
-        console.error(`Error fetching messages for channel ${channel}:`, error);
+        console.error(
+          `Error fetching messages for channel ${channelName}:`,
+          error
+        );
       }
     })
   );

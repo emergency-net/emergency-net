@@ -59,9 +59,9 @@ class ChannelController {
             });
           } else {
             if (
-              req.channelName === "" ||
+              channelInfo.channelName === "" ||
               (await AppDataSource.manager.findOneBy(Channel, {
-                channelName: req.channelName,
+                channelName: channelInfo.channelName,
               }))
             ) {
               res.status(409).json({
@@ -75,7 +75,7 @@ class ChannelController {
               //Save channel to the database
               AppDataSource.manager
                 .save(Channel, {
-                  channelName: req.channelName,
+                  channelName: channelInfo.channelName,
                   isActive: true,
                   channelCert: createMessageCert(channelInfo),
                 })
@@ -143,9 +143,9 @@ class ChannelController {
             });
           } else {
             if (
-              req.channelName === "" ||
+              req.body.channelName === "" ||
               !(await AppDataSource.manager.findOneBy(Channel, {
-                channelName: req.channelName,
+                channelName: req.body.channelName,
               }))
             ) {
               res.status(409).json({
@@ -160,7 +160,7 @@ class ChannelController {
               AppDataSource.manager
                 .update(
                   Channel,
-                  { channelName: req.channelName },
+                  { channelName: req.body.channelName },
                   { isActive: false }
                 )
                 .then(() => console.log("Channel deleted from the database"));
