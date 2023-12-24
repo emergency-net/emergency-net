@@ -62,7 +62,7 @@ export const authMiddleware = async (req, res, next) => {
       }
 
       auth.puVerified = verify(
-        JSON.stringify(req.body.pu_cert),
+        JSON.stringify(puContent),
         puSignature,
         adminPublicKey
       );
@@ -80,6 +80,7 @@ export const authMiddleware = async (req, res, next) => {
 
     next();
   } catch (err) {
+    console.error(err);
     auth.errorMessage = err.message;
     if (req.body && req.body.content) {
       req.body = req.body.content;
