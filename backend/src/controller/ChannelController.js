@@ -9,9 +9,9 @@ class ChannelController {
     let tod_received = req.body.tod;
 
     const channelInfo = {
-        channelName: req.body.channelName,
-        operation: "$$OPEN$$"
-    }
+      channelName: req.body.channelName,
+      operation: "$$OPEN$$",
+    };
 
     if (!checkTod(tod_received)) {
       res.status(408).json({
@@ -33,7 +33,10 @@ class ChannelController {
             : "Signature check is failed.",
         });
       } else {
-        if (req.auth.apVerified === "INVALID" || req.auth.apVerified === "NO_CERT") {
+        if (
+          req.auth.apVerified === "INVALID" ||
+          req.auth.apVerified === "NO_CERT"
+        ) {
           res.status(400).json({
             id: apId,
             tod: Date.now(),
@@ -114,7 +117,10 @@ class ChannelController {
             : "Signature check is failed.",
         });
       } else {
-        if (req.auth.apVerified === "INVALID" || req.auth.apVerified === "NO_CERT") {
+        if (
+          req.auth.apVerified === "INVALID" ||
+          req.auth.apVerified === "NO_CERT"
+        ) {
           res.status(400).json({
             id: apId,
             tod: Date.now(),
@@ -172,3 +178,5 @@ class ChannelController {
     }
   }
 }
+
+export const channelController = new ChannelController();
