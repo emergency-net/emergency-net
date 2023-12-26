@@ -6,7 +6,6 @@
 
 import dotenv from "dotenv";
 import app from "../app.js";
-import fs from "fs";
 import http from "http";
 
 dotenv.config();

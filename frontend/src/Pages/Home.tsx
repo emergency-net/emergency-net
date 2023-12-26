@@ -14,10 +14,10 @@ import { Input } from "@/Components/ui/input";
 import useKeys from "@/Hooks/useKeys";
 import useSyncStore from "@/Hooks/useSyncStore";
 import { createChannel, destroyChannel } from "@/Services/channel";
-import { Delete, DeleteIcon, MessagesSquare, Trash2 } from "lucide-react";
+import { MessagesSquare, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useMutation } from "react-query";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
   const { store, sync } = useSyncStore();

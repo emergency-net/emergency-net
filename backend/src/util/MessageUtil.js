@@ -1,4 +1,4 @@
-import { base64toJson, sign, verify } from "./CryptoUtil.js";
+import { base64toJson, sign } from "./CryptoUtil.js";
 import { apCert } from "./readcert.js";
 
 export async function getKeyFromToken(token) {

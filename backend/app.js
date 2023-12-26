@@ -1,16 +1,12 @@
-import createError from "http-errors";
 import express from "express";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 
 import cors from "cors";
 import "reflect-metadata";
-import { responseInterceptor } from "./src/middleware/responseInterceptor.js";
-import { authMiddleware } from "./src/middleware/authMiddleware.js";
 import path from "path";
 import indexRouter from "./src/routes/index.js";
 import { fileURLToPath } from "url";
-import dotenv from "dotenv";
 
 //import AppDataSource from "./database/newDbSetup.js";
 
