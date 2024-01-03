@@ -5,7 +5,12 @@ import useSyncStore from "@/Hooks/useSyncStore";
 import { cn } from "@/Library/cn";
 import { convertTodToDate } from "@/Library/date";
 import { message } from "@/Services/message";
-import { ArrowLeftCircle, MessagesSquare, SendHorizonal } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeftCircle,
+  MessagesSquare,
+  SendHorizonal,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useMutation } from "react-query";
 import { Link, useParams } from "react-router-dom";
@@ -13,10 +18,12 @@ function Message({
   msg,
   my,
   loading,
+  isSafe,
 }: {
   msg: any;
   my: boolean;
   loading?: boolean;
+  isSafe: boolean;
 }) {
   return (
     <div
@@ -38,6 +45,9 @@ function Message({
       <span className="absolute bottom-0 right-2 text-[10px] text-gray-400 font-light">
         {msg.tod && convertTodToDate(msg.tod)}
       </span>
+      {!isSafe && (
+        <AlertCircle className="bottom-1 left-1 absolute w-4 h-4 text-red-500" />
+      )}
     </div>
   );
 }
@@ -118,9 +128,15 @@ function Channel() {
           Object.values(store?.messages?.[channelName!])
             ?.sort((a, b) => a.tod - b.tod)
             ?.map((msg: any) => (
-              <Message msg={msg} my={msg.usernick === usernick} />
+              <Message
+                msg={msg}
+                my={msg.usernick === usernick}
+                isSafe={msg.isSafe}
+              />
             ))}
-        {loadingMsg && <Message msg={loadingMsg} my={true} loading={true} />}
+        {loadingMsg && (
+          <Message msg={loadingMsg} my={true} loading={true} isSafe />
+        )}
       </div>
       <div
         className={

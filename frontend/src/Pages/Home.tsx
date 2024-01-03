@@ -3,10 +3,11 @@ import BanDialog from "@/Components/BanDialog";
 import { Button } from "@/Components/ui/button";
 import { Card } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
+import { useAPData } from "@/Hooks/useAPData";
 import useKeys from "@/Hooks/useKeys";
 import useSyncStore from "@/Hooks/useSyncStore";
 import { createChannel, destroyChannel } from "@/Services/channel";
-import { MessagesSquare, Trash2 } from "lucide-react";
+import { AlertTriangle, MessagesSquare, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +18,7 @@ function Home() {
   const [channelName, setChannelName] = useState("");
   const [banOpen, setBanOpen] = useState(false);
   const navigate = useNavigate();
+  const APData = useAPData();
 
   const { mutate: addChannel } = useMutation(createChannel, {
     onSuccess() {
@@ -31,8 +33,15 @@ function Home() {
     },
   });
   return (
-    <div className="p-1">
+    <div className="p-1 relative">
       <div className="flex flex-col m-5 items-stretch gap-4">
+        {APData?.type === "non_certified" && (
+          <Card className="p-4 flex gap-2 text-sm">
+            <AlertTriangle className="flex-none " /> Bağlandığınız AP güvenli
+            değildir, buradan göndereceğiniz mesajlar güvensiz olarak
+            işaretlenecektir.
+          </Card>
+        )}
         <Card className="p-4 flex gap-4 ">
           <MessagesSquare /> Kanallar
         </Card>
@@ -75,6 +84,9 @@ function Home() {
             </Card>
           ))}
       </div>
+      <span className="text-xs text-gray-400 fixed bottom-1 right-1">
+        {APData?.id} - {APData?.type}
+      </span>
     </div>
   );
 }
