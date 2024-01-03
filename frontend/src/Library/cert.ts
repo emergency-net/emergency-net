@@ -19,26 +19,30 @@ export async function verifyApCert(cert: string): Promise<APData> {
       type: "unknown",
     };
   }
-  const signature = splitCert[1];
+  if (splitCert.length === 2) {
+    const signature = splitCert[1];
 
-  if (signature === "NO_CERT") {
-    return {
-      key: await importPublicKeyPem(content.apPub),
-      id: content.apId as string,
-      type: "non_certified",
-    };
-  }
+    if (signature === "NO_CERT") {
+      return {
+        key: await importPublicKeyPem(content.apPub),
+        id: content.apId as string,
+        type: "non_certified",
+      };
+    }
 
-  const stringContent = JSON.stringify(content);
+    const stringContent = JSON.stringify(content);
 
-  const verified = await verify(adminKey, signature, stringContent);
-  if (verified) {
-    return {
-      key: await importPublicKeyPem(content.apPub),
-      id: content.apId as string,
-      type: "admin_certified",
-    };
+    const verified = await verify(adminKey, signature, stringContent);
+    if (verified) {
+      return {
+        key: await importPublicKeyPem(content.apPub),
+        id: content.apId as string,
+        type: "admin_certified",
+      };
+    } else {
+      throw new Error("AP Certificate Invalid");
+    }
   } else {
-    throw new Error("AP Certificate Invalid");
+    throw new Error("AP Certificate Weird");
   }
 }

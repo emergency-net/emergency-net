@@ -5,9 +5,7 @@ import axios from "axios";
 export async function sync({ localStore }: { localStore: any }) {
   const response = await axios.post(
     getApiURL() + "/sync",
-    await MTResponseSigner({
-      messages: localStore ?? {},
-    })
+    await MTResponseSigner(localStore ?? {})
   );
   return await APResponseVerifier(response.data);
 }

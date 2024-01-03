@@ -1,13 +1,5 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/Components/ui/alert-dialog";
+import AreYouSureDialog from "@/Components/AreYouSureDialog";
+import BanDialog from "@/Components/BanDialog";
 import { Button } from "@/Components/ui/button";
 import { Card } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
@@ -23,6 +15,7 @@ function Home() {
   const { store, sync } = useSyncStore();
   const { isPU } = useKeys();
   const [channelName, setChannelName] = useState("");
+  const [banOpen, setBanOpen] = useState(false);
   const navigate = useNavigate();
 
   const { mutate: addChannel } = useMutation(createChannel, {
@@ -56,36 +49,29 @@ function Home() {
             </Button>
           </div>
         )}
+        <Button onClick={() => setBanOpen(true)}>PU Banla</Button>
+        <BanDialog
+          open={banOpen}
+          onClose={() => setBanOpen(false)}
+          onSubmit={console.log}
+        />
         {store &&
           Object.keys(store.messages)?.map((channel) => (
             <Card
               onClick={() => navigate(`/channel/${channel}`)}
               className="p-8 flex gap-8 transition-transform duration-100 active:scale-95 relative"
+              key={channel}
             >
               {channel}
-              <div
-                className="absolute right-2"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <AlertDialog>
-                  <AlertDialogTrigger className="text-red-500">
-                    <Trash2 />
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Kanalı silmek istediğinize emin misiniz?
-                      </AlertDialogTitle>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>İptal</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => deleteChannel(channel)}>
-                        Devam Et
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
+              {isPU && (
+                <AreYouSureDialog
+                  title="Kanalı silmek istediğinize emin misiniz?"
+                  onAccept={() => deleteChannel(channel)}
+                  className="absolute right-2 text-red-500"
+                >
+                  <Trash2 />
+                </AreYouSureDialog>
+              )}
             </Card>
           ))}
       </div>
