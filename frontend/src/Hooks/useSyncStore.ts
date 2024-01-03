@@ -40,7 +40,7 @@ function useSyncStore(onSuccess?: () => void) {
 
       Object.keys(updatedMessages).forEach((key) => {
         if (channels.find((c: any) => c.channelName === key)?.isActive) {
-          cleanedMessages[key] === updatedMessages[key];
+          cleanedMessages[key] = updatedMessages[key];
         }
       });
 
