@@ -11,7 +11,8 @@ class ChannelController {
 
     const channelInfo = {
       channelName: req.body.channelName,
-      operation: "$$OPEN$$",
+      isActive: true,
+      tod: Date.now(),
     };
 
     if (!checkTod(tod_received)) {
@@ -98,6 +99,12 @@ class ChannelController {
   async destroyChannel(req, res) {
     let tod_received = req.body.tod;
 
+    const channelInfo = {
+      channelName: req.body.channelName,
+      isActive: false,
+      tod: Date.now(),
+    };
+
     if (!checkTod(tod_received)) {
       res.status(408).json({
         id: apId,
@@ -162,10 +169,9 @@ class ChannelController {
                 .update(
                   Channel,
                   { channelName: req.body.channelName },
-                  { isActive: false }
+                  { isActive: false, channelCert: createMessageCert(channelInfo)},
                 )
                 .then(() => console.log("Channel deleted from the database"));
-
               res.status(200).json({
                 id: apId,
                 tod: Date.now(),

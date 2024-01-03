@@ -27,6 +27,33 @@ export function verifyMessage(message) {
   }
 }
 
+export function verifyChannel(channel) {
+  const certificate = channel.certificate;
+  const signature = certificate.split(".")[0];
+  const apCert = certificate.split(".")[1];
+  const verificationResult = verifyAPSource(apCert);
+  let apPubKey;
+  let isSafe = true;
+  if (verificationResult?.apPubKey) {
+    apPubKey = verificationResult.apPubKey;
+    if (verificationResult.reason === "No certificate") {
+      return {
+        isSafe: false,
+        isChannelVerified: false,
+      };
+    }
+    const isVerified = verify(JSON.stringify(channel), signature, apPubKey);
+    return {
+      isChannelVerified: isVerified,
+      isSafe: isSafe,
+    };
+  } else {
+    return {
+      isChannelVerified: false,
+    };
+  }
+}
+
 export function verifyAPSource(certificate) {
   let isVerified = false;
   const fragmentedCert = certificate.split(".");
@@ -74,10 +101,18 @@ export function verifyAPSource(certificate) {
   return { isApVerified: isVerified, apPubKey: decodedAPData.apPub };
 }
 
+export async function getChannelsToSend() {
+   return await AppDataSource.getRepository(Channel).find();
+}
+
 export async function getMessagesToSend(receivedMessages) {
   const channelMap = {};
-
-  const channels = await AppDataSource.manager.find(Channel);
+ 
+  const channels = await AppDataSource.getRepository(Channel).find({
+    where: {
+       isActive: true,
+    },
+})
   await Promise.all(
     channels.map(async (channel) => {
       const channelName = channel.channelName;
@@ -109,7 +144,6 @@ export async function getMessagesToSend(receivedMessages) {
       }
     })
   );
-  //console.log("kardi", channelMap);
   return channelMap;
 }
 
@@ -140,4 +174,23 @@ export async function findMissingMessages(receivedMessages) {
     }
   });
   return missingMessages;
+}
+
+export async function findMissingChannels(receivedChannels) {
+  const missingChannels = [];
+  await receivedChannels.forEach(async (channel) => {
+    try {
+      const result = await AppDataSource.manager.findOneBy(Channel, {
+        channelName: channel.channelName,
+        isActive: channel.isActive,
+      });
+      if (!result) {
+        missingChannels.push(channel);
+      }
+    } catch (error) {
+      console.log("Error while finding channel");
+      throw error;
+    }
+  });
+  return missingChannels;
 }
