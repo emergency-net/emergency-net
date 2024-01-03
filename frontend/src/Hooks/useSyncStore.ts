@@ -17,17 +17,18 @@ function useSyncStore(onSuccess?: () => void) {
     async () => {
       let storeString = localStorage.getItem("store");
       if (!storeString) {
-        storeString = JSON.stringify({ messages: {}, channels: {} });
+        storeString = JSON.stringify({ messages: {}, channels: [] });
         localStorage.setItem("store", storeString);
       }
 
       const localStore: Store = JSON.parse(storeString);
 
-      const resonse = await sync({
+      const response = await sync({
         localStore,
       });
 
-      const { missingMessages, unverifiedMessages } = resonse.content;
+      const { missingMessages, unverifiedMessages, channels } =
+        response.content;
 
       const sterileMessages = removeMessages(
         localStore.messages,
@@ -35,7 +36,7 @@ function useSyncStore(onSuccess?: () => void) {
       );
       const newMessages = combineMessages(sterileMessages, missingMessages);
 
-      const newStore = { ...localStore, messages: newMessages };
+      const newStore = { channels, messages: newMessages };
       localStorage.setItem("store", JSON.stringify(newStore));
 
       return newStore;
