@@ -34,9 +34,17 @@ function useSyncStore(onSuccess?: () => void) {
         localStore.messages,
         unverifiedMessages
       );
-      const newMessages = combineMessages(sterileMessages, missingMessages);
+      const updatedMessages = combineMessages(sterileMessages, missingMessages);
 
-      const newStore = { channels, messages: newMessages };
+      let cleanedMessages: any = {};
+
+      Object.keys(updatedMessages).forEach((key) => {
+        if (channels.find((c: any) => c.channelName === key)?.isActive) {
+          cleanedMessages[key] === updatedMessages[key];
+        }
+      });
+
+      const newStore = { channels, messages: cleanedMessages };
       localStorage.setItem("store", JSON.stringify(newStore));
 
       return newStore;

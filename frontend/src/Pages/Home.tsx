@@ -58,12 +58,12 @@ function Home() {
             </Button>
           </div>
         )}
-        <Button onClick={() => setBanOpen(true)}>PU Banla</Button>
+        {/* <Button onClick={() => setBanOpen(true)}>PU Banla</Button>
         <BanDialog
           open={banOpen}
           onClose={() => setBanOpen(false)}
           onSubmit={console.log}
-        />
+        /> */}
         {store &&
           Object.keys(store.messages)?.map((channel) => (
             <Card
