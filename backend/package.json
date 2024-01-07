@@ -7,6 +7,7 @@
     "start": "node ./bin/www.js",
     "genkeys": "node ./src/util/genkeys.js",
     "gencert": "node ./src/util/gencert.js",
+    "gennocert": "node ./src/util/gennocert.js",
     "genpu": "node ./src/util/genpu.js",
     "copy-dist": "shx cp -r ../frontend/dist ./",
     "dev": "nodemon ./bin/www.js"

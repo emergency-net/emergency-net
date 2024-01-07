@@ -47,47 +47,53 @@ class SyncController {
     );
     const missingChannels = await findMissingChannels(receivedChannels);
 
-    missingChannels.forEach((channel) => {
-      const verificationResult = verifyChannel(channel);
-      if (verificationResult.isChannelVerified) {
-        if (channel.isActive) {
-          AppDataSource.manager.save(Channel, channel).catch((error) => {
-            console.error("Error saving channel:", error);
+    await Promise.all(
+      missingChannels.map(async (channel) => {
+        const verificationResult = verifyChannel(channel);
+        if (verificationResult.isChannelVerified) {
+          if (channel.isActive) {
+            await AppDataSource.manager
+              .save(Channel, channel)
+              .catch((error) => {
+                console.error("Error saving channel:", error);
+                res.status(500).json({
+                  tod: Date.now(),
+                  priority: -1,
+                  type: "MT_SYNC_RJT",
+                  error: "Database error while saving channel.",
+                });
+              });
+          } else {
+            await AppDataSource.manager.update(
+              Channel,
+              { channelName: channel.channelName },
+              channel
+            );
+          }
+        }
+      })
+    );
+
+    const unverifiedMessages = {};
+
+    await Promise.all(
+      missingMessages.map(async (message) => {
+        const verificationResult = verifyMessage(message);
+        if (verificationResult.isMessageVerified) {
+          await AppDataSource.manager.save(Message, message).catch((error) => {
+            console.error("Error saving message:", error);
             res.status(500).json({
               tod: Date.now(),
               priority: -1,
               type: "MT_SYNC_RJT",
-              error: "Database error while saving channel.",
+              error: "Database error while saving message.",
             });
           });
         } else {
-          AppDataSource.manager.update(
-            Channel,
-            { channelName: channel.channelName },
-            channel
-          );
+          unverifiedMessages[message.channel] = message.hashKey;
         }
-      }
-    });
-
-    const unverifiedMessages = {};
-
-    missingMessages.forEach((message) => {
-      const verificationResult = verifyMessage(message);
-      if (verificationResult.isMessageVerified) {
-        AppDataSource.manager.save(Message, message).catch((error) => {
-          console.error("Error saving message:", error);
-          res.status(500).json({
-            tod: Date.now(),
-            priority: -1,
-            type: "MT_SYNC_RJT",
-            error: "Database error while saving message.",
-          });
-        });
-      } else {
-        unverifiedMessages[message.channel] = message.hashKey;
-      }
-    });
+      })
+    );
 
     const channelsToSend = await getChannelsToSend();
 

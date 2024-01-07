@@ -14,5 +14,8 @@ export const Channel = new EntitySchema({
     channelCert: {
       type: "varchar",
     },
+    tod: {
+      type: "datetime",
+    },
   },
 });
