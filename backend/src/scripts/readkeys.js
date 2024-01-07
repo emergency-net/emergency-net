@@ -28,6 +28,9 @@ export function getPrivateKey() {
 export function getPublicKey() {
   return publicKey;
 }
+export function getAdminPublicKey() {
+  return adminPublicKey;
+}
 
 // Export the admin keys as constants
-export { adminPublicKey, adminPrivateKey };
+export { adminPrivateKey };

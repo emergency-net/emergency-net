@@ -5,7 +5,7 @@ import {
   verify,
 } from "../util/CryptoUtil.js";
 import { verifyToken } from "../util/HelloUtil.js";
-import { adminPublicKey } from "../scripts/readkeys.js";
+import { getAdminPublicKey } from "../scripts/readkeys.js";
 
 export const authMiddleware = async (req, res, next) => {
   let auth = {
@@ -64,7 +64,7 @@ export const authMiddleware = async (req, res, next) => {
       auth.puVerified = verify(
         JSON.stringify(puContent),
         puSignature,
-        adminPublicKey
+        getAdminPublicKey()
       );
 
       if (!req.body) {
