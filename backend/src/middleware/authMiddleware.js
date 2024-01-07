@@ -48,7 +48,7 @@ export const authMiddleware = async (req, res, next) => {
     }
 
     if (req.body.pu_cert) {
-      req.auth.puCert = req.body.pu_cert;
+      auth.puCert = req.body.pu_cert;
       const fragmentedPUCert = req.body.pu_cert.split(".");
       if (fragmentedPUCert.length != 2) {
         throw new Error("PU certificate is not in the correct format.");
@@ -66,12 +66,13 @@ export const authMiddleware = async (req, res, next) => {
       if (!comparePEMStrings(pu_pub_cert, pu_pub_token)) {
         throw new Error("PU certificate does not match token.");
       }
-
-      auth.puVerified = verify(
-        JSON.stringify(puContent),
-        puSignature,
-        getAdminPublicKey()
-      );
+      if (auth.applicable) {
+        auth.puVerified = verify(
+          JSON.stringify(puContent),
+          puSignature,
+          getAdminPublicKey()
+        );
+      }
 
       if (!req.body) {
         throw new Error("There is no body.");

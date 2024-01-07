@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import fs from "fs";
 import dotenv from "dotenv";
-import { getPublicKey, reReadKeys } from "../scripts/readkeys.js";
+import { getPublicKey, reReadKeys } from "../scripts/readkeys.js.";
 import { jsonToBase64, jwkToKeyObject } from "../util/CryptoUtil.js";
 import { checkTod } from "../util/Util.js";
 dotenv.config();
