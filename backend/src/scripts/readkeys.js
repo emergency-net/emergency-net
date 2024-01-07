@@ -2,14 +2,15 @@ import fs from "fs";
 import dotenv from "dotenv";
 dotenv.config();
 
-let privateKey, publicKey;
-const adminPublicKey = fs.readFileSync(process.env.ADMIN_PUBLIC_KEY_PATH);
+let privateKey, publicKey, adminPublicKey;
 const adminPrivateKey = fs.readFileSync(process.env.ADMIN_PRIVATE_KEY_PATH);
 
 function readKeys() {
   privateKey = fs.readFileSync(process.env.PRIVATE_KEY_PATH);
   publicKey = fs.readFileSync(process.env.PUBLIC_KEY_PATH);
-  console.log("Regular KEYS READ");
+  adminPublicKey = fs.readFileSync(process.env.ADMIN_PUBLIC_KEY_PATH);
+
+  console.log("KEYS READ");
 }
 
 // Initial read
