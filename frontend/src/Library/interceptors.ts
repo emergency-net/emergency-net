@@ -10,6 +10,7 @@ export async function APResponseVerifier({
   signature: string;
 }) {
   const APData = APDataReference.current;
+  console.log("APDATA", APData);
   if (!APData) {
     throw new Error("AP Data Unknown");
   }
