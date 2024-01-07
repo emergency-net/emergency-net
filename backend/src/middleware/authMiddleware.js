@@ -5,7 +5,7 @@ import {
   verify,
 } from "../util/CryptoUtil.js";
 import { verifyToken } from "../util/HelloUtil.js";
-import { adminPublicKey } from "../util/readkeys.js";
+import { adminPublicKey } from "../scripts/readkeys.js";
 
 export const authMiddleware = async (req, res, next) => {
   let auth = {

@@ -1,5 +1,5 @@
 import { base64toJson, sign } from "./CryptoUtil.js";
-import { apCert } from "./readcert.js";
+import { apCert } from "../scripts/readcert.js";
 
 export async function getKeyFromToken(token) {
   const fragmentedToken = token.split(".");
