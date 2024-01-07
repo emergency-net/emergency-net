@@ -6,6 +6,7 @@ import { Input } from "@/Components/ui/input";
 import { useAPData } from "@/Hooks/useAPData";
 import useKeys from "@/Hooks/useKeys";
 import useSyncStore from "@/Hooks/useSyncStore";
+import { logout } from "@/Library/util";
 import { createChannel, destroyChannel } from "@/Services/channel";
 import { AlertTriangle, MessagesSquare, Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -35,6 +36,22 @@ function Home() {
   return (
     <div className="p-1 relative">
       <div className="flex flex-col m-5 items-stretch gap-4">
+        <AreYouSureDialog
+          title="Hesabı kapamak istediğinize emin misiniz? (Geri alınamaz)"
+          onAccept={logout}
+        >
+          <Button
+            className="
+        !bg-red-500 w-min text-xs "
+          >
+            Hesabı Kapa
+          </Button>
+        </AreYouSureDialog>
+        {isPU && APData?.type === "non_certified" && (
+          <div className="flex justify-stretch items-stretch h-10 ,">
+            <Button className="h-full">AP'yi güvenilir yap</Button>
+          </div>
+        )}
         {APData?.type === "non_certified" && (
           <Card className="p-4 flex gap-2 text-sm">
             <AlertTriangle className="flex-none " /> Bağlandığınız AP güvenli
@@ -46,18 +63,24 @@ function Home() {
           <MessagesSquare /> Kanallar
         </Card>
         {isPU && (
-          <div className="flex justify-stretch items-stretch h-10 gap-4">
-            <Input
-              placeholder="Kanal Adı..."
-              value={channelName}
-              onChange={(e) => setChannelName(e.target.value)}
-              className="h-full"
-            />
-            <Button onClick={() => addChannel(channelName)} className="h-full">
-              Ekle
-            </Button>
-          </div>
+          <>
+            <div className="flex justify-stretch items-stretch h-10 gap-4">
+              <Input
+                placeholder="Kanal Adı..."
+                value={channelName}
+                onChange={(e) => setChannelName(e.target.value)}
+                className="h-full"
+              />
+              <Button
+                onClick={() => addChannel(channelName)}
+                className="h-full"
+              >
+                Ekle
+              </Button>
+            </div>
+          </>
         )}
+
         {/* <Button onClick={() => setBanOpen(true)}>PU Banla</Button>
         <BanDialog
           open={banOpen}

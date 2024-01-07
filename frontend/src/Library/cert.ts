@@ -1,6 +1,6 @@
 import { APData } from "./APData";
-import { importPublicKeyPem, verify } from "./crypt";
-import { readAdminKey } from "./keys";
+import { importPublicKeyPem, sign, verify } from "./crypt";
+import { readAdminKey, readPrivateKey } from "./keys";
 import { base64ToJson } from "./util";
 
 export async function verifyApCert(cert: string): Promise<APData> {
@@ -68,6 +68,8 @@ export async function verifyApCert(cert: string): Promise<APData> {
   }
 }
 
-export async function giveApproval(cert: string) {
-  const splitCert = cert;
+export async function giveSignatureToAp(content: string) {
+  const MTKey = await readPrivateKey();
+  const signature = await sign(MTKey, content);
+  return signature;
 }

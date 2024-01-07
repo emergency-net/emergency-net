@@ -30,13 +30,8 @@ function HelloWrapper() {
       setTokenData(data);
     }
 
-    if (!import.meta.env.PROD) {
-      setLoading(false);
-    }
-
     hello()
       .then(async (res) => {
-        setLoading(false);
         if (res.status === 202) {
           const APData = await verifyApCert(res.data.content.cert);
           APDataReference.current = APData;
@@ -54,6 +49,7 @@ function HelloWrapper() {
             navigate("/home");
           }
         }
+        setLoading(false);
       })
       .catch(handleError);
   }, []);
