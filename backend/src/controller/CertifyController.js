@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { getPublicKey, reReadKeys } from "../scripts/readkeys.js";
 import { jsonToBase64, jwkToKeyObject } from "../util/CryptoUtil.js";
 import { checkTod } from "../util/Util.js";
+import { reReadCert } from "../scripts/readcert.js";
 dotenv.config();
 
 class CertifyController {
@@ -84,7 +85,7 @@ class CertifyController {
       const apCert = `${encodedApContent}.${signedApContent}.${req.auth.puCert}`;
 
       fs.writeFileSync(process.env.CERT_PATH, apCert);
-
+      reReadCert();
       res.status(200).json({
         type: "MT_AP_CERT_ACK",
         priority: -1,

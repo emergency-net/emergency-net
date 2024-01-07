@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node ./bin/www.js",
     "genkeys": "node ./src/scripts/genkeys.js",
+    "genadmin": "node ./src/scripts/genadmin.js",
     "gencert": "node ./src/scripts/gencert.js",
     "gennocert": "node ./src/scripts/gennocert.js",
     "genpu": "node ./src/scripts/genpu.js",
