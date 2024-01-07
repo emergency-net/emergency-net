@@ -1,5 +1,4 @@
 import AreYouSureDialog from "@/Components/AreYouSureDialog";
-import BanDialog from "@/Components/BanDialog";
 import { Button } from "@/Components/ui/button";
 import { Card } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
@@ -20,7 +19,6 @@ function Home() {
   const { store, sync } = useSyncStore();
   const { isPU } = useKeys();
   const [channelName, setChannelName] = useState("");
-  const [banOpen, setBanOpen] = useState(false);
   const navigate = useNavigate();
   const APData = useAPData();
 
@@ -68,7 +66,9 @@ function Home() {
         </AreYouSureDialog>
         {isPU && APData?.type === "non_certified" && (
           <div className="flex justify-stretch items-stretch h-10 ,">
-            <Button className="h-full">AP'yi güvenilir yap</Button>
+            <Button className="h-full" onClick={() => certifyAP()}>
+              AP'yi güvenilir yap
+            </Button>
           </div>
         )}
         {APData?.type === "non_certified" && (
