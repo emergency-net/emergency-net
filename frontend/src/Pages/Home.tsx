@@ -6,7 +6,6 @@ import { useAPData } from "@/Hooks/useAPData";
 import useKeys from "@/Hooks/useKeys";
 import useSyncStore from "@/Hooks/useSyncStore";
 import { giveSignatureToAp } from "@/Library/cert";
-import { APResponseVerifier } from "@/Library/interceptors";
 import { logout } from "@/Library/util";
 import { certify, requestToCertify } from "@/Services/certify";
 import { createChannel, destroyChannel } from "@/Services/channel";
