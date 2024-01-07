@@ -4,7 +4,7 @@ import { AppDataSource } from "../database/newDbSetup.js";
 import { jwkToKeyObject } from "../util/CryptoUtil.js";
 import "../util/RegisterUtils.js";
 import { createToken } from "../util/RegisterUtils.js";
-import { adminPublicKey } from "../util/readkeys.js";
+import { adminPublicKey } from "../scripts/readkeys.js";
 
 class RegisterController {
   async register(req, res, next) {

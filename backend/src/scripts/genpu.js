@@ -1,6 +1,6 @@
 import fs from "fs";
 import crypto from "crypto";
-import { jsonToBase64, signByAdmin } from "./CryptoUtil.js";
+import { jsonToBase64, signByAdmin } from "../util/CryptoUtil.js";
 import dotenv from "dotenv";
 
 const { subtle } = crypto.webcrypto;

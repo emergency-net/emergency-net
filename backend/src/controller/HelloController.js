@@ -1,6 +1,6 @@
 import { apId } from "../../bin/www.js";
-import { adminPublicKey } from "../util/readkeys.js";
-import { apCert } from "../util/readcert.js";
+import { adminPublicKey } from "../scripts/readkeys.js";
+import { apCert } from "../scripts/readcert.js";
 
 class HelloController {
   async hello(req, res, next) {

@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { publicKey } from "./readkeys.js";
-import { jsonToBase64 } from "./CryptoUtil.js";
+import { jsonToBase64 } from "../util/CryptoUtil.js";
 import fs from "fs";
 
 dotenv.config();
