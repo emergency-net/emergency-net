@@ -37,10 +37,10 @@ function Home() {
 
   const { mutate: certifyAP } = useMutation(
     async () => {
-      const { apContent } = await APResponseVerifier(await requestToCertify());
-      const signature = await giveSignatureToAp(apContent);
-
-      const response = await APResponseVerifier(await certify({ signature }));
+      const { apContent } = (await requestToCertify()).content;
+      const signature = await giveSignatureToAp(JSON.stringify(apContent));
+      console.log("benim signladım: ", apContent);
+      const response = (await certify({ signature })).content;
 
       return response;
     },

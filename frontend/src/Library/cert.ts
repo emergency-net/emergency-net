@@ -51,9 +51,11 @@ export async function verifyApCert(cert: string): Promise<APData> {
       throw new Error("PU Certificate in AP Certificate invalid.");
     }
 
+    const puKey = await importPublicKeyPem(PUcontent.pubKey);
+
     const stringAPContent = JSON.stringify(APcontent);
 
-    const verified = await verify(adminKey, APsignature, stringAPContent);
+    const verified = await verify(puKey, APsignature, stringAPContent);
     if (verified) {
       return {
         key: await importPublicKeyPem(APcontent.apPub),

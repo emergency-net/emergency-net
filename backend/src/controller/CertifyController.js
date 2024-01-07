@@ -45,12 +45,11 @@ class CertifyController {
         apPub: getPublicKey().toString(),
         apId: process.env.AP_ID,
       };
-      const encodedApContent = jsonToBase64(apContent);
       res.status(200).json({
         priority: -1,
         type: "MT_AP_CERT_ACK",
         tod: Date.now(),
-        apContent: encodedApContent,
+        apContent,
       });
     } else {
       res.status(400).json({

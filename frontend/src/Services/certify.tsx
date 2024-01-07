@@ -1,3 +1,4 @@
+import { keyToJwk } from "@/Library/crypt";
 import { getApiURL } from "@/Library/getApiURL";
 import { MTResponseSigner } from "@/Library/interceptors";
 import { readAdminKey } from "@/Library/keys";
@@ -5,11 +6,11 @@ import axios from "axios";
 
 export async function requestToCertify() {
   const content = {
-    adminPubKey: await readAdminKey(),
+    adminPubKey: await keyToJwk(await readAdminKey()),
   };
 
   const response = await axios.post(
-    getApiURL() + "/message",
+    getApiURL() + "/request-to-certify",
     await MTResponseSigner(content)
   );
 
@@ -22,7 +23,7 @@ export async function certify({ signature }: { signature: string }) {
   };
 
   const response = await axios.post(
-    getApiURL() + "/message",
+    getApiURL() + "/certify",
     await MTResponseSigner(content)
   );
 

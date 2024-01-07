@@ -35,7 +35,7 @@ export const authMiddleware = async (req, res, next) => {
       throw new Error(tokenVerification.reason);
     }
 
-    if (!req.body.signature || !req.body.content) {
+    if (!req.body?.signature || !req.body?.content) {
       throw new Error("There is no content or signature in body.");
     }
     auth.contentVerified = verify(
