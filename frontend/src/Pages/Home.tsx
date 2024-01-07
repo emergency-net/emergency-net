@@ -6,7 +6,10 @@ import { Input } from "@/Components/ui/input";
 import { useAPData } from "@/Hooks/useAPData";
 import useKeys from "@/Hooks/useKeys";
 import useSyncStore from "@/Hooks/useSyncStore";
+import { giveSignatureToAp } from "@/Library/cert";
+import { APResponseVerifier } from "@/Library/interceptors";
 import { logout } from "@/Library/util";
+import { certify, requestToCertify } from "@/Services/certify";
 import { createChannel, destroyChannel } from "@/Services/channel";
 import { AlertTriangle, MessagesSquare, Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -33,6 +36,22 @@ function Home() {
       sync();
     },
   });
+
+  const { mutate: certifyAP } = useMutation(
+    async () => {
+      const { apContent } = await APResponseVerifier(await requestToCertify());
+      const signature = await giveSignatureToAp(apContent);
+
+      const response = await APResponseVerifier(await certify({ signature }));
+
+      return response;
+    },
+    {
+      onSuccess() {
+        location.reload();
+      },
+    }
+  );
   return (
     <div className="p-1 relative">
       <div className="flex flex-col m-5 items-stretch gap-4">

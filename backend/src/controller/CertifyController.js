@@ -1,8 +1,8 @@
 import crypto from "crypto";
 import fs from "fs";
 import dotenv from "dotenv";
-import { getPublicKey, reReadKeys } from "../scripts/readkeys.js";
-import { jsonToBase64 } from "../util/CryptoUtil.js";
+import { getPublicKey, reReadKeys } from "../scripts/readkeys.js.";
+import { jsonToBase64, jwkToKeyObject } from "../util/CryptoUtil.js";
 import { checkTod } from "../util/Util.js";
 dotenv.config();
 
@@ -17,7 +17,7 @@ class CertifyController {
         error: "Timeout error.",
       });
     }
-    const adminPubKey = req.body.adminPubKey;
+    const adminPubKey = await jwkToKeyObject(req.body.adminPubKey);
     if (req.auth.puCert) {
       fs.writeFileSync(
         process.env.ADMIN_PUBLIC_KEY_PATH,
