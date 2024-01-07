@@ -188,10 +188,10 @@ export async function findMissingChannels(receivedChannels) {
       try {
         const result = await AppDataSource.manager.findOneBy(Channel, {
           channelName: channel.channelName,
-          isActive: channel.isActive,
         });
-        console.log("result:", result);
         if (!result) {
+          missingChannels.push(channel);
+        } else if (result.tod < channel.tod) {
           missingChannels.push(channel);
         }
       } catch (error) {

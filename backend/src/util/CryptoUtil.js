@@ -1,6 +1,6 @@
 import crypto, { createHash } from "crypto";
 import {
-  adminPublicKey,
+  getAdminPublicKey,
   adminPrivateKey,
   getPrivateKey,
 } from "../scripts/readkeys.js";
@@ -93,7 +93,7 @@ export function hashBase64(base64String, algorithm = "sha256") {
 // TO-DO:: object equality check will be implemented
 export function verifyACAP(encodedData, adminSignature) {
   const stringifiedData = JSON.stringify(base64toJson(encodedData));
-  return verify(stringifiedData, adminSignature, adminPublicKey);
+  return verify(stringifiedData, adminSignature, getAdminPublicKey());
 }
 
 // PU-Certified AP
@@ -105,7 +105,7 @@ export function verifyPUAP(
 ) {
   const PUData = base64toJson(encodedPUData);
   const stringifiedPUData = JSON.stringify(PUData);
-  if (verify(stringifiedPUData, adminSignature, adminPublicKey)) {
+  if (verify(stringifiedPUData, adminSignature, getAdminPublicKey())) {
     const stringifiedAPData = JSON.stringify(base64toJson(encodedAPData));
     const PUkey = PUData.pubKey;
     return verify(stringifiedAPData, PUsignature, PUkey);

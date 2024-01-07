@@ -1,5 +1,5 @@
 import { apId } from "../../bin/www.js";
-import { adminPublicKey } from "../scripts/readkeys.js";
+import { getAdminPublicKey } from "../scripts/readkeys.js";
 import { getApCert } from "../scripts/readcert.js";
 
 class HelloController {
@@ -15,7 +15,7 @@ class HelloController {
           priority: -1,
           type: "MT_HELLO_ACK",
           cert: getApCert(),
-          adminPubKey: adminPublicKey.toString(),
+          adminPubKey: getAdminPublicKey().toString(),
         });
       } else {
         // Correctly send the response with an error status
@@ -37,7 +37,7 @@ class HelloController {
         priority: -1,
         type: "MT_HELLO_ACK",
         cert: getApCert(),
-        adminPubKey: adminPublicKey.toString(),
+        adminPubKey: getAdminPublicKey().toString(),
       });
     }
   }
