@@ -18,7 +18,7 @@ export async function requestToCertify() {
 
 export async function certify({ signature }: { signature: string }) {
   const content = {
-    signedApContent: await readAdminKey(),
+    signedApContent: signature,
   };
 
   const response = await axios.post(
