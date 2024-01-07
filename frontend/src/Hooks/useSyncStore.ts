@@ -17,7 +17,11 @@ function useSyncStore(onSuccess?: () => void) {
     async () => {
       let storeString = localStorage.getItem("store");
       if (!storeString) {
-        storeString = JSON.stringify({ messages: {}, channels: [] });
+        storeString = JSON.stringify({
+          messages: {},
+          channels: [],
+          blacklist: [],
+        });
         localStorage.setItem("store", storeString);
       }
 
