@@ -65,24 +65,26 @@ function Home() {
           onSubmit={console.log}
         /> */}
         {store &&
-          Object.keys(store.messages)?.map((channel) => (
-            <Card
-              onClick={() => navigate(`/channel/${channel}`)}
-              className="p-8 flex gap-8 transition-transform duration-100 active:scale-95 relative"
-              key={channel}
-            >
-              {channel}
-              {isPU && (
-                <AreYouSureDialog
-                  title="Kanalı silmek istediğinize emin misiniz?"
-                  onAccept={() => deleteChannel(channel)}
-                  className="absolute right-2 text-red-500"
-                >
-                  <Trash2 />
-                </AreYouSureDialog>
-              )}
-            </Card>
-          ))}
+          store.channels
+            .filter((c: any) => c.isActive)
+            ?.map((channel: any) => (
+              <Card
+                onClick={() => navigate(`/channel/${channel.channelName}`)}
+                className="p-8 flex gap-8 transition-transform duration-100 active:scale-95 relative"
+                key={channel.channelName}
+              >
+                {channel.channelName}
+                {isPU && (
+                  <AreYouSureDialog
+                    title="Kanalı silmek istediğinize emin misiniz?"
+                    onAccept={() => deleteChannel(channel.channelName)}
+                    className="absolute right-2 text-red-500"
+                  >
+                    <Trash2 />
+                  </AreYouSureDialog>
+                )}
+              </Card>
+            ))}
       </div>
       <span className="text-xs text-gray-400 fixed bottom-1 right-1">
         {APData?.id} - {APData?.type}

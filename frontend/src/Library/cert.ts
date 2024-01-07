@@ -67,3 +67,7 @@ export async function verifyApCert(cert: string): Promise<APData> {
     throw new Error("AP Certificate Weird");
   }
 }
+
+export async function giveApproval(cert: string) {
+  const splitCert = cert;
+}
