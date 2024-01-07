@@ -9,12 +9,6 @@ class ChannelController {
     let tod_received = req.body.tod;
     console.log("BADİİİ", req.body);
 
-    const channelInfo = {
-      channelName: req.body.channelName,
-      isActive: true,
-      tod: Date.now(),
-    };
-
     if (!checkTod(tod_received)) {
       res.status(408).json({
         id: apId,
@@ -60,6 +54,11 @@ class ChannelController {
                 : "Signature check is failed.",
             });
           } else {
+            const channelInfo = {
+              channelName: req.body.channelName,
+              isActive: true,
+              tod: tod_received,
+            };
             if (
               channelInfo.channelName === "" ||
               (await AppDataSource.manager.findOneBy(Channel, {
@@ -79,6 +78,7 @@ class ChannelController {
                 .save(Channel, {
                   channelName: channelInfo.channelName,
                   isActive: true,
+                  tod: tod_received,
                   channelCert: createMessageCert(channelInfo),
                 })
                 .then(() => console.log("Channel saved to the database"));
@@ -169,7 +169,10 @@ class ChannelController {
                 .update(
                   Channel,
                   { channelName: req.body.channelName },
-                  { isActive: false, channelCert: createMessageCert(channelInfo)},
+                  {
+                    isActive: false,
+                    channelCert: createMessageCert(channelInfo),
+                  }
                 )
                 .then(() => console.log("Channel deleted from the database"));
               res.status(200).json({

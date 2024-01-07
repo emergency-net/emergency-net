@@ -6,7 +6,7 @@ import { base64toJson, verify, verifyACAP, verifyPUAP } from "./CryptoUtil.js";
 export function verifyMessage(message) {
   const certificate = message.certificate;
   const signature = certificate.split(".")[0];
-  const apCert = certificate.split(".")[1];
+  const apCert = certificate.slice(1).join(".");
   const verificationResult = verifyAPSource(apCert);
   let apPubKey;
   let isSafe = true;
@@ -28,9 +28,10 @@ export function verifyMessage(message) {
 }
 
 export function verifyChannel(channel) {
-  const certificate = channel.certificate;
-  const signature = certificate.split(".")[0];
-  const apCert = certificate.split(".")[1];
+  const certificate = channel.channelCert;
+  const fragmentedCert = certificate.split(".");
+  const signature = fragmentedCert[0];
+  const apCert = fragmentedCert.slice(1).join(".");
   const verificationResult = verifyAPSource(apCert);
   let apPubKey;
   let isSafe = true;
@@ -42,7 +43,12 @@ export function verifyChannel(channel) {
         isChannelVerified: false,
       };
     }
-    const isVerified = verify(JSON.stringify(channel), signature, apPubKey);
+    const channelInfo = {
+      channelName: channel.channelName,
+      isActive: channel.isActive,
+      tod: channel.tod,
+    };
+    const isVerified = verify(JSON.stringify(channelInfo), signature, apPubKey);
     return {
       isChannelVerified: isVerified,
       isSafe: isSafe,
@@ -71,7 +77,6 @@ export function verifyAPSource(certificate) {
       };
     } else {
       isVerified = verifyACAP(encodedAPData, adminSignature);
-      //console.log(encodedAPData);
     }
   } else if (fragmentedCert.length === 4) {
     //PU certified AP
@@ -102,17 +107,17 @@ export function verifyAPSource(certificate) {
 }
 
 export async function getChannelsToSend() {
-   return await AppDataSource.getRepository(Channel).find();
+  return await AppDataSource.getRepository(Channel).find();
 }
 
 export async function getMessagesToSend(receivedMessages) {
   const channelMap = {};
- 
+
   const channels = await AppDataSource.getRepository(Channel).find({
     where: {
-       isActive: true,
+      isActive: true,
     },
-})
+  });
   await Promise.all(
     channels.map(async (channel) => {
       const channelName = channel.channelName;
@@ -178,19 +183,22 @@ export async function findMissingMessages(receivedMessages) {
 
 export async function findMissingChannels(receivedChannels) {
   const missingChannels = [];
-  await receivedChannels.forEach(async (channel) => {
-    try {
-      const result = await AppDataSource.manager.findOneBy(Channel, {
-        channelName: channel.channelName,
-        isActive: channel.isActive,
-      });
-      if (!result) {
-        missingChannels.push(channel);
+  await Promise.all(
+    receivedChannels.map(async (channel) => {
+      try {
+        const result = await AppDataSource.manager.findOneBy(Channel, {
+          channelName: channel.channelName,
+          isActive: channel.isActive,
+        });
+        console.log("result:", result);
+        if (!result) {
+          missingChannels.push(channel);
+        }
+      } catch (error) {
+        console.log("Error while finding channel");
+        throw error;
       }
-    } catch (error) {
-      console.log("Error while finding channel");
-      throw error;
-    }
-  });
+    })
+  );
   return missingChannels;
 }
