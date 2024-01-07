@@ -2,7 +2,7 @@ import crypto, { createHash } from "crypto";
 import {
   adminPublicKey,
   adminPrivateKey,
-  privateKey,
+  getPrivateKey,
 } from "../scripts/readkeys.js";
 
 export function jsonToBase64(object) {
@@ -39,7 +39,7 @@ export function sign(data) {
   const sign = crypto.createSign("RSA-SHA256");
   sign.update(data);
   const signAlgorithm = {
-    key: privateKey,
+    key: getPrivateKey(),
     saltLength: 0,
     padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
   };

@@ -1,6 +1,6 @@
 import { apId } from "../../bin/www.js";
 import { adminPublicKey } from "../scripts/readkeys.js";
-import { apCert } from "../scripts/readcert.js";
+import { getApCert } from "../scripts/readcert.js";
 
 class HelloController {
   async hello(req, res, next) {
@@ -14,7 +14,7 @@ class HelloController {
           tod: tod,
           priority: -1,
           type: "MT_HELLO_ACK",
-          cert: apCert,
+          cert: getApCert(),
           adminPubKey: adminPublicKey.toString(),
         });
       } else {
@@ -36,7 +36,7 @@ class HelloController {
         tod: tod,
         priority: -1,
         type: "MT_HELLO_ACK",
-        cert: apCert,
+        cert: getApCert(),
         adminPubKey: adminPublicKey.toString(),
       });
     }

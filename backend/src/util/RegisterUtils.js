@@ -1,6 +1,6 @@
 import { apId } from "../../bin/www.js";
 import { jsonToBase64, sign, signByAdmin } from "./CryptoUtil.js";
-import { apCert } from "../scripts/readcert.js";
+import { getApCert } from "../scripts/readcert.js";
 
 export function createToken(mtUsername, mtPubKey) {
   const tod = Date.now();
@@ -17,5 +17,5 @@ export function createToken(mtUsername, mtPubKey) {
   var encoded = jsonToBase64(registerContent);
   var signed = sign(registerContentStringified);
 
-  return `${encoded}.${signed}.${apCert}`;
+  return `${encoded}.${signed}.${getApCert()}`;
 }
