@@ -61,7 +61,7 @@ export function verifyAPReg(data, cert) {
   return { isApVerified: "VALID", apPubKey: decodedAPData.apPub };
 }
 
-export function verifyToken(token) {
+export function verifyToken(token, isApplicable) {
   //Token is in the form of payload.signature.certificate
   const fragmentedToken = token.split(".");
   if (fragmentedToken.length < 3) {
@@ -78,8 +78,24 @@ export function verifyToken(token) {
   const signature = fragmentedToken[1];
   //Certificate is the third part of the token
   const cert = fragmentedToken.slice(2).join(".");
-  const verificationResult = verifyAPReg(encodedData, cert);
+
   const decodedData = base64toJson(encodedData);
+  const decodedApData = base64toJson(cert.split(".")[0]);
+  console.log("decodedData " + JSON.stringify(decodedApData));
+  if (!isApplicable) {
+    const apPubKey = decodedApData.apPub;
+    let isTokenVerified = verify(
+      JSON.stringify(base64toJson(encodedData)),
+      signature,
+      apPubKey
+    );
+    return {
+      isApVerified: "NO_CERT",
+      isTokenVerified: isTokenVerified,
+      mtPubKey: decodedData.mtPubKey ? decodedData.mtPubKey : "",
+    };
+  }
+  const verificationResult = verifyAPReg(encodedData, cert);
   if (verificationResult.isApVerified === "VALID") {
     //console.log("verified APREG");
     let isTokenVerified = verify(

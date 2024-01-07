@@ -8,6 +8,7 @@ import { syncController } from "../controller/SyncController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { responseInterceptor } from "../middleware/responseInterceptor.js";
 import { channelController } from "../controller/ChannelController.js";
+import { certifyController } from "../controller/CertifyController.js";
 const indexRouter = express.Router();
 
 indexRouter.use(authMiddleware);
@@ -22,5 +23,8 @@ indexRouter.post("/sync", syncController.sync);
 
 indexRouter.post("/channel", channelController.createChannel);
 indexRouter.delete("/channel", channelController.destroyChannel);
+
+indexRouter.post("/request-to-certify", certifyController.requestToCertify);
+indexRouter.post("/certify", certifyController.certify);
 
 export default indexRouter;

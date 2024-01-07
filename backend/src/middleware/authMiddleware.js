@@ -14,8 +14,13 @@ export const authMiddleware = async (req, res, next) => {
     apVerified: "INVALID",
     puVerified: false,
     errorMessage: "",
+    puCert: "",
+    applicable: true,
   };
   try {
+    if (getAdminPublicKey() === null) {
+      auth.applicable = false;
+    }
     const token = req.header("authorization");
 
     if (!token) {
@@ -23,7 +28,7 @@ export const authMiddleware = async (req, res, next) => {
     }
     const tokenData = await getTokenData(token);
 
-    const tokenVerification = verifyToken(token);
+    const tokenVerification = verifyToken(token, auth.applicable);
     auth.tokenVerified = tokenVerification.isTokenVerified;
     auth.apVerified = tokenVerification.isApVerified;
     if (!auth.tokenVerified) {
@@ -43,6 +48,7 @@ export const authMiddleware = async (req, res, next) => {
     }
 
     if (req.body.pu_cert) {
+      req.auth.puCert = req.body.pu_cert;
       const fragmentedPUCert = req.body.pu_cert.split(".");
       if (fragmentedPUCert.length != 2) {
         throw new Error("PU certificate is not in the correct format.");

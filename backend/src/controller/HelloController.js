@@ -15,7 +15,7 @@ class HelloController {
           priority: -1,
           type: "MT_HELLO_ACK",
           cert: getApCert(),
-          adminPubKey: getAdminPublicKey().toString(),
+          adminPubKey: getAdminPublicKey()?.toString(),
         });
       } else {
         // Correctly send the response with an error status
@@ -37,7 +37,7 @@ class HelloController {
         priority: -1,
         type: "MT_HELLO_ACK",
         cert: getApCert(),
-        adminPubKey: getAdminPublicKey().toString(),
+        adminPubKey: getAdminPublicKey()?.toString(),
       });
     }
   }
