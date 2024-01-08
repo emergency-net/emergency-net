@@ -1,4 +1,5 @@
 import AreYouSureDialog from "@/Components/AreYouSureDialog";
+import { useTokenData } from "@/Components/HelloWrapper";
 import { Button } from "@/Components/ui/button";
 import { Card } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
@@ -20,6 +21,8 @@ function Home() {
   const [channelName, setChannelName] = useState("");
   const navigate = useNavigate();
   const APData = useAPData();
+  const tokenData = useTokenData();
+  const usernick = `${tokenData?.mtUsername}@${tokenData?.apReg}`;
 
   const { mutate: addChannel } = useMutation(createChannel, {
     onSuccess() {
@@ -52,17 +55,20 @@ function Home() {
   return (
     <div className="p-1 relative">
       <div className="flex flex-col m-5 items-stretch gap-4">
-        <AreYouSureDialog
-          title="Hesabı kapamak istediğinize emin misiniz? (Geri alınamaz)"
-          onAccept={logout}
-        >
-          <Button
-            className="
-        !bg-red-500 w-min text-xs "
+        <div className="w-full flex items-center justify-start gap-2">
+          <AreYouSureDialog
+            title="Hesabı kapamak istediğinize emin misiniz? (Geri alınamaz)"
+            onAccept={logout}
           >
-            Hesabı Kapa
-          </Button>
-        </AreYouSureDialog>
+            <Button
+              className="
+        !bg-red-500 w-min text-xs "
+            >
+              Hesabı Kapa
+            </Button>
+          </AreYouSureDialog>
+          <span className=" text-sm">{usernick}</span>
+        </div>
         {isPU && APData?.type === "non_certified" && (
           <div className="flex justify-stretch items-stretch h-10 ,">
             <Button className="h-full" onClick={() => certifyAP()}>
