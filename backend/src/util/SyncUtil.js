@@ -5,8 +5,9 @@ import { base64toJson, verify, verifyACAP, verifyPUAP } from "./CryptoUtil.js";
 
 export function verifyMessage(message) {
   const certificate = message.certificate;
-  const signature = certificate.split(".")[0];
-  const apCert = certificate.slice(1).join(".");
+  const fragmentedCert = certificate.split(".");
+  const signature = fragmentedCert[0];
+  const apCert = fragmentedCert.slice(1).join(".");
   const verificationResult = verifyAPSource(apCert);
   let apPubKey;
   let isSafe = true;
