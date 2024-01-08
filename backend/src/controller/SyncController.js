@@ -90,7 +90,10 @@ class SyncController {
             });
           });
         } else {
-          unverifiedMessages[message.channel] = message.hashKey;
+          if (unverifiedMessages[message.channel] === undefined) {
+            unverifiedMessages[message.channel] = [];
+          }
+          unverifiedMessages[message.channel].push(message.hashKey);
         }
       })
     );

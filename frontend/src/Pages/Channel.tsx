@@ -127,11 +127,12 @@ function Channel() {
         {store?.messages?.[channelName!] &&
           Object.values(store?.messages?.[channelName!])
             ?.sort((a, b) => a.tod - b.tod)
-            ?.map((msg: any) => (
+            ?.map((msg: any, index) => (
               <Message
                 msg={msg}
                 my={msg.usernick === usernick}
                 isSafe={msg.isSafe}
+                key={msg.content + msg.usernick + index}
               />
             ))}
         {loadingMsg && (
