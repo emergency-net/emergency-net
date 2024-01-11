@@ -1,5 +1,5 @@
 import { apId } from "../../bin/www.js";
-import { getAdminPublicKey } from "../scripts/readkeys.js";
+import { getAdminPrivateKey, getAdminPublicKey } from "../scripts/readkeys.js";
 import { getApCert } from "../scripts/readcert.js";
 
 class HelloController {
@@ -38,6 +38,7 @@ class HelloController {
         type: "MT_HELLO_ACK",
         cert: getApCert(),
         adminPubKey: getAdminPublicKey()?.toString(),
+        isAdmin: getAdminPrivateKey() != null,
       });
     }
   }

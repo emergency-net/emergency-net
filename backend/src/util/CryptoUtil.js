@@ -1,7 +1,7 @@
 import crypto, { createHash } from "crypto";
 import {
   getAdminPublicKey,
-  adminPrivateKey,
+  getAdminPrivateKey,
   getPrivateKey,
 } from "../scripts/readkeys.js";
 
@@ -65,7 +65,7 @@ export function signByAdmin(data) {
 
   sign.update(data);
   const signAlgorithm = {
-    key: adminPrivateKey,
+    key: getAdminPrivateKey(),
     saltLength: 0,
     padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
   };
