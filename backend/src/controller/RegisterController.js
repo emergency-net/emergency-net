@@ -3,8 +3,9 @@ import { User } from "../database/entity/User.js";
 import { AppDataSource } from "../database/newDbSetup.js";
 import { jwkToKeyObject } from "../util/CryptoUtil.js";
 import "../util/RegisterUtils.js";
-import { createToken } from "../util/RegisterUtils.js";
+import { createToken, generatePUCert } from "../util/RegisterUtils.js";
 import { getAdminPublicKey } from "../scripts/readkeys.js";
+import { useOneTimePassword } from "../util/PasswordUtil.js";
 
 class RegisterController {
   async register(req, res, next) {
@@ -39,14 +40,39 @@ class RegisterController {
       );
       const token = createToken(username, mtPubBuffer);
 
-      res.status(200).json({
-        id: apId,
-        tod: tod_reg,
-        priority: -1,
-        type: "MT_REG_ACK",
-        adminPubKey: getAdminPublicKey().toString(),
-        token: token,
-      });
+      let otp = req.body.password;
+      if (otp) {
+        if (useOneTimePassword(otp)) {
+          let puCert = generatePUCert(mtPubKey);
+          res.status(200).json({
+            id: apId,
+            tod: tod_reg,
+            priority: -1,
+            type: "MT_REG_ACK",
+            adminPubKey: getAdminPublicKey().toString(),
+            pu_cert: puCert,
+            token: token,
+          });
+        } else {
+          res.status(400).json({
+            id: apId,
+            tod: tod_reg,
+            priority: -1,
+            type: "MT_REG_RJT",
+            username: username,
+            error: "One time password is not verified.",
+          });
+        }
+      } else {
+        res.status(200).json({
+          id: apId,
+          tod: tod_reg,
+          priority: -1,
+          type: "MT_REG_ACK",
+          adminPubKey: getAdminPublicKey().toString(),
+          token: token,
+        });
+      }
     }
   }
 }

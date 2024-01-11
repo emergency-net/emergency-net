@@ -9,6 +9,7 @@ import { authMiddleware } from "../middleware/authMiddleware.js";
 import { responseInterceptor } from "../middleware/responseInterceptor.js";
 import { channelController } from "../controller/ChannelController.js";
 import { certifyController } from "../controller/CertifyController.js";
+import { passwordController } from "../controller/PasswordController.js";
 const indexRouter = express.Router();
 
 indexRouter.use(authMiddleware);
@@ -26,5 +27,7 @@ indexRouter.delete("/channel", channelController.destroyChannel);
 
 indexRouter.post("/request-to-certify", certifyController.requestToCertify);
 indexRouter.post("/certify", certifyController.certify);
+
+indexRouter.get("/get-password", passwordController.getPassword);
 
 export default indexRouter;
