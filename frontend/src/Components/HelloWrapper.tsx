@@ -36,7 +36,11 @@ function HelloWrapper() {
           const APData = await verifyApCert(res.data.content.cert);
           APDataReference.current = APData;
 
-          navigate("/register");
+          if (res.data.isAdmin) {
+            navigate("/PUregister");
+          } else {
+            navigate("/register");
+          }
         } else if (res.status === 200) {
           const APData = await verifyApCert(res.data.content.cert);
           APDataReference.current = APData;

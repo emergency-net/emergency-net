@@ -4,6 +4,7 @@ import HelloWrapper from "./Components/HelloWrapper";
 import Home from "./Pages/Home";
 import Channel from "./Pages/Channel";
 import SyncWrapper from "./Components/SyncWrapper";
+import PURegister from "./Pages/PURegister";
 
 export const routes: RouteObject[] = [
   {
@@ -17,6 +18,10 @@ export const routes: RouteObject[] = [
           {
             path: "register",
             element: <Register />,
+          },
+          {
+            path: "PUregister",
+            element: <PURegister />,
           },
           {
             path: "home",
