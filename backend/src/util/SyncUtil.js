@@ -16,7 +16,17 @@ export function verifyMessage(message) {
     if (verificationResult.reason === "No certificate") {
       isSafe = false;
     }
-    const isVerified = verify(JSON.stringify(message), signature, apPubKey);
+    const messageToCheck = {
+      content: message.content,
+      tod: message.tod,
+      usernick: message.usernick,
+      origin: message.origin,
+    };
+    const isVerified = verify(
+      JSON.stringify(messageToCheck),
+      signature,
+      apPubKey
+    );
     return {
       isMessageVerified: isVerified,
       isSafe: isSafe,
