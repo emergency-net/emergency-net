@@ -21,7 +21,7 @@ export function createToken(mtUsername, mtPubKey) {
 }
 
 export async function generatePUCert(puPubKey) {
-  const pubPem = await convertCryptoKeyToPem(puPubKey);
+  const pubPem = puPubKey.export({ format: "pem", type: "spki" });
 
   const puContent = {
     pubKey: pubPem,

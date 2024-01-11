@@ -31,7 +31,7 @@ function PURegister() {
       if (username.length < 3) {
         throw new Error("Kullanıcı ismi geçersiz.");
       }
-      return register({ key: MTpublic!, username: username });
+      return register({ key: MTpublic!, username: username, password });
     },
     {
       async onSuccess(data) {

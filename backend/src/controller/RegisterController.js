@@ -43,7 +43,7 @@ class RegisterController {
       let otp = req.body.password;
       if (otp) {
         if (useOneTimePassword(otp)) {
-          let puCert = generatePUCert(mtPubKey);
+          let puCert = await generatePUCert(mtPubKey);
           res.status(200).json({
             id: apId,
             tod: tod_reg,
