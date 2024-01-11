@@ -15,6 +15,8 @@ import { setCookie } from "typescript-cookie";
 import useErrorToast from "@/Hooks/useErrorToast";
 import { importPublicKeyPem } from "@/Library/crypt";
 import { APResponseVerifier } from "@/Library/interceptors";
+import { getPassword } from "@/Services/password";
+import { toast, useToast } from "@/Components/ui/use-toast";
 
 function PURegister() {
   const { MTpublic, setAdminKey } = useKeys();
@@ -22,6 +24,7 @@ function PURegister() {
   const [password, setPassword] = useState<string>("");
 
   const handleError = useErrorToast();
+  const toast = useToast();
   const queryClient = useQueryClient();
   const { mutate: sendPURegister } = useMutation(
     () => {
@@ -52,6 +55,12 @@ function PURegister() {
       onError: handleError,
     }
   );
+
+  const { mutate: requestPassword } = useMutation(getPassword, {
+    onSuccess() {
+      toast.toast({ description: "Şifre istendi!" });
+    },
+  });
   return (
     <div className="flex flex-col justify-center items-center h-full">
       <Card className="w-[90%]">
@@ -73,9 +82,18 @@ function PURegister() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Tek kullanımlık şifre..."
           />
-          <Button className="self-end mt-8" onClick={() => sendPURegister()}>
-            Gönder
-          </Button>
+          <div className="flex justify-end gap-4">
+            <Button
+              className="mt-8 "
+              onClick={() => requestPassword()}
+              variant={"outline"}
+            >
+              Şifre iste
+            </Button>
+            <Button className=" mt-8" onClick={() => sendPURegister()}>
+              Gönder
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
