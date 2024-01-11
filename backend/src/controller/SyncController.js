@@ -10,6 +10,7 @@ import {
   verifyChannel,
 } from "../util/SyncUtil.js";
 import { checkTod } from "../util/Util.js";
+import { getBlacklistAsArray } from "../util/DatabaseUtil.js";
 
 class SyncController {
   async sync(req, res, next) {
@@ -102,6 +103,8 @@ class SyncController {
 
     const messagesToSend = await getMessagesToSend(receivedMessages);
 
+    const blacklist = await getBlacklistAsArray();
+
     return res.status(200).json({
       tod: Date.now(),
       priority: -1,
@@ -110,6 +113,7 @@ class SyncController {
         missingMessages: messagesToSend,
         unverifiedMessages: unverifiedMessages,
         channels: channelsToSend,
+        blacklist: blacklist,
       },
     });
   }
