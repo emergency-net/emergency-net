@@ -35,8 +35,9 @@ function HelloWrapper() {
         if (res.status === 202) {
           const APData = await verifyApCert(res.data.content.cert);
           APDataReference.current = APData;
+          const content = await APResponseVerifier(res.data);
 
-          if (res.data.isAdmin) {
+          if (content.isAdmin) {
             navigate("/PUregister");
           } else {
             navigate("/register");
@@ -48,7 +49,8 @@ function HelloWrapper() {
           if (
             location.pathname === "/" ||
             location.pathname === "" ||
-            location.pathname === "/register"
+            location.pathname === "/register" ||
+            location.pathname === "/PUregister"
           ) {
             navigate("/home");
           }

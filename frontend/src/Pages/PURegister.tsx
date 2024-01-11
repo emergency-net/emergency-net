@@ -62,7 +62,7 @@ function PURegister() {
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="flex-col flex">
+        <CardContent className="flex-col flex gap-4">
           <Input
             value={username}
             onChange={(e) => setUsername(e.target.value)}
