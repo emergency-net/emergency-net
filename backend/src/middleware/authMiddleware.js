@@ -29,7 +29,7 @@ export const authMiddleware = async (req, res, next) => {
       throw new Error("Token does not exist");
     }
     const tokenData = await getTokenData(token);
-console.log("TOKEN DATA: ", tokenData);
+    console.log("TOKEN DATA: ", tokenData);
     const tokenVerification = verifyToken(token, auth.applicable);
     auth.tokenVerified = tokenVerification.isTokenVerified;
     auth.apVerified = tokenVerification.isApVerified;

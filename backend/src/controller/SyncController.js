@@ -81,6 +81,7 @@ class SyncController {
       missingMessages.map(async (message) => {
         const verificationResult = verifyMessage(message);
         if (verificationResult.isMessageVerified) {
+          message.isSafe = verificationResult.isSafe;
           await AppDataSource.manager.save(Message, message).catch((error) => {
             console.error("Error saving message:", error);
             res.status(500).json({
