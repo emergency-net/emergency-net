@@ -11,13 +11,13 @@ import {
 } from "../util/SyncUtil.js";
 import { checkTod } from "../util/Util.js";
 import { getBlacklistAsArray } from "../util/DatabaseUtil.js";
+import { addMissingBlacklistedPUs } from "../util/BlacklistUtil.js";
 
 class SyncController {
   async sync(req, res, next) {
     const receivedMessages = req.body.messages;
     const receivedChannels = req.body.channels;
     const tod_received = req.body.tod;
-    const mtPubKey = req.body.mtPubKey;
 
     if (!checkTod(tod_received)) {
       return res.status(408).json({
@@ -38,6 +38,8 @@ class SyncController {
           : "Signature check is failed.",
       });
     }
+
+    const blacklistedPUs = await addMissingBlacklistedPUs(req.body.blacklist);
 
     const flattenedReceivedMessages = Object.values(receivedMessages).flatMap(
       (messages) => Object.values(messages)
