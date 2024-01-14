@@ -8,6 +8,8 @@ import { APDataReference } from "@/Library/APData";
 import { APResponseVerifier } from "@/Library/interceptors";
 import { getTokenData } from "@/Library/token";
 import { hello } from "@/Services/hello";
+import { Button } from "./ui/button";
+import { logout } from "@/Library/util";
 
 // Create the context
 const TokenDataContext = createContext<any>(null);
@@ -62,8 +64,16 @@ function HelloWrapper() {
 
   if (loading) {
     return (
-      <div className="h-full w-full flex items-center justify-center">
-        Yükleniyor...
+      <div className="h-full w-full flex flex-col gap-4 relative items-center justify-center">
+        <span>Yükleniyor...</span>
+        <Button
+          className="opacity-50 text-xs absolute bottom-2 right-2"
+          variant={"outline"}
+          size={"sm"}
+          onClick={logout}
+        >
+          Hesabı Kapa
+        </Button>
       </div>
     );
   } else {
