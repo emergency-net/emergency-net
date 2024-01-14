@@ -1,0 +1,36 @@
+{
+  "name": "emergency-net",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node ./bin/www.js",
+    "genkeys": "node ./src/scripts/genkeys.js",
+    "genadmin": "node ./src/scripts/genadmin.js",
+    "gencert": "node ./src/scripts/gencert.js",
+    "gennocert": "node ./src/scripts/gennocert.js",
+    "genpu": "node ./src/scripts/genpu.js",
+    "copy-dist": "shx cp -r ../frontend/dist ./",
+    "dev": "nodemon ./bin/www.js"
+  },
+  "dependencies": {
+    "@types/node": "^20.10.2",
+    "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "5.0.0-beta.1",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "jsonwebtoken": "^9.0.2",
+    "jwk-to-pem": "^2.0.5",
+    "morgan": "~1.9.1",
+    "reflect-metadata": "^0.1.13",
+    "sqlite": "5.1.1",
+    "sqlite3": "~5.0.11",
+    "typeorm": "^0.3.17"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "shx": "^0.3.4"
+  }
+}
