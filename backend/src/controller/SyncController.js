@@ -52,8 +52,30 @@ class SyncController {
 
     await Promise.all(
       missingChannels.map(async (channel) => {
-        const verificationResult = verifyChannel(channel);
-        if (verificationResult.isChannelVerified) {
+        if (req.auth.applicable) {
+          const verificationResult = verifyChannel(channel);
+          if (verificationResult.isChannelVerified) {
+            if (channel.isActive) {
+              await AppDataSource.manager
+                .save(Channel, channel)
+                .catch((error) => {
+                  console.error("Error saving channel:", error);
+                  res.status(500).json({
+                    tod: Date.now(),
+                    priority: -1,
+                    type: "MT_SYNC_RJT",
+                    error: "Database error while saving channel.",
+                  });
+                });
+            } else {
+              await AppDataSource.manager.update(
+                Channel,
+                { channelName: channel.channelName },
+                channel
+              );
+            }
+          }
+        } else {
           if (channel.isActive) {
             await AppDataSource.manager
               .save(Channel, channel)
@@ -81,9 +103,28 @@ class SyncController {
 
     await Promise.all(
       missingMessages.map(async (message) => {
-        const verificationResult = verifyMessage(message);
-        if (verificationResult.isMessageVerified) {
-          message.isSafe = verificationResult.isSafe;
+        if (req.auth.applicable) {
+          const verificationResult = verifyMessage(message);
+          if (verificationResult.isMessageVerified) {
+            message.isSafe = verificationResult.isSafe;
+            await AppDataSource.manager
+              .save(Message, message)
+              .catch((error) => {
+                console.error("Error saving message:", error);
+                res.status(500).json({
+                  tod: Date.now(),
+                  priority: -1,
+                  type: "MT_SYNC_RJT",
+                  error: "Database error while saving message.",
+                });
+              });
+          } else {
+            if (unverifiedMessages[message.channel] === undefined) {
+              unverifiedMessages[message.channel] = [];
+            }
+            unverifiedMessages[message.channel].push(message.hashKey);
+          }
+        } else {
           await AppDataSource.manager.save(Message, message).catch((error) => {
             console.error("Error saving message:", error);
             res.status(500).json({
@@ -93,11 +134,6 @@ class SyncController {
               error: "Database error while saving message.",
             });
           });
-        } else {
-          if (unverifiedMessages[message.channel] === undefined) {
-            unverifiedMessages[message.channel] = [];
-          }
-          unverifiedMessages[message.channel].push(message.hashKey);
         }
       })
     );
