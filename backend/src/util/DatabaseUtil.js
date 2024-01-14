@@ -58,5 +58,5 @@ export async function getBlacklistAsArray() {
     select: ["puNickname"],
   });
 
-  return nicknames.map(entry => entry.puNickname);
+  return nicknames.map((entry) => entry.puNickname);
 }

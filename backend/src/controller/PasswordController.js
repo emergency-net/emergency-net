@@ -1,6 +1,5 @@
 import { apId } from "../../bin/www.js";
 import { generateOneTimePassword } from "../util/PasswordUtil.js";
-import { checkTod } from "../util/Util.js";
 
 class PasswordController {
   async getPassword(req, res) {

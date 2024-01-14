@@ -16,7 +16,7 @@ import useErrorToast from "@/Hooks/useErrorToast";
 import { importPublicKeyPem } from "@/Library/crypt";
 import { APResponseVerifier } from "@/Library/interceptors";
 import { getPassword } from "@/Services/password";
-import { toast, useToast } from "@/Components/ui/use-toast";
+import { useToast } from "@/Components/ui/use-toast";
 
 function PURegister() {
   const { MTpublic, setAdminKey } = useKeys();

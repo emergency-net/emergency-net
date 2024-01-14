@@ -47,4 +47,3 @@ export function getAdminPublicKey() {
 export function getAdminPrivateKey() {
   return adminPrivateKey;
 }
-
