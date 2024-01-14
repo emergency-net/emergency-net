@@ -39,16 +39,8 @@ export function base64ToJson(base64String: string): any {
 }
 
 export function logout() {
-  // Save 'store' item temporarily
-  const store = localStorage.getItem("store");
-
   // Clear all localStorage items
   localStorage.clear();
-
-  // Restore 'store' item
-  if (store !== null) {
-    localStorage.setItem("store", store);
-  }
 
   // Delete 'token' cookie
   document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
