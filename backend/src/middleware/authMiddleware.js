@@ -108,7 +108,9 @@ export const authMiddleware = async (req, res, next) => {
 
     req.auth = auth;
     console.log("AUTH: ", auth);
-
+    if (err.message == "PU is blacklisted.") {
+      throw new Error(err);
+    }
     next();
   }
 };
