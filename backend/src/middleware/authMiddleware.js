@@ -6,6 +6,8 @@ import {
 } from "../util/CryptoUtil.js";
 import { verifyToken } from "../util/HelloUtil.js";
 import { getAdminPublicKey } from "../scripts/readkeys.js";
+import { AppDataSource } from "../database/newDbSetup.js";
+import { BlacklistedPU } from "../database/entity/BlacklistedPU.js";
 
 export const authMiddleware = async (req, res, next) => {
   let auth = {
@@ -27,7 +29,7 @@ export const authMiddleware = async (req, res, next) => {
       throw new Error("Token does not exist");
     }
     const tokenData = await getTokenData(token);
-
+    console.log("TOKEN DATA: ", tokenData);
     const tokenVerification = verifyToken(token, auth.applicable);
     auth.tokenVerified = tokenVerification.isTokenVerified;
     auth.apVerified = tokenVerification.isApVerified;
@@ -48,6 +50,17 @@ export const authMiddleware = async (req, res, next) => {
     }
 
     if (req.body.pu_cert) {
+      if (tokenData.mtUsername && tokenData.apReg) {
+        let nickname = tokenData.mtUsername + "@" + tokenData.apReg;
+        if (
+          await AppDataSource.manager.findOneBy(BlacklistedPU, {
+            puNickname: nickname,
+          })
+        ) {
+          auth.puVerified = false;
+          throw new Error("PU is blacklisted.");
+        }
+      }
       auth.puCert = req.body.pu_cert;
       const fragmentedPUCert = req.body.pu_cert.split(".");
       if (fragmentedPUCert.length != 2) {
