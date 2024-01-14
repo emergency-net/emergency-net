@@ -27,6 +27,7 @@ export async function fillBlacklist() {
 
   for (let nickname of blacklist.split("\n")) {
     if (nickname) {
+      nickname = nickname.replace(/\r/g, '');
       if (
         await AppDataSource.manager.findOneBy(BlacklistedPU, {
           puNickname: nickname,
