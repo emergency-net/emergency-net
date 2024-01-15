@@ -97,11 +97,11 @@ class ChannelController {
 
   async destroyChannel(req, res) {
     let tod_received = req.body.tod;
-
+    let destroy_tod = Date.now();
     const channelInfo = {
       channelName: req.body.channelName,
       isActive: false,
-      tod: Date.now(),
+      tod: destroy_tod,
     };
 
     if (!checkTod(tod_received)) {
@@ -169,7 +169,9 @@ class ChannelController {
                   Channel,
                   { channelName: req.body.channelName },
                   {
+                    channelName: req.body.channelName,
                     isActive: false,
+                    tod: destroy_tod,
                     channelCert: createMessageCert(channelInfo),
                   }
                 )
