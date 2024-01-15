@@ -57,15 +57,7 @@ function Channel() {
   const tokenData = useTokenData();
   const usernick = `${tokenData?.mtUsername}@${tokenData?.apReg}`;
   const { store, sync } = useSyncStore(() => {
-    setTimeout(
-      () =>
-        messagesRef.current &&
-        messagesRef.current.scrollTo({
-          top: messagesRef.current.scrollHeight,
-          behavior: "smooth", // Optional: define the scrolling behavior (smooth or auto)
-        }),
-      500
-    );
+    setLoadingMsg(null);
   });
   const [loadingMsg, setLoadingMsg] = useState<any | null>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
@@ -80,11 +72,19 @@ function Channel() {
     {
       onSuccess() {
         sync();
-        setLoadingMsg(null);
       },
       onMutate({ messageStr }) {
         setInput("");
         setLoadingMsg({ content: messageStr, usernick });
+        setTimeout(
+          () =>
+            messagesRef.current &&
+            messagesRef.current.scrollTo({
+              top: messagesRef.current.scrollHeight,
+              behavior: "smooth", // Optional: define the scrolling behavior (smooth or auto)
+            }),
+          200
+        );
         setTimeout(
           () =>
             messagesRef.current &&

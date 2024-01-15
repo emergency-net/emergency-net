@@ -9,6 +9,8 @@ function useErrorToast() {
       return err;
     } else if (err?.response?.data?.content?.error) {
       return err?.response?.data?.content?.error;
+    } else if (err?.response?.data?.error?.message) {
+      return err?.response?.data?.error?.message;
     } else if (err?.message) {
       return err?.message;
     } else {

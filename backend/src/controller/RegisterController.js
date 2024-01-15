@@ -41,7 +41,7 @@ class RegisterController {
       const token = createToken(username, mtPubBuffer);
 
       let otp = req.body.password;
-      if (otp) {
+      if (otp !== undefined) {
         if (useOneTimePassword(otp)) {
           let puCert = await generatePUCert(mtPubKey);
           res.status(200).json({

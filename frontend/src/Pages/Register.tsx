@@ -15,12 +15,15 @@ import { setCookie } from "typescript-cookie";
 import useErrorToast from "@/Hooks/useErrorToast";
 import { importPublicKeyPem } from "@/Library/crypt";
 import { APResponseVerifier } from "@/Library/interceptors";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function Register() {
   const { MTpublic, setAdminKey } = useKeys();
   const [username, setUsername] = useState<string>("");
   const handleError = useErrorToast();
   const queryClient = useQueryClient();
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
   const { mutate: sendRegister } = useMutation(
     () => {
       if (username.length < 3) {
@@ -48,7 +51,16 @@ function Register() {
     }
   );
   return (
-    <div className="flex flex-col justify-center items-center h-full">
+    <div className="flex flex-col justify-center items-center h-full relative">
+      {params.get("canPu") && (
+        <Button
+          variant={"outline"}
+          onClick={() => navigate("/PUregister")}
+          className="bottom-2 left-2 absolute"
+        >
+          PU olarak kayıt ol
+        </Button>
+      )}
       <Card className="w-[90%]">
         <CardHeader>
           <CardTitle>Kayıt Ol</CardTitle>

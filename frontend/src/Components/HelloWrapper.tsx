@@ -40,7 +40,7 @@ function HelloWrapper() {
           const content = await APResponseVerifier(res.data);
 
           if (content.isAdmin) {
-            navigate("/PUregister");
+            navigate("/register?canPu=true");
           } else {
             navigate("/register");
           }

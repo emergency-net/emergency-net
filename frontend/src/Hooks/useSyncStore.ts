@@ -2,6 +2,7 @@ import { combineMessages, removeMessages } from "@/Library/sync";
 import { sync } from "@/Services/sync";
 import { useQuery, useQueryClient } from "react-query";
 import { getCookie } from "typescript-cookie";
+import useErrorToast from "./useErrorToast";
 
 interface Store {
   messages: Record<string, Record<string, any>>;
@@ -11,6 +12,7 @@ interface Store {
 function useSyncStore(onSuccess?: () => void) {
   const queryClient = useQueryClient();
   const tokenExists = !!getCookie("token");
+  const handleError = useErrorToast();
 
   const { data: syncStore, isLoading: isSyncLoading } = useQuery<Store>(
     ["store"],
@@ -31,7 +33,7 @@ function useSyncStore(onSuccess?: () => void) {
         localStore,
       });
 
-      const { missingMessages, unverifiedMessages, channels } =
+      const { missingMessages, unverifiedMessages, channels, blacklist } =
         response.content;
 
       const sterileMessages = removeMessages(
@@ -40,7 +42,7 @@ function useSyncStore(onSuccess?: () => void) {
       );
       const updatedMessages = combineMessages(sterileMessages, missingMessages);
 
-      const newStore = { channels, messages: updatedMessages };
+      const newStore = { channels, messages: updatedMessages, blacklist };
       localStorage.setItem("store", JSON.stringify(newStore));
 
       return newStore;
@@ -48,6 +50,11 @@ function useSyncStore(onSuccess?: () => void) {
     {
       enabled: tokenExists,
       onSuccess,
+      onError(e) {
+        console.log(e);
+        handleError(e as any);
+      },
+      retry: 2,
     }
   );
   function initSync() {
