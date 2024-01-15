@@ -49,12 +49,13 @@ class SyncController {
       flattenedReceivedMessages
     );
     const missingChannels = await findMissingChannels(receivedChannels);
-
+    console.log("missing channels: ", missingChannels);
     await Promise.all(
       missingChannels.map(async (channel) => {
         if (req.auth.applicable) {
           const verificationResult = verifyChannel(channel);
           if (verificationResult.isChannelVerified) {
+            console.log(channel.channelName, " Channel verified");
             if (channel.isActive) {
               await AppDataSource.manager
                 .save(Channel, channel)
@@ -68,6 +69,7 @@ class SyncController {
                   });
                 });
             } else {
+              console.log(JSON.stringify(channel), " Channel is not active");
               await AppDataSource.manager.update(
                 Channel,
                 { channelName: channel.channelName },
